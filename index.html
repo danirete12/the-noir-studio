@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Noir Studio</title>
+  <style>
+    /* ── Tokens ── */
+    :root {
+      --bg:        #050505;
+      --panel:     #0f0f0f;
+      --border:    #1a1a1a;
+      --text:      #e8e8e8;
+      --muted:     #555;
+      --gold:      #C5A059;
+      --font-serif: 'Georgia', serif;
+      --font-sans:  system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    header h1 {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      font-weight: normal;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    header span {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── Layout principal ── */
+    .workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 260px;
+    }
+
+    /* ── Canvas area ── */
+    .canvas-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+    }
+
+    /* Zona de drop cuando no hay imagen */
+    .drop-zone {
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 500px;
+      aspect-ratio: 4/5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.drag-over { border-color: var(--gold); }
+
+    .drop-zone p {
+      color: var(--muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .drop-zone .icon {
+      font-size: 1.5rem;
+      color: var(--muted);
+    }
+
+    /* Canvas con la imagen */
+    #canvas {
+      display: none;
+      max-width: 100%;
+      max-height: calc(100vh - 140px);
+      object-fit: contain;
+    }
+
+    /* ── Panel lateral ── */
+    .panel {
+      border-left: 1px solid var(--border);
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      overflow-y: auto;
+    }
+
+    .panel-section h2 {
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── Controles ── */
+    .control { margin-bottom: 14px; }
+
+    .control label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .control label span {
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--gold);
+      cursor: pointer;
+    }
+
+    /* ── Botones ── */
+    .btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover { opacity: 0.8; }
+
+    .btn-primary {
+      background: var(--gold);
+      color: #000;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      margin-top: 8px;
+    }
+
+    /* Input file oculto */
+    #file-input { display: none; }
+
+    /* ── Mobile ── */
+    @media (max-width: 680px) {
+      .workspace { grid-template-columns: 1fr; }
+      .panel { border-left: none; border-top: 1px solid var(--border); }
+      .canvas-area { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>The Noir Studio</h1>
+  <span>Editor de fotografía</span>
+</header>
+
+<div class="workspace">
+
+  <!-- Área de imagen -->
+  <div class="canvas-area">
+    <div class="drop-zone" id="drop-zone">
+      <div class="icon">&#9671;</div>
+      <p>Arrastra tu foto aquí<br>o haz clic para seleccionar<br><br>JPG · PNG · WEBP</p>
+    </div>
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <!-- Panel de controles -->
+  <div class="panel">
+
+    <div class="panel-section">
+      <h2>Exposición</h2>
+
+      <div class="control">
+        <label>Brillo <span id="val-brightness">0</span></label>
+        <input type="range" id="brightness" min="-100" max="100" value="0">
+      </div>
+
+      <div class="control">
+        <label>Contraste <span id="val-contrast">0</span></label>
+        <input type="range" id="contrast" min="-100" max="100" value="0">
+      </div>
+
+      <div class="control">
+        <label>Sombras <span id="val-shadows">0</span></label>
+        <input type="range" id="shadows" min="-100" max="100" value="0">
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <h2>Identidad visual</h2>
+
+      <div class="control">
+        <label>Marco blanco <span id="val-border">0</span></label>
+        <input type="range" id="border-size" min="0" max="120" value="0">
+      </div>
+
+      <div class="control">
+        <label>Grano de película <span id="val-grain">0</span></label>
+        <input type="range" id="grain" min="0" max="100" value="0">
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <h2>Exportar</h2>
+      <button class="btn btn-primary" id="btn-export">Exportar para Instagram</button>
+      <button class="btn btn-secondary" id="btn-reset">Resetear ajustes</button>
+    </div>
+
+  </div>
+</div>
+
+<input type="file" id="file-input" accept="image/*">
+
+<script>
+  // ── Referencias al DOM ──
+  const dropZone   = document.getElementById('drop-zone');
+  const canvas     = document.getElementById('canvas');
+  const ctx        = canvas.getContext('2d');
+  const fileInput  = document.getElementById('file-input');
+
+  // Sliders
+  const sliders = {
+    brightness: document.getElementById('brightness'),
+    contrast:   document.getElementById('contrast'),
+    shadows:    document.getElementById('shadows'),
+    borderSize: document.getElementById('border-size'),
+    grain:      document.getElementById('grain'),
+  };
+
+  // Valores mostrados junto a cada slider
+  const vals = {
+    brightness: document.getElementById('val-brightness'),
+    contrast:   document.getElementById('val-contrast'),
+    shadows:    document.getElementById('val-shadows'),
+    border:     document.getElementById('val-border'),
+    grain:      document.getElementById('val-grain'),
+  };
+
+  // La imagen original (sin tocar) — edición no destructiva
+  let originalImage = null;
+
+  // ── Carga de imagen ──
+
+  // Clic en la drop zone abre el selector de archivo
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  // Selección por input file
+  fileInput.addEventListener('change', e => {
+    if (e.target.files[0]) loadImage(e.target.files[0]);
+  });
+
+  // Drag & Drop
+  dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('drag-over');
+  });
+
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) loadImage(file);
+  });
+
+  function loadImage(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        originalImage = img;         // guardamos el original
+        dropZone.style.display = 'none';
+        canvas.style.display  = 'block';
+        applyFilters();              // primera renderización
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── Motor de filtros ──
+
+  function applyFilters() {
+    if (!originalImage) return;
+
+    const border = parseInt(sliders.borderSize.value);
+
+    // Tamaño del canvas = imagen + marco
+    canvas.width  = originalImage.width  + border * 2;
+    canvas.height = originalImage.height + border * 2;
+
+    // Fondo blanco para el marco
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Dibujamos la imagen original centrada
+    ctx.drawImage(originalImage, border, border);
+
+    // Leemos los píxeles que acaba de pintar
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data; // array de [R, G, B, A, R, G, B, A, ...]
+
+    const brightness = parseInt(sliders.brightness.value);
+    const contrast   = parseInt(sliders.contrast.value);
+    const shadows    = parseInt(sliders.shadows.value);
+    const grain      = parseInt(sliders.grain.value);
+
+    // Factor de contraste (fórmula estándar)
+    const contrastFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+
+    for (let i = 0; i < data.length; i += 4) {
+      let r = data[i];
+      let g = data[i + 1];
+      let b = data[i + 2];
+      // i + 3 es el canal alpha (transparencia) — no lo tocamos
+
+      // Luminancia: cuán oscuro/claro es este píxel (0=negro, 255=blanco)
+      const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+
+      // Sombras: recupera detalle en zonas oscuras (luminancia baja)
+      if (luminance < 128 && shadows !== 0) {
+        const shadowBoost = (shadows / 100) * (1 - luminance / 128) * 60;
+        r += shadowBoost;
+        g += shadowBoost;
+        b += shadowBoost;
+      }
+
+      // Brillo: suma o resta a todos los canales por igual
+      r += brightness;
+      g += brightness;
+      b += brightness;
+
+      // Contraste: aleja los valores del punto medio (128)
+      r = contrastFactor * (r - 128) + 128;
+      g = contrastFactor * (g - 128) + 128;
+      b = contrastFactor * (b - 128) + 128;
+
+      // Grano: ruido aleatorio por píxel
+      if (grain > 0) {
+        const noise = (Math.random() - 0.5) * grain * 0.8;
+        r += noise;
+        g += noise;
+        b += noise;
+      }
+
+      // Clamping: los valores deben estar entre 0 y 255
+      data[i]     = Math.min(255, Math.max(0, r));
+      data[i + 1] = Math.min(255, Math.max(0, g));
+      data[i + 2] = Math.min(255, Math.max(0, b));
+    }
+
+    // Devolvemos los píxeles modificados al canvas
+    ctx.putImageData(imageData, 0, 0);
+  }
+
+  // ── Sliders: actualizar valor y re-renderizar ──
+
+  Object.entries(sliders).forEach(([key, slider]) => {
+    slider.addEventListener('input', () => {
+      // Actualiza el número visible
+      const labelKey = key === 'borderSize' ? 'border' : key;
+      if (vals[labelKey]) vals[labelKey].textContent = slider.value;
+      applyFilters();
+    });
+  });
+
+  // ── Exportar ──
+
+  document.getElementById('btn-export').addEventListener('click', () => {
+    if (!originalImage) return;
+
+    // Canvas de exportación separado (no toca el visible)
+    const exportCanvas = document.createElement('canvas');
+    const exportCtx    = exportCanvas.getContext('2d');
+
+    // Instagram: 1080px de ancho, proporción 4:5
+    exportCanvas.width  = 1080;
+    exportCanvas.height = 1350;
+
+    // Copiamos el resultado actual escalado
+    exportCtx.drawImage(canvas, 0, 0, 1080, 1350);
+
+    // Descarga
+    const link    = document.createElement('a');
+    link.download = 'noir-studio-export.jpg';
+    link.href     = exportCanvas.toDataURL('image/jpeg', 0.92);
+    link.click();
+  });
+
+  // ── Reset ──
+
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    Object.values(sliders).forEach(s => { s.value = s.defaultValue; });
+    Object.values(vals).forEach(v => { v.textContent = '0'; });
+    applyFilters();
+  });
+
+  // ── URL params para SEO ──
+  // Ejemplo: ?tool=noir activa contraste alto
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('tool') === 'noir') {
+    sliders.contrast.value = '60';
+    vals.contrast.textContent = '60';
+  }
+  if (params.get('tool') === 'border') {
+    sliders.borderSize.value = '60';
+    vals.border.textContent = '60';
+  }
+</script>
+
+</body>
+</html>
