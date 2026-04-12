@@ -191,6 +191,25 @@
       margin-top: 8px;
     }
 
+    .btn-preset {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      margin-bottom: 6px;
+      text-align: left;
+      padding-left: 14px;
+      position: relative;
+    }
+
+    .btn-preset.active {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .btn-preset.active::before {
+      content: '— ';
+    }
+
     /* Input file oculto */
     #file-input { display: none; }
 
@@ -224,7 +243,17 @@
   <div class="panel">
 
     <div class="panel-section">
+      <h2>Presets</h2>
+      <button class="btn btn-preset" id="btn-bw">Blanco y Negro</button>
+    </div>
+
+    <div class="panel-section">
       <h2>Exposición</h2>
+
+      <div class="control">
+        <label>Saturación <span id="val-saturation">0</span></label>
+        <input type="range" id="saturation" min="-100" max="100" value="0">
+      </div>
 
       <div class="control">
         <label>Brillo <span id="val-brightness">0</span></label>
@@ -279,6 +308,7 @@
     brightness: document.getElementById('brightness'),
     contrast:   document.getElementById('contrast'),
     shadows:    document.getElementById('shadows'),
+    saturation: document.getElementById('saturation'),
     borderSize: document.getElementById('border-size'),
     grain:      document.getElementById('grain'),
   };
@@ -288,9 +318,23 @@
     brightness: document.getElementById('val-brightness'),
     contrast:   document.getElementById('val-contrast'),
     shadows:    document.getElementById('val-shadows'),
+    saturation: document.getElementById('val-saturation'),
     border:     document.getElementById('val-border'),
     grain:      document.getElementById('val-grain'),
   };
+
+  // Estado del preset B&W
+  let bwActive = false;
+
+  const btnBW = document.getElementById('btn-bw');
+  btnBW.addEventListener('click', () => {
+    bwActive = !bwActive;
+    btnBW.classList.toggle('active', bwActive);
+    // B&W lleva la saturación a -100 visualmente
+    sliders.saturation.value = bwActive ? '-100' : '0';
+    vals.saturation.textContent = sliders.saturation.value;
+    applyFilters();
+  });
 
   // La imagen original (sin tocar) — edición no destructiva
   let originalImage = null;
@@ -362,10 +406,14 @@
     const brightness = parseInt(sliders.brightness.value);
     const contrast   = parseInt(sliders.contrast.value);
     const shadows    = parseInt(sliders.shadows.value);
+    const saturation = parseInt(sliders.saturation.value);
     const grain      = parseInt(sliders.grain.value);
 
     // Factor de contraste (fórmula estándar)
     const contrastFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+
+    // Factor de saturación: -100 = B&W total, 0 = sin cambio, +100 = más vivo
+    const satFactor = (saturation + 100) / 100; // va de 0 a 2
 
     for (let i = 0; i < data.length; i += 4) {
       let r = data[i];
@@ -374,9 +422,16 @@
       // i + 3 es el canal alpha (transparencia) — no lo tocamos
 
       // Luminancia: cuán oscuro/claro es este píxel (0=negro, 255=blanco)
+      // Pesos distintos porque el ojo humano es más sensible al verde
       const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
 
-      // Sombras: recupera detalle en zonas oscuras (luminancia baja)
+      // Saturación: interpolamos entre la luminancia (gris) y el color original
+      // satFactor=0 → todo gris (B&W), satFactor=1 → color original, satFactor=2 → hipersaturado
+      r = luminance + (r - luminance) * satFactor;
+      g = luminance + (g - luminance) * satFactor;
+      b = luminance + (b - luminance) * satFactor;
+
+      // Sombras: recupera detalle en zonas oscuras
       if (luminance < 128 && shadows !== 0) {
         const shadowBoost = (shadows / 100) * (1 - luminance / 128) * 60;
         r += shadowBoost;
@@ -384,17 +439,17 @@
         b += shadowBoost;
       }
 
-      // Brillo: suma o resta a todos los canales por igual
+      // Brillo
       r += brightness;
       g += brightness;
       b += brightness;
 
-      // Contraste: aleja los valores del punto medio (128)
+      // Contraste
       r = contrastFactor * (r - 128) + 128;
       g = contrastFactor * (g - 128) + 128;
       b = contrastFactor * (b - 128) + 128;
 
-      // Grano: ruido aleatorio por píxel
+      // Grano
       if (grain > 0) {
         const noise = (Math.random() - 0.5) * grain * 0.8;
         r += noise;
@@ -451,6 +506,8 @@
   document.getElementById('btn-reset').addEventListener('click', () => {
     Object.values(sliders).forEach(s => { s.value = s.defaultValue; });
     Object.values(vals).forEach(v => { v.textContent = '0'; });
+    bwActive = false;
+    btnBW.classList.remove('active');
     applyFilters();
   });
 
@@ -458,8 +515,12 @@
   // Ejemplo: ?tool=noir activa contraste alto
   const params = new URLSearchParams(window.location.search);
   if (params.get('tool') === 'noir') {
-    sliders.contrast.value = '60';
-    vals.contrast.textContent = '60';
+    bwActive = true;
+    btnBW.classList.add('active');
+    sliders.saturation.value = '-100';
+    vals.saturation.textContent = '-100';
+    sliders.contrast.value = '30';
+    vals.contrast.textContent = '30';
   }
   if (params.get('tool') === 'border') {
     sliders.borderSize.value = '60';
