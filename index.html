@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Noir Studio — Editor de Fotografía</title>
+  <title>The Noir Studio — Professional Photo Editor</title>
+  <meta name="description" content="Edit your photos with cinematic presets inspired by cinema and painting. Free, no signup required. Export to Instagram 1080×1350.">
+  <meta property="og:title" content="The Noir Studio — Professional Photo Editor">
+  <meta property="og:description" content="Cinematic photo presets for photographers who care about craft. Free, no signup, no install.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Noir Studio — Professional Photo Editor">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
@@ -13,7 +19,7 @@
       --border:    #e0ddd8;
       --text:      #1a1a1a;
       --muted:     #aaa;
-      --gold:      #C8201A;
+      --accent:    #C8201A;
       --font-serif: 'Cormorant Garamond', Georgia, serif;
       --font-sans:  'Inter', system-ui, sans-serif;
     }
@@ -100,7 +106,7 @@
     }
 
     .drop-zone:hover,
-    .drop-zone.drag-over { border-color: var(--gold); }
+    .drop-zone.drag-over { border-color: var(--accent); }
 
     .drop-zone p {
       color: var(--muted);
@@ -122,6 +128,44 @@
       max-width: 100%;
       max-height: calc(100vh - 120px);
       box-shadow: 0 12px 48px rgba(0,0,0,0.18);
+    }
+
+    /* ── Botón cambiar foto ── */
+    #btn-change-photo {
+      display: none;
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.88);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--font-sans);
+      font-size: 0.5rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    #btn-change-photo:hover { color: var(--text); border-color: #aaa; }
+
+    /* ── Indicador Antes/Después ── */
+    #before-badge {
+      display: none;
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 0.45rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      pointer-events: none;
     }
 
     /* ── Panel ── */
@@ -225,9 +269,9 @@
     .btn-preset:hover .preset-icon { color: #555; }
     .btn-preset:hover .preset-label { color: #555; }
 
-    .btn-preset.active { border-color: var(--gold); }
-    .btn-preset.active .preset-icon { color: var(--gold); }
-    .btn-preset.active .preset-label { color: var(--gold); }
+    .btn-preset.active { border-color: var(--accent); }
+    .btn-preset.active .preset-icon { color: var(--accent); }
+    .btn-preset.active .preset-label { color: var(--accent); }
 
     /* ── Sliders ── */
     .control { margin-bottom: 13px; }
@@ -244,7 +288,7 @@
     }
 
     .control label span {
-      color: var(--gold);
+      color: var(--accent);
       font-variant-numeric: tabular-nums;
       font-weight: 400;
     }
@@ -263,7 +307,7 @@
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: var(--gold);
+      background: var(--accent);
       cursor: pointer;
       transition: transform 0.15s;
     }
@@ -285,7 +329,7 @@
     }
 
     .btn:hover { opacity: 0.75; }
-    .btn-primary { background: var(--gold); color: #000; }
+    .btn-primary { background: var(--accent); color: #000; }
     .btn-secondary {
       background: transparent;
       color: var(--muted);
@@ -344,12 +388,14 @@
 
 <div class="workspace">
 
-  <div class="canvas-area">
+  <div class="canvas-area" style="position:relative;">
     <div class="drop-zone" id="drop-zone">
       <div class="icon">◇ ◇ ◇</div>
       <p>Arrastra tu foto aquí<br>o haz clic para seleccionar<br>JPG · PNG · WEBP</p>
     </div>
     <canvas id="canvas"></canvas>
+    <div id="before-badge">Before</div>
+    <button id="btn-change-photo">↺ Change photo</button>
   </div>
 
   <div class="panel">
@@ -648,12 +694,25 @@ function loadImage(file) {
       originalImage = img;
       dropZone.style.display = 'none';
       canvas.style.display   = 'block';
+      document.getElementById('btn-change-photo').style.display = 'block';
       applyFilters();
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
+
+// ── Cambiar foto ──
+document.getElementById('btn-change-photo').addEventListener('click', () => {
+  originalImage = null;
+  activePreset  = null;
+  canvas.style.display = 'none';
+  document.getElementById('btn-change-photo').style.display = 'none';
+  document.getElementById('before-badge').style.display = 'none';
+  dropZone.style.display = '';
+  presetGrid.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+  resetSliders();
+});
 
 // ── Motor de píxeles (reutilizable para vista principal y thumbnails) ──
 function processPixels(data, p) {
@@ -833,11 +892,23 @@ function resetSliders() {
 document.getElementById('btn-reset').addEventListener('click', resetSliders);
 
 // ── Atajos de teclado ──
+// A: mantener pulsado = ver original (antes/después)
 // V: toggle marco blanco (on/off con 60px)
 // B: aplica ZULOAGA
 // S: exportar
 document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT') return; // no capturar mientras se edita un slider
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key.toLowerCase() === 'a' && originalImage && !e.repeat) {
+    const badge = document.getElementById('before-badge');
+    badge.style.display = 'block';
+    const border = parseInt(sliders.borderSize.value);
+    canvas.width  = originalImage.width  + border * 2;
+    canvas.height = originalImage.height + border * 2;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(originalImage, border, border);
+    return;
+  }
   switch (e.key.toLowerCase()) {
     case 'v': {
       const cur = parseInt(sliders.borderSize.value);
@@ -858,6 +929,13 @@ document.addEventListener('keydown', e => {
       document.getElementById('btn-export').click();
       break;
     }
+  }
+});
+
+document.addEventListener('keyup', e => {
+  if (e.key.toLowerCase() === 'a' && originalImage) {
+    document.getElementById('before-badge').style.display = 'none';
+    applyFilters();
   }
 });
 
