@@ -301,11 +301,36 @@
         overscroll-behavior-y: contain;
       }
 
+      /* Carrusel horizontal de presets en mobile */
+      .panel-section:has(.preset-grid) {
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      .panel-section:has(.preset-grid) h2 {
+        padding-left: 22px;
+      }
+
       .preset-grid {
-        grid-template-columns: repeat(5, 1fr);
-        /* pan-y: solo se reconocen gestos verticales en el grid de presets.
-           Un deslizamiento horizontal ya no mueve el fondo. */
-        touch-action: pan-y;
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        touch-action: pan-x;
+        scroll-snap-type: x mandatory;
+        gap: 4px;
+        padding: 0 22px 8px;
+        /* ocultar scrollbar pero mantener funcionalidad */
+        scrollbar-width: none;
+      }
+
+      .preset-grid::-webkit-scrollbar { display: none; }
+
+      .btn-preset {
+        flex: 0 0 64px; /* ancho fijo, no crece ni encoge */
+        scroll-snap-align: start;
       }
     }
   </style>
