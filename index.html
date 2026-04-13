@@ -1,2 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Noir Studio — Editor de Fotografía</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #ffffff;
+      --panel:     #f8f8f6;
+      --border:    #e0ddd8;
+      --text:      #1a1a1a;
+      --muted:     #aaa;
+      --gold:      #C8201A;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans:  'Inter', system-ui, sans-serif;
+    }
 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* html + body anclados al viewport: nada scrollea a nivel de página */
+    html {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      height: 100%;      /* ocupa exactamente el viewport, sin crecer */
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 32px;
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+    }
+
+    header h1 {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 300;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    header span {
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── Layout ── */
+    .workspace {
+      flex: 1;
+      height: 0;          /* con flex:1, height:0 fuerza que ocupe solo el espacio disponible */
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      grid-template-rows: 1fr;
+      overflow: hidden;
+    }
+
+    /* ── Área de imagen ── */
+    .canvas-area {
+      height: 100%;       /* rellena su celda del grid */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      background: radial-gradient(ellipse at center, #efefed 0%, #e8e6e2 70%);
+      overflow: hidden;
+    }
+
+    .drop-zone {
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 460px;
+      aspect-ratio: 4/5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.drag-over { border-color: var(--gold); }
+
+    .drop-zone p {
+      color: var(--muted);
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-align: center;
+      line-height: 2.2;
+    }
+
+    .drop-zone .icon {
+      font-size: 1rem;
+      color: var(--muted);
+      letter-spacing: 0.5em;
+    }
+
+    #canvas {
+      display: none;
+      max-width: 100%;
+      max-height: calc(100vh - 120px);
+      box-shadow: 0 12px 48px rgba(0,0,0,0.18);
+    }
+
+    /* ── Panel ── */
+    .panel {
+      height: 100%;       /* rellena su celda del grid */
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: scroll;
+      background: var(--panel);
+    }
+
+    /* Scrollbar del panel siempre visible y con estilo */
+    .panel::-webkit-scrollbar { width: 3px; }
+    .panel::-webkit-scrollbar-track { background: transparent; }
+    .panel::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+    .panel::-webkit-scrollbar-thumb:hover { background: #aaa; }
+
+    .panel-section {
+      padding: 24px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-section h2 {
+      font-size: 0.55rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── Barra de presets (top, ancho completo) ── */
+    .presets-bar {
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .presets-bar::-webkit-scrollbar { display: none; }
+
+    .presets-bar-label {
+      font-size: 0.5rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+      padding-right: 10px;
+      border-right: 1px solid var(--border);
+    }
+
+    .preset-grid {
+      display: flex;
+      flex-direction: row;
+      gap: 3px;
+    }
+
+    .btn-preset {
+      background: #ffffff;
+      border: 1px solid #e0ddd8;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.2s, color 0.2s;
+      padding: 8px 6px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      flex: 0 0 52px;
+    }
+
+    .btn-preset .preset-icon {
+      display: block;
+      width: 20px;
+      height: 20px;
+      color: #bbb;
+      transition: color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .btn-preset .preset-icon svg { width: 100%; height: 100%; }
+
+    .btn-preset .preset-label {
+      font-size: 0.38rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #aaa;
+      line-height: 1.4;
+      transition: color 0.2s;
+    }
+
+    .btn-preset:hover { border-color: #bbb; }
+    .btn-preset:hover .preset-icon { color: #555; }
+    .btn-preset:hover .preset-label { color: #555; }
+
+    .btn-preset.active { border-color: var(--gold); }
+    .btn-preset.active .preset-icon { color: var(--gold); }
+    .btn-preset.active .preset-label { color: var(--gold); }
+
+    /* ── Sliders ── */
+    .control { margin-bottom: 13px; }
+    .control:last-child { margin-bottom: 0; }
+
+    .control label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.58rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 9px;
+    }
+
+    .control label span {
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+      font-weight: 400;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 1px;
+      background: #d8d5d0;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+    /* ── Botones ── */
+    .btn {
+      width: 100%;
+      padding: 11px;
+      font-family: var(--font-sans);
+      font-size: 0.55rem;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover { opacity: 0.75; }
+    .btn-primary { background: var(--gold); color: #000; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      margin-top: 7px;
+    }
+
+    #file-input { display: none; }
+
+    /* ── Mobile ── */
+    @media (max-width: 700px) {
+
+      /* header ~57px + presets-bar ~58px */
+      .workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        height: calc(100vh - 115px);
+        overflow: hidden;
+      }
+
+      .presets-bar-label { display: none; }
+
+      /* La imagen queda fija arriba, el panel scrollea debajo */
+      .canvas-area {
+        padding: 16px 20px;
+        max-height: 40vh;
+        flex-shrink: 0;
+        touch-action: none;
+      }
+
+      #canvas { max-height: 36vh; }
+
+      .panel {
+        border-left: none;
+        border-top: 1px solid var(--border);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>The Noir Studio</h1>
+  <span>Photo Editor</span>
+</header>
+
+<div class="presets-bar">
+  <span class="presets-bar-label">Signature Presets</span>
+  <div class="preset-grid" id="preset-grid">
+    <!-- generado por JS -->
+  </div>
+</div>
+
+<div class="workspace">
+
+  <div class="canvas-area">
+    <div class="drop-zone" id="drop-zone">
+      <div class="icon">◇ ◇ ◇</div>
+      <p>Arrastra tu foto aquí<br>o haz clic para seleccionar<br>JPG · PNG · WEBP</p>
+    </div>
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <div class="panel">
+
+    <!-- Exposición -->
+    <div class="panel-section">
+      <h2>Exposición</h2>
+
+      <div class="control">
+        <label>Temperatura <span id="val-warmth">0</span></label>
+        <input type="range" id="warmth" min="-100" max="100" value="0">
+      </div>
+
+      <div class="control">
+        <label>Brillo <span id="val-brightness">0</span></label>
+        <input type="range" id="brightness" min="-100" max="100" value="0">
+      </div>
+
+      <div class="control">
+        <label>Contraste <span id="val-contrast">0</span></label>
+        <input type="range" id="contrast" min="-100" max="100" value="0">
+      </div>
+
+      <div class="control">
+        <label>Saturación <span id="val-saturation">0</span></label>
+        <input type="range" id="saturation" min="-100" max="100" value="0">
+      </div>
+
+      <div class="control">
+        <label>Sombras <span id="val-shadows">0</span></label>
+        <input type="range" id="shadows" min="-100" max="100" value="0">
+      </div>
+    </div>
+
+    <!-- Máscaras de luminancia -->
+    <div class="panel-section">
+      <h2>Máscaras de Luminancia</h2>
+
+      <div class="control">
+        <label>Tinte en sombras <span id="val-shadowTint">0</span></label>
+        <input type="range" id="shadowTint" min="-100" max="100" value="0">
+      </div>
+
+      <div class="control">
+        <label>Recuperar luces <span id="val-highlightRecovery">0</span></label>
+        <input type="range" id="highlightRecovery" min="0" max="100" value="0">
+      </div>
+    </div>
+
+    <!-- Identidad visual -->
+    <div class="panel-section">
+      <h2>Identidad Visual</h2>
+
+      <div class="control">
+        <label>Negros lavados <span id="val-liftBlacks">0</span></label>
+        <input type="range" id="liftBlacks" min="0" max="100" value="0">
+      </div>
+
+      <div class="control">
+        <label>Viñeta <span id="val-vignette">0</span></label>
+        <input type="range" id="vignette" min="0" max="100" value="0">
+      </div>
+
+      <div class="control">
+        <label>Marco blanco <span id="val-borderSize">0</span></label>
+        <input type="range" id="borderSize" min="0" max="120" value="0">
+      </div>
+
+      <div class="control">
+        <label>Grano <span id="val-grain">0</span></label>
+        <input type="range" id="grain" min="0" max="100" value="0">
+      </div>
+    </div>
+
+    <!-- Exportar -->
+    <div class="panel-section">
+      <h2>Exportar</h2>
+      <button class="btn btn-primary" id="btn-export">Exportar para Instagram</button>
+      <button class="btn btn-secondary" id="btn-reset">Resetear todo</button>
+    </div>
+
+  </div>
+</div>
+
+<input type="file" id="file-input" accept="image/*">
+
+<script>
+// ── Definición de los 15 presets ──
+// Cada preset es un objeto con los valores de todos los sliders
+// warmth: positivo=cálido/naranja, negativo=frío/azul
+// liftBlacks: sube el suelo de los negros (efecto matte/desvanecido)
+// vignette: oscurece las esquinas (0–100)
+
+const PRESETS = {
+  'golden-hour': {
+    label: '19:24\nGolden Hour',
+    warmth: 55, brightness: 8, contrast: 22, saturation: 18,
+    shadows: 28, liftBlacks: 0, vignette: 18, grain: 5, borderSize: 0,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'first-light': {
+    label: '06:45\nFirst Light',
+    warmth: -35, brightness: 6, contrast: 15, saturation: -12,
+    shadows: 22, liftBlacks: 10, vignette: 14, grain: 8, borderSize: 0,
+    shadowTint: -5, highlightRecovery: 8
+  },
+  'dead-of-night': {
+    label: '00:00\nDead of Night',
+    warmth: -12, brightness: -22, contrast: 75, saturation: -22,
+    shadows: -18, liftBlacks: 0, vignette: 62, grain: 12, borderSize: 0,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'quentin': {
+    label: 'QUENTIN',
+    warmth: 42, brightness: 5, contrast: 32, saturation: 48,
+    shadows: 10, liftBlacks: 0, vignette: 22, grain: 48, borderSize: 0,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'wes': {
+    label: 'WES',
+    warmth: 14, brightness: 10, contrast: -22, saturation: -35,
+    shadows: 32, liftBlacks: 38, vignette: 0, grain: 6, borderSize: 0,
+    shadowTint: 5, highlightRecovery: 18
+  },
+  'caravaggio': {
+    label: 'CARAVAGGIO',
+    warmth: -8, brightness: -5, contrast: 65, saturation: -15,
+    shadows: 55, liftBlacks: 0, vignette: 45, grain: 6, borderSize: 0,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'tobacco': {
+    label: 'TOBACCO',
+    warmth: 55, brightness: -6, contrast: 25, saturation: -45,
+    shadows: -12, liftBlacks: 5, vignette: 42, grain: 22, borderSize: 0,
+    shadowTint: -8, highlightRecovery: 0
+  },
+  'velvet': {
+    label: 'VELVET',
+    warmth: -6, brightness: -22, contrast: 42, saturation: 22,
+    shadows: -8, liftBlacks: 0, vignette: 78, grain: 10, borderSize: 0,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'old-money': {
+    label: 'OLD\nMONEY',
+    warmth: -16, brightness: 0, contrast: 22, saturation: -58,
+    shadows: 12, liftBlacks: 12, vignette: 22, grain: 5, borderSize: 0,
+    shadowTint: 18, highlightRecovery: 8
+  },
+  'matte': {
+    label: 'MATTE\n180g',
+    warmth: 5, brightness: 5, contrast: -25, saturation: -20,
+    shadows: 16, liftBlacks: 48, vignette: 5, grain: 3, borderSize: 0,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'zuloaga': {
+    label: 'ZULOAGA',
+    warmth: 0, brightness: 0, contrast: 55, saturation: -100,
+    shadows: 0, liftBlacks: 5, vignette: 25, grain: 35, borderSize: 0,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'japanese-grain': {
+    label: 'JAPANESE\nGRAIN',
+    warmth: 0, brightness: -5, contrast: -5, saturation: -100,
+    shadows: 22, liftBlacks: 8, vignette: 10, grain: 82, borderSize: 0,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'm-system': {
+    label: 'M-SYSTEM',
+    warmth: 5, brightness: 2, contrast: 18, saturation: 8,
+    shadows: 16, liftBlacks: 0, vignette: 12, grain: 2, borderSize: 0,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'f-chrome': {
+    label: 'F-CHROME',
+    warmth: -25, brightness: 5, contrast: 28, saturation: 32,
+    shadows: 10, liftBlacks: 0, vignette: 20, grain: 5, borderSize: 0,
+    shadowTint: -5, highlightRecovery: 0
+  },
+  'h-format': {
+    label: 'H-FORMAT',
+    warmth: 8, brightness: 8, contrast: -8, saturation: 12,
+    shadows: 32, liftBlacks: 5, vignette: 8, grain: 3, borderSize: 0,
+    shadowTint: 0, highlightRecovery: 22
+  },
+};
+
+// ── Iconos SVG de cada preset ──
+// Trazo minimalista sobre viewBox 24×24, stroke="currentColor"
+const PRESET_ICONS = {
+  'golden-hour': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7.1" y2="7.1"/><line x1="16.9" y1="16.9" x2="19.1" y2="19.1"/><line x1="19.1" y1="4.9" x2="16.9" y2="7.1"/><line x1="7.1" y1="16.9" x2="4.9" y2="19.1"/></svg>`,
+  'first-light':  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 17 Q12 5 21 17"/><line x1="3" y1="20" x2="21" y2="20"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="6" y1="7" x2="7.5" y2="8.5"/><line x1="18" y1="7" x2="16.5" y2="8.5"/></svg>`,
+  'dead-of-night':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 4 A8 8 0 1 0 14 20 A6 6 0 1 1 14 4Z"/></svg>`,
+  'quentin':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="20" height="16"/><line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/><rect x="3" y="7" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="3" y="11" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="3" y="15" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="18.5" y="7" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="18.5" y="11" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="18.5" y="15" width="2.5" height="2" fill="currentColor" stroke="none"/></svg>`,
+  'wes':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="20" height="20"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>`,
+  'caravaggio':   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3 C9 7 7 9 7 12 A5 5 0 0 0 17 12 C17 9 15 7 12 3Z"/><line x1="12" y1="17" x2="12" y2="20"/><line x1="9" y1="20" x2="15" y2="20"/></svg>`,
+  'tobacco':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 19 C9 15 15 15 15 11 C15 7 9 7 9 3"/><path d="M14 19 C14 16 18 15 18 12 C18 9 14 8 14 5"/><line x1="5" y1="19" x2="19" y2="19"/></svg>`,
+  'velvet':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L22 12 L12 22 L2 12 Z"/><path d="M12 7 L17 12 L12 17 L7 12 Z"/></svg>`,
+  'old-money':    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 L3 9 L8 14 L12 5 L16 14 L21 9 L21 18 Z"/><line x1="3" y1="21" x2="21" y2="21"/></svg>`,
+  'matte':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="8" width="17" height="13"/><rect x="6" y="5" width="17" height="13"/></svg>`,
+  'zuloaga':      `<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9" fill="none"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor" stroke="none"/><line x1="12" y1="3" x2="12" y2="21" stroke-linecap="round"/></svg>`,
+  'japanese-grain':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="7" x2="22" y2="7"/><line x1="4" y1="4" x2="20" y2="4"/><line x1="7" y1="7" x2="7" y2="22"/><line x1="17" y1="7" x2="17" y2="22"/><line x1="7" y1="13" x2="17" y2="13"/></svg>`,
+  'm-system':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>`,
+  'f-chrome':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 L21 20 L3 20 Z"/><line x1="7.5" y1="14" x2="16.5" y2="14"/><line x1="9.5" y1="10" x2="14.5" y2="10"/></svg>`,
+  'h-format':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="7" x2="2" y2="2"/><line x1="2" y1="2" x2="7" y2="2"/><line x1="22" y1="7" x2="22" y2="2"/><line x1="22" y1="2" x2="17" y2="2"/><line x1="2" y1="17" x2="2" y2="22"/><line x1="2" y1="22" x2="7" y2="22"/><line x1="22" y1="17" x2="22" y2="22"/><line x1="22" y1="22" x2="17" y2="22"/></svg>`,
+};
+
+// ── Referencias al DOM ──
+const dropZone  = document.getElementById('drop-zone');
+const canvas    = document.getElementById('canvas');
+const ctx       = canvas.getContext('2d');
+const fileInput = document.getElementById('file-input');
+
+// Mapa de todos los sliders
+const sliders = {
+  warmth:             document.getElementById('warmth'),
+  brightness:         document.getElementById('brightness'),
+  contrast:           document.getElementById('contrast'),
+  saturation:         document.getElementById('saturation'),
+  shadows:            document.getElementById('shadows'),
+  shadowTint:         document.getElementById('shadowTint'),
+  highlightRecovery:  document.getElementById('highlightRecovery'),
+  liftBlacks:         document.getElementById('liftBlacks'),
+  vignette:           document.getElementById('vignette'),
+  borderSize:         document.getElementById('borderSize'),
+  grain:              document.getElementById('grain'),
+};
+
+// Mapa de los valores mostrados
+const vals = {};
+Object.keys(sliders).forEach(k => {
+  vals[k] = document.getElementById('val-' + k);
+});
+
+let originalImage    = null;
+let activePreset     = null;
+
+// ── Construir grid de presets ──
+const presetGrid = document.getElementById('preset-grid');
+Object.entries(PRESETS).forEach(([key, preset]) => {
+  const btn = document.createElement('button');
+  btn.className = 'btn-preset';
+  btn.dataset.key = key;
+  btn.innerHTML = `
+    <span class="preset-icon">${PRESET_ICONS[key] || ''}</span>
+    <span class="preset-label">${preset.label.replace('\n', '<br>')}</span>
+  `;
+  btn.addEventListener('click', () => applyPreset(key, btn));
+  presetGrid.appendChild(btn);
+});
+
+function applyPreset(key, btn) {
+  // Toggle: si ya estaba activo, resetea
+  if (activePreset === key) {
+    resetSliders();
+    activePreset = null;
+    return;
+  }
+  activePreset = key;
+  // Desactiva todos los botones
+  presetGrid.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Aplica los valores del preset a los sliders
+  const p = PRESETS[key];
+  Object.keys(sliders).forEach(k => {
+    if (p[k] !== undefined) {
+      sliders[k].value = p[k];
+      if (vals[k]) vals[k].textContent = p[k];
+    }
+  });
+  applyFilters();
+}
+
+// ── Carga de imagen ──
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) loadImage(e.target.files[0]);
+});
+dropZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropZone.classList.add('drag-over');
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadImage(file);
+});
+
+function loadImage(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      originalImage = img;
+      dropZone.style.display = 'none';
+      canvas.style.display   = 'block';
+      applyFilters();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── Motor de píxeles (reutilizable para vista principal y thumbnails) ──
+function processPixels(data, p) {
+  const contrastFactor = (259 * (p.contrast + 255)) / (255 * (259 - p.contrast));
+  const satFactor      = (p.saturation + 100) / 100;
+  const w              = p.warmth / 100;
+  const lift           = p.liftBlacks * 0.65;
+
+  for (let i = 0; i < data.length; i += 4) {
+    let r = data[i], g = data[i+1], b = data[i+2];
+    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+    r = lum + (r - lum) * satFactor;
+    g = lum + (g - lum) * satFactor;
+    b = lum + (b - lum) * satFactor;
+
+    if (p.shadowTint !== 0 && lum < 140) {
+      const t = (p.shadowTint / 100) * (1 - lum / 140) * 20;
+      g += t; r -= t * 0.25; b -= t * 0.15;
+    }
+
+    r += w * 28; g += w * 8; b -= w * 22;
+
+    if (p.shadows !== 0 && lum < 128) {
+      const boost = (p.shadows / 100) * (1 - lum / 128) * 55;
+      r += boost; g += boost; b += boost;
+    }
+
+    r += p.brightness; g += p.brightness; b += p.brightness;
+
+    r = contrastFactor * (r - 128) + 128;
+    g = contrastFactor * (g - 128) + 128;
+    b = contrastFactor * (b - 128) + 128;
+
+    if (p.highlightRecovery > 0 && lum > 190) {
+      const pull = ((lum - 190) / 65) * (p.highlightRecovery / 100) * 40;
+      r -= pull; g -= pull; b -= pull;
+    }
+
+    if (lift > 0) {
+      r = (r / 255) * (255 - lift) + lift;
+      g = (g / 255) * (255 - lift) + lift;
+      b = (b / 255) * (255 - lift) + lift;
+    }
+
+    if (p.grain > 0) {
+      const noise = (Math.random() - 0.5) * p.grain * 0.85;
+      r += noise; g += noise; b += noise;
+    }
+
+    data[i]   = Math.min(255, Math.max(0, r));
+    data[i+1] = Math.min(255, Math.max(0, g));
+    data[i+2] = Math.min(255, Math.max(0, b));
+  }
+}
+
+function applyVignette(c, w, h, vignette) {
+  if (vignette <= 0) return;
+  const cx = w / 2, cy = h / 2;
+  const grad = c.createRadialGradient(cx, cy, h * 0.22, cx, cy, h * 0.82);
+  grad.addColorStop(0, 'rgba(0,0,0,0)');
+  grad.addColorStop(1, `rgba(0,0,0,${(vignette / 100) * 0.88})`);
+  c.fillStyle = grad;
+  c.fillRect(0, 0, w, h);
+}
+
+// ── Motor de filtros (vista principal) ──
+function applyFilters() {
+  if (!originalImage) return;
+
+  const border = parseInt(sliders.borderSize.value);
+  const p = {
+    brightness:        parseInt(sliders.brightness.value),
+    contrast:          parseInt(sliders.contrast.value),
+    saturation:        parseInt(sliders.saturation.value),
+    shadows:           parseInt(sliders.shadows.value),
+    warmth:            parseInt(sliders.warmth.value),
+    liftBlacks:        parseInt(sliders.liftBlacks.value),
+    vignette:          parseInt(sliders.vignette.value),
+    grain:             parseInt(sliders.grain.value),
+    shadowTint:        parseInt(sliders.shadowTint.value),
+    highlightRecovery: parseInt(sliders.highlightRecovery.value),
+  };
+
+  canvas.width  = originalImage.width  + border * 2;
+  canvas.height = originalImage.height + border * 2;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(originalImage, border, border);
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  processPixels(imageData.data, p);
+  ctx.putImageData(imageData, 0, 0);
+  applyVignette(ctx, canvas.width, canvas.height, p.vignette);
+}
+
+// ── Sliders: escuchar cambios ──
+Object.entries(sliders).forEach(([key, slider]) => {
+  slider.addEventListener('input', () => {
+    vals[key].textContent = slider.value;
+    // Si el usuario mueve un slider, desactiva el preset activo
+    activePreset = null;
+    presetGrid.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+    applyFilters();
+  });
+});
+
+// ── Exportar para Instagram ──
+document.getElementById('btn-export').addEventListener('click', () => {
+  if (!originalImage) return;
+
+  const btn = document.getElementById('btn-export');
+  btn.textContent = 'Procesando...';
+  btn.style.opacity = '0.6';
+
+  // Defer para que el botón repinte antes de bloquear el hilo con la convolución
+  setTimeout(() => {
+    const exp    = document.createElement('canvas');
+    const expCtx = exp.getContext('2d');
+    exp.width    = 1080;
+    exp.height   = 1350; // proporción 4:5
+    expCtx.drawImage(canvas, 0, 0, 1080, 1350);
+
+    // Output sharpening — se aplica solo al exportar, no en preview en tiempo real
+    const imgData = expCtx.getImageData(0, 0, 1080, 1350);
+    sharpenImageData(imgData, 0.45);
+    expCtx.putImageData(imgData, 0, 0);
+
+    const link    = document.createElement('a');
+    link.download = 'noir-studio.jpg';
+    link.href     = exp.toDataURL('image/jpeg', 0.93);
+    link.click();
+
+    btn.textContent = 'Exportar para Instagram';
+    btn.style.opacity = '';
+  }, 16);
+});
+
+// ── Algoritmo de sharpening (Laplacian unsharp mask) ──
+// Cómo funciona: para cada píxel, calcula su diferencia con los 4 vecinos.
+// Esa diferencia es el "detalle" o "borde". Sumamos `amount * detalle` al píxel.
+// amount=0.45 es conservador: evita halos pero compensa la pérdida de nitidez
+// al redimensionar a 1080px y al comprimir en JPEG.
+function sharpenImageData(imageData, amount) {
+  const w   = imageData.width;
+  const h   = imageData.height;
+  const src = new Uint8ClampedArray(imageData.data); // copia inmutable del original
+  const dst = imageData.data;
+
+  for (let y = 1; y < h - 1; y++) {
+    for (let x = 1; x < w - 1; x++) {
+      const i = (y * w + x) * 4;
+      for (let c = 0; c < 3; c++) {
+        const center = src[i + c];
+        const neighbors = src[((y - 1) * w + x) * 4 + c]
+                        + src[((y + 1) * w + x) * 4 + c]
+                        + src[(y * w + x - 1) * 4 + c]
+                        + src[(y * w + x + 1) * 4 + c];
+        // Laplacian = center*4 - sum_of_4_neighbors
+        dst[i + c] = Math.min(255, Math.max(0,
+          Math.round(center + amount * (4 * center - neighbors))
+        ));
+      }
+    }
+  }
+}
+
+// ── Reset ──
+function resetSliders() {
+  Object.values(sliders).forEach(s => { s.value = s.defaultValue; });
+  Object.keys(vals).forEach(k => { vals[k].textContent = sliders[k].defaultValue; });
+  presetGrid.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+  activePreset = null;
+  applyFilters();
+}
+
+document.getElementById('btn-reset').addEventListener('click', resetSliders);
+
+// ── Atajos de teclado ──
+// V: toggle marco blanco (on/off con 60px)
+// B: aplica ZULOAGA
+// S: exportar
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return; // no capturar mientras se edita un slider
+  switch (e.key.toLowerCase()) {
+    case 'v': {
+      const cur = parseInt(sliders.borderSize.value);
+      const next = cur > 0 ? 0 : 60;
+      sliders.borderSize.value = next;
+      vals.borderSize.textContent = next;
+      activePreset = null;
+      presetGrid.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+      applyFilters();
+      break;
+    }
+    case 'b': {
+      const zuloagaBtn = presetGrid.querySelector('[data-key="zuloaga"]');
+      if (zuloagaBtn) applyPreset('zuloaga', zuloagaBtn);
+      break;
+    }
+    case 's': {
+      document.getElementById('btn-export').click();
+      break;
+    }
+  }
+});
+
+// ── URL params para SEO ──
+// Así, /editor/?tool=golden-hour carga esa página con el preset activo
+const params = new URLSearchParams(window.location.search);
+const toolParam = params.get('tool');
+// ?tool=noir → activa Dead of Night
+const resolvedTool = toolParam === 'noir' ? 'dead-of-night' : toolParam;
+
+if (resolvedTool && PRESETS[resolvedTool]) {
+  const btn = presetGrid.querySelector(`[data-key="${resolvedTool}"]`);
+  if (btn) applyPreset(resolvedTool, btn);
+}
+if (toolParam === 'border') {
+  sliders.borderSize.value = '60';
+  vals.borderSize.textContent = '60';
+}
+</script>
+
+</body>
 </html>
