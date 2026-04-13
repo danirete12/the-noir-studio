@@ -67,22 +67,22 @@
     /* ── Layout ── */
     .workspace {
       flex: 1;
+      height: 0;          /* con flex:1, height:0 fuerza que ocupe solo el espacio disponible */
       display: grid;
       grid-template-columns: 1fr 280px;
-      grid-template-rows: 1fr; /* fila única con altura explícita = altura del workspace */
+      grid-template-rows: 1fr;
       overflow: hidden;
-      min-height: 0;
     }
 
     /* ── Área de imagen ── */
     .canvas-area {
+      height: 100%;       /* rellena su celda del grid */
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 48px;
       background: radial-gradient(ellipse at center, #0f0f0f 0%, #050505 70%);
-      overflow: hidden; /* el canvas no puede hacer crecer el contenedor */
-      min-height: 0;    /* evita el mismo problema en el eje del grid */
+      overflow: hidden;
     }
 
     .drop-zone {
@@ -126,12 +126,12 @@
 
     /* ── Panel ── */
     .panel {
+      height: 100%;       /* rellena su celda del grid */
       border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      overflow-y: scroll; /* scroll siempre visible, no solo al hover */
+      overflow-y: scroll;
       background: var(--panel);
-      min-height: 0;
     }
 
     /* Scrollbar del panel siempre visible y con estilo */
