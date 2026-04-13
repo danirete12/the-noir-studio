@@ -163,67 +163,44 @@
     .btn-preset {
       background: #111;
       border: 1px solid #2a2a2a;
-      color: #888;
       font-family: var(--font-sans);
       cursor: pointer;
       text-align: center;
-      transition: border-color 0.2s;
-      padding: 0;
-      position: relative;
-      overflow: hidden;
-      aspect-ratio: 4/5;
-      display: block;
+      transition: border-color 0.2s, color 0.2s;
+      padding: 11px 4px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
     }
 
-    /* Thumbnail: ocupa todo el botón */
-    .btn-preset .preset-thumb {
+    .btn-preset .preset-icon {
       display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 0.3s;
+      width: 20px;
+      height: 20px;
+      color: #484848;
+      transition: color 0.2s;
+      flex-shrink: 0;
     }
 
-    .btn-preset .preset-thumb.loaded { opacity: 1; }
+    .btn-preset .preset-icon svg { width: 100%; height: 100%; }
 
-    /* Etiqueta: overlay en la parte inferior */
     .btn-preset .preset-label {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 10px 3px 4px;
-      background: linear-gradient(transparent, rgba(0,0,0,0.88));
-      font-size: 0.4rem;
+      font-size: 0.38rem;
       font-weight: 400;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #aaa;
-      line-height: 1.35;
-    }
-
-    /* Sin imagen cargada: texto centrado con fondo sólido */
-    .btn-preset.no-thumb {
-      aspect-ratio: unset;
-      padding: 9px 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btn-preset.no-thumb .preset-thumb { display: none; }
-
-    .btn-preset.no-thumb .preset-label {
-      position: static;
-      background: none;
-      padding: 0;
-      font-size: 0.45rem;
-      color: #888;
+      color: #5a5a5a;
+      line-height: 1.4;
+      transition: color 0.2s;
     }
 
     .btn-preset:hover { border-color: #555; }
-    .btn-preset:hover .preset-label { color: #ccc; }
+    .btn-preset:hover .preset-icon { color: #aaa; }
+    .btn-preset:hover .preset-label { color: #bbb; }
 
     .btn-preset.active { border-color: var(--gold); }
+    .btn-preset.active .preset-icon { color: var(--gold); }
     .btn-preset.active .preset-label { color: var(--gold); }
 
     /* ── Sliders ── */
@@ -542,6 +519,26 @@ const PRESETS = {
   },
 };
 
+// ── Iconos SVG de cada preset ──
+// Trazo minimalista sobre viewBox 24×24, stroke="currentColor"
+const PRESET_ICONS = {
+  'golden-hour': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7.1" y2="7.1"/><line x1="16.9" y1="16.9" x2="19.1" y2="19.1"/><line x1="19.1" y1="4.9" x2="16.9" y2="7.1"/><line x1="7.1" y1="16.9" x2="4.9" y2="19.1"/></svg>`,
+  'first-light':  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 17 Q12 5 21 17"/><line x1="3" y1="20" x2="21" y2="20"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="6" y1="7" x2="7.5" y2="8.5"/><line x1="18" y1="7" x2="16.5" y2="8.5"/></svg>`,
+  'dead-of-night':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 4 A8 8 0 1 0 14 20 A6 6 0 1 1 14 4Z"/></svg>`,
+  'quentin':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="20" height="16"/><line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/><rect x="3" y="7" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="3" y="11" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="3" y="15" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="18.5" y="7" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="18.5" y="11" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="18.5" y="15" width="2.5" height="2" fill="currentColor" stroke="none"/></svg>`,
+  'wes':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="20" height="20"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>`,
+  'caravaggio':   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3 C9 7 7 9 7 12 A5 5 0 0 0 17 12 C17 9 15 7 12 3Z"/><line x1="12" y1="17" x2="12" y2="20"/><line x1="9" y1="20" x2="15" y2="20"/></svg>`,
+  'tobacco':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 19 C9 15 15 15 15 11 C15 7 9 7 9 3"/><path d="M14 19 C14 16 18 15 18 12 C18 9 14 8 14 5"/><line x1="5" y1="19" x2="19" y2="19"/></svg>`,
+  'velvet':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L22 12 L12 22 L2 12 Z"/><path d="M12 7 L17 12 L12 17 L7 12 Z"/></svg>`,
+  'old-money':    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 L3 9 L8 14 L12 5 L16 14 L21 9 L21 18 Z"/><line x1="3" y1="21" x2="21" y2="21"/></svg>`,
+  'matte':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="8" width="17" height="13"/><rect x="6" y="5" width="17" height="13"/></svg>`,
+  'zuloaga':      `<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9" fill="none"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor" stroke="none"/><line x1="12" y1="3" x2="12" y2="21" stroke-linecap="round"/></svg>`,
+  'japanese-grain':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="7" x2="22" y2="7"/><line x1="4" y1="4" x2="20" y2="4"/><line x1="7" y1="7" x2="7" y2="22"/><line x1="17" y1="7" x2="17" y2="22"/><line x1="7" y1="13" x2="17" y2="13"/></svg>`,
+  'm-system':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>`,
+  'f-chrome':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 L21 20 L3 20 Z"/><line x1="7.5" y1="14" x2="16.5" y2="14"/><line x1="9.5" y1="10" x2="14.5" y2="10"/></svg>`,
+  'h-format':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="7" x2="2" y2="2"/><line x1="2" y1="2" x2="7" y2="2"/><line x1="22" y1="7" x2="22" y2="2"/><line x1="22" y1="2" x2="17" y2="2"/><line x1="2" y1="17" x2="2" y2="22"/><line x1="2" y1="22" x2="7" y2="22"/><line x1="22" y1="17" x2="22" y2="22"/><line x1="22" y1="22" x2="17" y2="22"/></svg>`,
+};
+
 // ── Referencias al DOM ──
 const dropZone  = document.getElementById('drop-zone');
 const canvas    = document.getElementById('canvas');
@@ -576,10 +573,10 @@ let activePreset     = null;
 const presetGrid = document.getElementById('preset-grid');
 Object.entries(PRESETS).forEach(([key, preset]) => {
   const btn = document.createElement('button');
-  btn.className = 'btn-preset no-thumb';
+  btn.className = 'btn-preset';
   btn.dataset.key = key;
   btn.innerHTML = `
-    <img class="preset-thumb" alt="">
+    <span class="preset-icon">${PRESET_ICONS[key] || ''}</span>
     <span class="preset-label">${preset.label.replace('\n', '<br>')}</span>
   `;
   btn.addEventListener('click', () => applyPreset(key, btn));
@@ -635,7 +632,6 @@ function loadImage(file) {
       dropZone.style.display = 'none';
       canvas.style.display   = 'block';
       applyFilters();
-      generateThumbnails();
     };
     img.src = e.target.result;
   };
@@ -735,43 +731,6 @@ function applyFilters() {
   processPixels(imageData.data, p);
   ctx.putImageData(imageData, 0, 0);
   applyVignette(ctx, canvas.width, canvas.height, p.vignette);
-}
-
-// ── Thumbnails de presets ──
-// Se generan al cargar la imagen: cada botón muestra tu foto con ese preset aplicado.
-// Dimensiones pequeñas (70×88px) para que sea rápido — son 15 canvases tiny.
-function generateThumbnails() {
-  const TW = 70, TH = 88; // 4:5
-
-  Object.entries(PRESETS).forEach(([key, preset]) => {
-    const tc = document.createElement('canvas');
-    tc.width = TW; tc.height = TH;
-    const tCtx = tc.getContext('2d');
-
-    // Crop central de la imagen original al ratio 4:5
-    const iw = originalImage.width, ih = originalImage.height;
-    const targetRatio = TW / TH;
-    const srcRatio = iw / ih;
-    let sx, sy, sw, sh;
-    if (srcRatio > targetRatio) {
-      sh = ih; sw = ih * targetRatio; sx = (iw - sw) / 2; sy = 0;
-    } else {
-      sw = iw; sh = iw / targetRatio; sx = 0; sy = (ih - sh) / 2;
-    }
-    tCtx.drawImage(originalImage, sx, sy, sw, sh, 0, 0, TW, TH);
-
-    const imgData = tCtx.getImageData(0, 0, TW, TH);
-    processPixels(imgData.data, preset);
-    tCtx.putImageData(imgData, 0, 0);
-    applyVignette(tCtx, TW, TH, preset.vignette);
-
-    const btn = presetGrid.querySelector(`[data-key="${key}"]`);
-    if (!btn) return;
-    const img = btn.querySelector('.preset-thumb');
-    img.src = tc.toDataURL('image/jpeg', 0.75);
-    img.onload = () => img.classList.add('loaded');
-    btn.classList.remove('no-thumb');
-  });
 }
 
 // ── Sliders: escuchar cambios ──
