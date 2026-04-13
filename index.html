@@ -69,8 +69,9 @@
       flex: 1;
       display: grid;
       grid-template-columns: 1fr 280px;
+      grid-template-rows: 1fr; /* fila única con altura explícita = altura del workspace */
       overflow: hidden;
-      min-height: 0; /* evita que el grid se expanda más allá del espacio flex */
+      min-height: 0;
     }
 
     /* ── Área de imagen ── */
@@ -128,10 +129,16 @@
       border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
+      overflow-y: scroll; /* scroll siempre visible, no solo al hover */
       background: var(--panel);
-      min-height: 0; /* sin esto el grid child no se encoge y el scroll no aparece */
+      min-height: 0;
     }
+
+    /* Scrollbar del panel siempre visible y con estilo */
+    .panel::-webkit-scrollbar { width: 3px; }
+    .panel::-webkit-scrollbar-track { background: transparent; }
+    .panel::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+    .panel::-webkit-scrollbar-thumb:hover { background: #444; }
 
     .panel-section {
       padding: 24px 22px;
