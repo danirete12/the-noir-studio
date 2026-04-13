@@ -157,7 +157,7 @@
     .preset-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 5px;
+      gap: 4px;
     }
 
     .btn-preset {
@@ -165,24 +165,66 @@
       border: 1px solid #2a2a2a;
       color: #888;
       font-family: var(--font-sans);
-      font-size: 0.48rem;
-      font-weight: 400;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      padding: 9px 4px;
       cursor: pointer;
       text-align: center;
-      line-height: 1.5;
-      transition: all 0.2s;
+      transition: border-color 0.2s;
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 4/5;
+      display: block;
     }
 
-    .btn-preset:hover { border-color: #555; color: #ccc; background: #181818; }
-
-    .btn-preset.active {
-      border-color: var(--gold);
-      color: var(--gold);
-      background: rgba(197,160,89,0.05);
+    /* Thumbnail: ocupa todo el botón */
+    .btn-preset .preset-thumb {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.3s;
     }
+
+    .btn-preset .preset-thumb.loaded { opacity: 1; }
+
+    /* Etiqueta: overlay en la parte inferior */
+    .btn-preset .preset-label {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 10px 3px 4px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.88));
+      font-size: 0.4rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #aaa;
+      line-height: 1.35;
+    }
+
+    /* Sin imagen cargada: texto centrado con fondo sólido */
+    .btn-preset.no-thumb {
+      aspect-ratio: unset;
+      padding: 9px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-preset.no-thumb .preset-thumb { display: none; }
+
+    .btn-preset.no-thumb .preset-label {
+      position: static;
+      background: none;
+      padding: 0;
+      font-size: 0.45rem;
+      color: #888;
+    }
+
+    .btn-preset:hover { border-color: #555; }
+    .btn-preset:hover .preset-label { color: #ccc; }
+
+    .btn-preset.active { border-color: var(--gold); }
+    .btn-preset.active .preset-label { color: var(--gold); }
 
     /* ── Sliders ── */
     .control { margin-bottom: 13px; }
@@ -534,9 +576,12 @@ let activePreset     = null;
 const presetGrid = document.getElementById('preset-grid');
 Object.entries(PRESETS).forEach(([key, preset]) => {
   const btn = document.createElement('button');
-  btn.className = 'btn-preset';
+  btn.className = 'btn-preset no-thumb';
   btn.dataset.key = key;
-  btn.innerHTML = preset.label.replace('\n', '<br>');
+  btn.innerHTML = `
+    <img class="preset-thumb" alt="">
+    <span class="preset-label">${preset.label.replace('\n', '<br>')}</span>
+  `;
   btn.addEventListener('click', () => applyPreset(key, btn));
   presetGrid.appendChild(btn);
 });
@@ -590,142 +635,143 @@ function loadImage(file) {
       dropZone.style.display = 'none';
       canvas.style.display   = 'block';
       applyFilters();
+      generateThumbnails();
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-// ── Motor de filtros ──
-function applyFilters() {
-  if (!originalImage) return;
-
-  const border             = parseInt(sliders.borderSize.value);
-  const brightness         = parseInt(sliders.brightness.value);
-  const contrast           = parseInt(sliders.contrast.value);
-  const saturation         = parseInt(sliders.saturation.value);
-  const shadows            = parseInt(sliders.shadows.value);
-  const warmth             = parseInt(sliders.warmth.value);
-  const liftBlacks         = parseInt(sliders.liftBlacks.value);
-  const vignette           = parseInt(sliders.vignette.value);
-  const grain              = parseInt(sliders.grain.value);
-  const shadowTint         = parseInt(sliders.shadowTint.value);
-  const highlightRecovery  = parseInt(sliders.highlightRecovery.value);
-
-  // Dimensiones finales con marco
-  canvas.width  = originalImage.width  + border * 2;
-  canvas.height = originalImage.height + border * 2;
-
-  // Marco blanco
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Imagen original en el centro
-  ctx.drawImage(originalImage, border, border);
-
-  // Leer píxeles
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const data = imageData.data;
-
-  // Precalcular factores (fuera del bucle = más rápido)
-  // Fórmula estándar de contraste que escala bien entre -100 y +100
-  const contrastFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
-  // Saturación: 0 = gris, 1 = original, 2 = hipersaturado
-  const satFactor = (saturation + 100) / 100;
-  // Temperatura: positivo = cálido (naranja), negativo = frío (azul)
-  const w = warmth / 100;
-  // Lifted blacks: sube el suelo de 0 a este valor (efecto matte)
-  const lift = liftBlacks * 0.65;
+// ── Motor de píxeles (reutilizable para vista principal y thumbnails) ──
+function processPixels(data, p) {
+  const contrastFactor = (259 * (p.contrast + 255)) / (255 * (259 - p.contrast));
+  const satFactor      = (p.saturation + 100) / 100;
+  const w              = p.warmth / 100;
+  const lift           = p.liftBlacks * 0.65;
 
   for (let i = 0; i < data.length; i += 4) {
-    let r = data[i];
-    let g = data[i + 1];
-    let b = data[i + 2];
-    // data[i + 3] = alpha, no se toca
-
-    // 1. LUMINANCIA — base de saturación y sombras
-    // Los pesos (0.299, 0.587, 0.114) reflejan cómo el ojo percibe cada color:
-    // somos más sensibles al verde que al azul
+    let r = data[i], g = data[i+1], b = data[i+2];
     const lum = 0.299 * r + 0.587 * g + 0.114 * b;
 
-    // 2. SATURACIÓN — interpolación entre gris (lum) y color original
     r = lum + (r - lum) * satFactor;
     g = lum + (g - lum) * satFactor;
     b = lum + (b - lum) * satFactor;
 
-    // 2b. SHADOW TINT — empuja un tinte de color solo en zonas oscuras
-    // Positivo = verde (estética 90s), negativo = magenta/cálido
-    // La fuerza disminuye a medida que lum sube hacia 140 (punto de corte)
-    if (shadowTint !== 0 && lum < 140) {
-      const tintStr = (shadowTint / 100) * (1 - lum / 140) * 20;
-      g += tintStr;
-      r -= tintStr * 0.25;
-      b -= tintStr * 0.15;
+    if (p.shadowTint !== 0 && lum < 140) {
+      const t = (p.shadowTint / 100) * (1 - lum / 140) * 20;
+      g += t; r -= t * 0.25; b -= t * 0.15;
     }
 
-    // 3. TEMPERATURA — desplazamiento de color cálido/frío
-    r += w * 28;
-    g += w * 8;
-    b -= w * 22;
+    r += w * 28; g += w * 8; b -= w * 22;
 
-    // 4. SOMBRAS — recupera detalle en zonas oscuras
-    if (shadows !== 0 && lum < 128) {
-      const boost = (shadows / 100) * (1 - lum / 128) * 55;
+    if (p.shadows !== 0 && lum < 128) {
+      const boost = (p.shadows / 100) * (1 - lum / 128) * 55;
       r += boost; g += boost; b += boost;
     }
 
-    // 5. BRILLO
-    r += brightness; g += brightness; b += brightness;
+    r += p.brightness; g += p.brightness; b += p.brightness;
 
-    // 6. CONTRASTE — aleja los valores del punto medio (128)
     r = contrastFactor * (r - 128) + 128;
     g = contrastFactor * (g - 128) + 128;
     b = contrastFactor * (b - 128) + 128;
 
-    // 6b. HIGHLIGHT RECOVERY — comprime las luces altas para evitar quemado
-    // Solo actúa sobre píxeles con lum > 190 (el top ~25% del rango tonal)
-    if (highlightRecovery > 0 && lum > 190) {
-      const overExp = (lum - 190) / 65; // 0→1 a medida que lum va de 190 a 255
-      const pull = overExp * (highlightRecovery / 100) * 40;
+    if (p.highlightRecovery > 0 && lum > 190) {
+      const pull = ((lum - 190) / 65) * (p.highlightRecovery / 100) * 40;
       r -= pull; g -= pull; b -= pull;
     }
 
-    // 7. LIFTED BLACKS (matte) — comprime el rango de [0,255] a [lift,255]
-    // Resultado: los negros nunca llegan a 0, quedando "lavados"
     if (lift > 0) {
       r = (r / 255) * (255 - lift) + lift;
       g = (g / 255) * (255 - lift) + lift;
       b = (b / 255) * (255 - lift) + lift;
     }
 
-    // 8. GRANO — ruido aleatorio por píxel
-    if (grain > 0) {
-      const noise = (Math.random() - 0.5) * grain * 0.85;
+    if (p.grain > 0) {
+      const noise = (Math.random() - 0.5) * p.grain * 0.85;
       r += noise; g += noise; b += noise;
     }
 
-    // 9. CLAMPING — los valores RGB deben estar entre 0 y 255
-    data[i]     = Math.min(255, Math.max(0, r));
-    data[i + 1] = Math.min(255, Math.max(0, g));
-    data[i + 2] = Math.min(255, Math.max(0, b));
+    data[i]   = Math.min(255, Math.max(0, r));
+    data[i+1] = Math.min(255, Math.max(0, g));
+    data[i+2] = Math.min(255, Math.max(0, b));
   }
+}
 
+function applyVignette(c, w, h, vignette) {
+  if (vignette <= 0) return;
+  const cx = w / 2, cy = h / 2;
+  const grad = c.createRadialGradient(cx, cy, h * 0.22, cx, cy, h * 0.82);
+  grad.addColorStop(0, 'rgba(0,0,0,0)');
+  grad.addColorStop(1, `rgba(0,0,0,${(vignette / 100) * 0.88})`);
+  c.fillStyle = grad;
+  c.fillRect(0, 0, w, h);
+}
+
+// ── Motor de filtros (vista principal) ──
+function applyFilters() {
+  if (!originalImage) return;
+
+  const border = parseInt(sliders.borderSize.value);
+  const p = {
+    brightness:        parseInt(sliders.brightness.value),
+    contrast:          parseInt(sliders.contrast.value),
+    saturation:        parseInt(sliders.saturation.value),
+    shadows:           parseInt(sliders.shadows.value),
+    warmth:            parseInt(sliders.warmth.value),
+    liftBlacks:        parseInt(sliders.liftBlacks.value),
+    vignette:          parseInt(sliders.vignette.value),
+    grain:             parseInt(sliders.grain.value),
+    shadowTint:        parseInt(sliders.shadowTint.value),
+    highlightRecovery: parseInt(sliders.highlightRecovery.value),
+  };
+
+  canvas.width  = originalImage.width  + border * 2;
+  canvas.height = originalImage.height + border * 2;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(originalImage, border, border);
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  processPixels(imageData.data, p);
   ctx.putImageData(imageData, 0, 0);
+  applyVignette(ctx, canvas.width, canvas.height, p.vignette);
+}
 
-  // 10. VIÑETA — se aplica como capa de gradiente encima (mucho más eficiente
-  // que calcular la distancia al centro píxel a píxel)
-  if (vignette > 0) {
-    const cx = canvas.width / 2;
-    const cy = canvas.height / 2;
-    const gradient = ctx.createRadialGradient(
-      cx, cy, canvas.height * 0.22,
-      cx, cy, canvas.height * 0.82
-    );
-    gradient.addColorStop(0, 'rgba(0,0,0,0)');
-    gradient.addColorStop(1, `rgba(0,0,0,${(vignette / 100) * 0.88})`);
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }
+// ── Thumbnails de presets ──
+// Se generan al cargar la imagen: cada botón muestra tu foto con ese preset aplicado.
+// Dimensiones pequeñas (70×88px) para que sea rápido — son 15 canvases tiny.
+function generateThumbnails() {
+  const TW = 70, TH = 88; // 4:5
+
+  Object.entries(PRESETS).forEach(([key, preset]) => {
+    const tc = document.createElement('canvas');
+    tc.width = TW; tc.height = TH;
+    const tCtx = tc.getContext('2d');
+
+    // Crop central de la imagen original al ratio 4:5
+    const iw = originalImage.width, ih = originalImage.height;
+    const targetRatio = TW / TH;
+    const srcRatio = iw / ih;
+    let sx, sy, sw, sh;
+    if (srcRatio > targetRatio) {
+      sh = ih; sw = ih * targetRatio; sx = (iw - sw) / 2; sy = 0;
+    } else {
+      sw = iw; sh = iw / targetRatio; sx = 0; sy = (ih - sh) / 2;
+    }
+    tCtx.drawImage(originalImage, sx, sy, sw, sh, 0, 0, TW, TH);
+
+    const imgData = tCtx.getImageData(0, 0, TW, TH);
+    processPixels(imgData.data, preset);
+    tCtx.putImageData(imgData, 0, 0);
+    applyVignette(tCtx, TW, TH, preset.vignette);
+
+    const btn = presetGrid.querySelector(`[data-key="${key}"]`);
+    if (!btn) return;
+    const img = btn.querySelector('.preset-thumb');
+    img.src = tc.toDataURL('image/jpeg', 0.75);
+    img.onload = () => img.classList.add('loaded');
+    btn.classList.remove('no-thumb');
+  });
 }
 
 // ── Sliders: escuchar cambios ──
