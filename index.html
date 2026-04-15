@@ -94,51 +94,75 @@
     #btn-lock.locked { color: var(--accent); border-color: var(--accent); }
     #btn-lock svg { width: 13px; height: 13px; display: block; }
 
-    /* ── Barra de presets ── */
+    /* ── Tab bar de grupos ── */
     .presets-bar-wrapper {
       flex-shrink: 0;
-      position: relative;
-      border-bottom: 1px solid var(--border);
       background: var(--bg);
     }
 
-    /* Fade derecho */
-    .presets-bar-wrapper::after {
-      content: '';
-      position: absolute;
-      top: 0; right: 0;
-      width: 40px; height: 100%;
-      background: linear-gradient(to right, transparent, var(--bg));
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .presets-bar {
-      display: flex;
-      align-items: stretch;
-      justify-content: flex-start;
-      overflow-x: auto;
-      scrollbar-width: none;
-      padding: 0 20px;
-      gap: 0;
-    }
-    .presets-bar::-webkit-scrollbar { display: none; }
-
-    .preset-group-label {
-      font-family: var(--font-sans);
-      font-size: 0.4rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: #ccc;
-      white-space: nowrap;
-      flex-shrink: 0;
+    .tab-bar {
       display: flex;
       align-items: center;
-      padding: 0 10px 0 16px;
-      border-right: 1px solid var(--border);
-      margin-right: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
     }
-    .preset-group-label:first-child { padding-left: 0; }
+    .tab-bar::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      font-family: var(--font-sans);
+      font-size: 0.42rem;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      background: none;
+      border: none;
+      border-bottom: 1.5px solid transparent;
+      padding: 9px 12px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      flex-shrink: 0;
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .tab-separator {
+      width: 1px;
+      height: 12px;
+      background: var(--border);
+      flex-shrink: 0;
+      margin: 0 4px;
+    }
+
+    /* ── Drawer desplegable ── */
+    .tab-drawer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.28s cubic-bezier(0.4,0,0.2,1);
+      background: var(--bg);
+    }
+    .tab-drawer.open {
+      max-height: 120px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-drawer.open-tall {
+      max-height: 260px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .drawer-presets {
+      display: none;
+      align-items: stretch;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 0 16px;
+    }
+    .drawer-presets.visible { display: flex; }
+    .drawer-presets::-webkit-scrollbar { display: none; }
 
     .btn-preset {
       display: flex;
@@ -146,14 +170,14 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
-      flex: 1 1 0;
-      min-width: 52px;
+      min-width: 56px;
       background: none;
       border: none;
       border-bottom: 1.5px solid transparent;
-      padding: 7px 4px 6px;
+      padding: 8px 5px 7px;
       cursor: pointer;
       transition: color 0.22s, border-color 0.22s;
+      flex-shrink: 0;
     }
     .btn-preset:hover .preset-icon { color: #666; }
     .btn-preset:hover .preset-label { color: #666; }
@@ -179,21 +203,32 @@
       text-align: center;
     }
 
-
-    /* Mobile: carrusel */
-    @media (max-width: 700px) {
-      .presets-bar {
-        justify-content: flex-start;
-        padding: 0 12px;
-        gap: 0;
-        -webkit-overflow-scrolling: touch;
-        scroll-snap-type: x mandatory;
-      }
-      .btn-preset {
-        flex: 0 0 64px;
-        scroll-snap-align: start;
-      }
+    /* Drawer Geometría */
+    .drawer-geo {
+      display: none;
+      padding: 12px 20px 14px;
+      gap: 12px;
+      flex-direction: column;
     }
+    .drawer-geo.visible { display: flex; }
+    .drawer-geo .control { margin-bottom: 0; }
+    .drawer-geo .annotation-row { margin-top: 0; padding-top: 0; border-top: none; }
+
+    /* Drawer Recorte */
+    .drawer-crop {
+      display: none;
+      padding: 10px 16px 12px;
+    }
+    .drawer-crop.visible { display: block; }
+    .drawer-crop .crop-formats {
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+      gap: 6px;
+    }
+    .drawer-crop .crop-formats::-webkit-scrollbar { display: none; }
+    .drawer-crop .btn-crop { flex: 0 0 auto; min-width: 52px; }
+    .drawer-crop .crop-custom-inputs { margin-top: 8px; }
 
     /* ── Layout principal ── */
     .workspace {
@@ -618,8 +653,9 @@
       }
       #canvas { max-height: calc(100dvh - 160px); }
 
-      /* Presets: carrusel sin fade en móvil */
-      .presets-bar-wrapper::after { display: none; }
+      /* Tab bar en móvil */
+      .tab-bar { padding: 0 12px; }
+      .tab-btn { padding: 8px 9px; font-size: 0.4rem; }
 
       /* Nav inferior */
       .mobile-nav {
@@ -659,8 +695,6 @@
       }
       .mobile-nav-export:active { opacity: 0.8; }
 
-      /* Crop formats: 2 cols en móvil */
-      .crop-formats { grid-template-columns: repeat(4, 1fr); }
     }
   </style>
 </head>
@@ -681,10 +715,38 @@
   </div>
 </header>
 
-<!-- La Curaduría: presets serif text-only -->
+<!-- La Curaduría: grupos de presets -->
 <div class="presets-bar-wrapper">
-  <div class="presets-bar" id="preset-bar">
-    <!-- generado por JS -->
+  <div class="tab-bar" id="tab-bar"></div>
+  <div class="tab-drawer" id="tab-drawer">
+    <!-- Drawer Geometría -->
+    <div class="drawer-geo" id="drawer-geo">
+      <div class="control">
+        <label>Marco blanco <span id="val-borderSize">0</span></label>
+        <input type="range" id="borderSize" min="0" max="120" value="0">
+      </div>
+      <div class="control">
+        <label>Nivelar <span id="val-nivelar">0°</span></label>
+        <input type="range" id="nivelar" min="-10" max="10" step="0.5" value="0">
+      </div>
+      <div class="annotation-row">
+        <span class="annotation-label">Anotación</span>
+        <label class="toggle">
+          <input type="checkbox" id="annotation-toggle">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <input type="text" class="annotation-input" id="annotation-text" placeholder="CARAVAGGIO / SEVILLA 2026" maxlength="40">
+    </div>
+    <!-- Drawer Recorte -->
+    <div class="drawer-crop" id="drawer-crop">
+      <div class="crop-formats" id="crop-formats"></div>
+      <div class="crop-custom-inputs" id="crop-custom-inputs">
+        <input type="number" id="crop-custom-w" placeholder="W" min="1" max="9999" value="4">
+        <span>:</span>
+        <input type="number" id="crop-custom-h" placeholder="H" min="1" max="9999" value="5">
+      </div>
+    </div>
   </div>
 </div>
 
@@ -705,53 +767,7 @@
   <!-- El Laboratorio -->
   <div class="panel">
 
-    <!-- A. Geometría -->
-    <div class="pillar collapsed" id="pillar-geo">
-      <div class="pillar-header" onclick="togglePillar('pillar-geo')">
-        <span class="pillar-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 21 L3 3 L21 3"/><path d="M3 3 L21 21"/>
-          </svg>
-        </span>
-        <span class="pillar-title">Geometría</span>
-        <span class="pillar-toggle">▾</span>
-      </div>
-      <div class="pillar-body">
-
-        <div class="control">
-          <label>Marco blanco <span id="val-borderSize">0</span></label>
-          <input type="range" id="borderSize" min="0" max="120" value="0">
-        </div>
-
-        <div class="control">
-          <label>Nivelar <span id="val-nivelar">0°</span></label>
-          <input type="range" id="nivelar" min="-10" max="10" step="0.5" value="0">
-        </div>
-
-        <div class="annotation-row">
-          <span class="annotation-label">Anotación</span>
-          <label class="toggle">
-            <input type="checkbox" id="annotation-toggle">
-            <span class="toggle-track"></span>
-          </label>
-        </div>
-        <input type="text" class="annotation-input" id="annotation-text" placeholder="CARAVAGGIO / SEVILLA 2026" maxlength="40">
-
-        <!-- Recorte -->
-        <p class="crop-header">Recorte</p>
-        <div class="crop-formats" id="crop-formats">
-          <!-- generado por JS -->
-        </div>
-        <div class="crop-custom-inputs" id="crop-custom-inputs">
-          <input type="number" id="crop-custom-w" placeholder="W" min="1" max="9999" value="4">
-          <span>:</span>
-          <input type="number" id="crop-custom-h" placeholder="H" min="1" max="9999" value="5">
-        </div>
-
-      </div>
-    </div>
-
-    <!-- B. Revelado -->
+    <!-- A. Revelado -->
     <div class="pillar collapsed" id="pillar-rev">
       <div class="pillar-header" onclick="togglePillar('pillar-rev')">
         <span class="pillar-icon">
@@ -893,10 +909,6 @@
 
 <!-- Barra de navegación inferior (solo móvil) -->
 <nav class="mobile-nav" id="mobile-nav">
-  <button class="mobile-nav-btn" data-pillar="pillar-geo" onclick="toggleMobileSheet('pillar-geo', this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21 L3 3 L21 3"/><path d="M3 3 L21 21"/></svg>
-    <span>Geometría</span>
-  </button>
   <button class="mobile-nav-btn" data-pillar="pillar-rev" onclick="toggleMobileSheet('pillar-rev', this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="12" y1="12" x2="16" y2="9"/></svg>
     <span>Revelado</span>
@@ -1139,7 +1151,6 @@ const dropZone    = document.getElementById('drop-zone');
 const canvas      = document.getElementById('canvas');
 const ctx         = canvas.getContext('2d');
 const fileInput   = document.getElementById('file-input');
-const presetBar   = document.getElementById('preset-bar');
 
 // Sliders del motor de píxeles
 const sliders = {
@@ -1288,7 +1299,7 @@ function updateCropOverlay() {
   overlayCtx.stroke();
 }
 
-// ── Grupos ──
+// ── Grupos de presets ──
 const GROUPS = [
   { label: 'Luz',      keys: ['golden-hour','first-light','dead-of-night'] },
   { label: 'Cine',     keys: ['quentin','wes','andy'] },
@@ -1299,13 +1310,25 @@ const GROUPS = [
   { label: 'Grano',    keys: ['japanese-grain','silver'] },
 ];
 
-// ── Construir barra de presets con grupos ──
+// ── Construir tab bar + drawers ──
+const tabBar    = document.getElementById('tab-bar');
+const tabDrawer = document.getElementById('tab-drawer');
+let activeTab   = null;
+
 GROUPS.forEach((group, gi) => {
-  const sep = document.createElement('span');
-  sep.className = 'preset-group-label';
-  if (gi === 0) sep.style.paddingLeft = '0';
-  sep.textContent = group.label;
-  presetBar.appendChild(sep);
+  // Tab
+  const tab = document.createElement('button');
+  tab.className = 'tab-btn';
+  tab.dataset.group = String(gi);
+  tab.textContent = group.label;
+  tab.addEventListener('click', () => toggleTab(String(gi), tab, 'preset'));
+  tabBar.appendChild(tab);
+
+  // Drawer container para este grupo (insertado antes de drawer-geo)
+  const container = document.createElement('div');
+  container.className = 'drawer-presets';
+  container.id = 'drawer-group-' + gi;
+  tabDrawer.insertBefore(container, document.getElementById('drawer-geo'));
 
   group.keys.forEach(key => {
     const preset = PRESETS[key];
@@ -1318,9 +1341,63 @@ GROUPS.forEach((group, gi) => {
       <span class="preset-label">${preset.label}</span>
     `;
     btn.addEventListener('click', () => applyPreset(key, btn));
-    presetBar.appendChild(btn);
+    container.appendChild(btn);
   });
 });
+
+// Separador visual
+const tabSep = document.createElement('div');
+tabSep.className = 'tab-separator';
+tabBar.appendChild(tabSep);
+
+// Tab Geometría
+const tabGeo = document.createElement('button');
+tabGeo.className = 'tab-btn';
+tabGeo.dataset.group = 'geo';
+tabGeo.textContent = 'Geometría';
+tabGeo.addEventListener('click', () => toggleTab('geo', tabGeo, 'tall'));
+tabBar.appendChild(tabGeo);
+
+// Tab Recorte
+const tabCropBtn = document.createElement('button');
+tabCropBtn.className = 'tab-btn';
+tabCropBtn.dataset.group = 'crop';
+tabCropBtn.textContent = 'Recorte';
+tabCropBtn.addEventListener('click', () => toggleTab('crop', tabCropBtn, 'tall'));
+tabBar.appendChild(tabCropBtn);
+
+function toggleTab(key, clickedTab, drawerType) {
+  const isSame = activeTab === key;
+
+  // Desactivar todos los tabs y ocultar drawers
+  tabBar.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.drawer-presets, #drawer-geo, #drawer-crop').forEach(el => {
+    el.classList.remove('visible');
+  });
+
+  if (isSame) {
+    activeTab = null;
+    tabDrawer.classList.remove('open', 'open-tall');
+    return;
+  }
+
+  activeTab = key;
+  clickedTab.classList.add('active');
+
+  if (key === 'geo') {
+    document.getElementById('drawer-geo').classList.add('visible');
+    tabDrawer.classList.remove('open');
+    tabDrawer.classList.add('open-tall');
+  } else if (key === 'crop') {
+    document.getElementById('drawer-crop').classList.add('visible');
+    tabDrawer.classList.remove('open');
+    tabDrawer.classList.add('open-tall');
+  } else {
+    document.getElementById('drawer-group-' + key)?.classList.add('visible');
+    tabDrawer.classList.remove('open-tall');
+    tabDrawer.classList.add('open');
+  }
+}
 
 // ── Aplicar preset ──
 function applyPreset(key, btn) {
@@ -1331,7 +1408,7 @@ function applyPreset(key, btn) {
   activePreset = key;
 
   // Desactiva todos
-  presetBar.querySelectorAll('.btn-preset').forEach(b => {
+  document.querySelectorAll('.btn-preset').forEach(b => {
     b.classList.remove('active');
     b.style.borderBottomColor = 'transparent';
     b.querySelector('.preset-icon').style.color  = '';
@@ -1356,7 +1433,7 @@ function applyPreset(key, btn) {
 
   // Actualiza texto de anotación con nombre del preset si está vacío
   const annotInput = document.getElementById('annotation-text');
-  if (!annotInput.value) annotInput.placeholder = preset.label.toUpperCase() + ' / SEVILLA 2026';
+  if (!annotInput.value) annotInput.placeholder = PRESETS[key].label.toUpperCase() + ' / SEVILLA 2026';
 
   applyFilters();
 }
@@ -1390,7 +1467,7 @@ function loadImage(file) {
 
       // Si Lock ON, re-aplica el preset activo a la nueva foto
       if (lockOn && activePreset) {
-        const btn = presetBar.querySelector(`[data-key="${activePreset}"]`);
+        const btn = document.querySelector(`.btn-preset[data-key="${activePreset}"]`);
         applyPreset(activePreset, btn);
       } else {
         applyFilters();
@@ -1414,7 +1491,7 @@ document.getElementById('btn-change-photo').addEventListener('click', () => {
   canvas.style.transform = '';
   dropZone.style.display = '';
   if (!lockOn) {
-    presetBar.querySelectorAll('.btn-preset').forEach(b => {
+    document.querySelectorAll('.btn-preset').forEach(b => {
       b.classList.remove('active');
       b.style.color = '';
       b.style.borderBottomColor = 'transparent';
@@ -1533,7 +1610,7 @@ Object.entries(sliders).forEach(([key, slider]) => {
   slider.addEventListener('input', () => {
     if (vals[key]) vals[key].textContent = slider.value;
     activePreset = null;
-    presetBar.querySelectorAll('.btn-preset').forEach(b => {
+    document.querySelectorAll('.btn-preset').forEach(b => {
       b.classList.remove('active');
       b.style.color = '';
       b.style.borderBottomColor = 'transparent';
@@ -1656,7 +1733,7 @@ function resetSliders() {
   nivelarSlider.value = 0;
   document.getElementById('val-nivelar').textContent = '0°';
   canvas.style.transform = '';
-  presetBar.querySelectorAll('.btn-preset').forEach(b => {
+  document.querySelectorAll('.btn-preset').forEach(b => {
     b.classList.remove('active');
     b.style.borderBottomColor = 'transparent';
     b.querySelector('.preset-icon').style.color  = '';
@@ -1731,7 +1808,7 @@ document.addEventListener('keydown', e => {
       sliders.borderSize.value = next;
       vals.borderSize.textContent = next;
       activePreset = null;
-      presetBar.querySelectorAll('.btn-preset').forEach(b => {
+      document.querySelectorAll('.btn-preset').forEach(b => {
         b.classList.remove('active');
         b.style.color = '';
         b.style.borderBottomColor = 'transparent';
@@ -1740,7 +1817,7 @@ document.addEventListener('keydown', e => {
       break;
     }
     case 'b': {
-      const btn = presetBar.querySelector('[data-key="zuloaga"]');
+      const btn = document.querySelector('.btn-preset[data-key="zuloaga"]');
       if (btn) applyPreset('zuloaga', btn);
       break;
     }
@@ -1815,7 +1892,7 @@ const params = new URLSearchParams(window.location.search);
 const toolParam = params.get('tool');
 const resolvedTool = toolParam === 'noir' ? 'dead-of-night' : toolParam;
 if (resolvedTool && PRESETS[resolvedTool]) {
-  const btn = presetBar.querySelector(`[data-key="${resolvedTool}"]`);
+  const btn = document.querySelector(`.btn-preset[data-key="${resolvedTool}"]`);
   if (btn) applyPreset(resolvedTool, btn);
 }
 if (toolParam === 'border') {
