@@ -981,8 +981,8 @@ const PRESETS = {
     shadows: 32, liftBlacks: 5, vignette: 8, grain: 3,
     shadowTint: 0, highlightRecovery: 22
   },
-  'leica': {
-    label: 'Leica', color: '#B8860B',
+  'wetzlar': {
+    label: 'Wetzlar', color: '#B8860B',
     warmth: 28, brightness: 3, contrast: 20, saturation: 5,
     shadows: 18, liftBlacks: 0, vignette: 15, grain: 3,
     shadowTint: 0, highlightRecovery: 5
@@ -1013,11 +1013,73 @@ const PRESETS = {
     shadows: 16, liftBlacks: 48, vignette: 5, grain: 3,
     shadowTint: 0, highlightRecovery: 5
   },
-  'kodak': {
-    label: 'Kodak', color: '#D4880A',
+  'eastman': {
+    label: 'Eastman', color: '#D4880A',
     warmth: 38, brightness: 5, contrast: 8, saturation: -15,
     shadows: 28, liftBlacks: 18, vignette: 8, grain: 8,
     shadowTint: 0, highlightRecovery: 12
+  },
+
+  // — Fotógrafos —
+  'cartier': {
+    label: 'Cartier', color: '#8B7D6B',
+    warmth: 12, brightness: 2, contrast: 28, saturation: -8,
+    shadows: 12, liftBlacks: 0, vignette: 18, grain: 8,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'brassai': {
+    label: 'Brassaï', color: '#4A3828',
+    warmth: 15, brightness: -18, contrast: 65, saturation: -20,
+    shadows: -10, liftBlacks: 0, vignette: 55, grain: 18,
+    shadowTint: 5, highlightRecovery: 0
+  },
+  'doisneau': {
+    label: 'Doisneau', color: '#C4906A',
+    warmth: 22, brightness: 5, contrast: -8, saturation: -18,
+    shadows: 28, liftBlacks: 15, vignette: 10, grain: 5,
+    shadowTint: 3, highlightRecovery: 10
+  },
+  'avedon': {
+    label: 'Avedon', color: '#C8C0B8',
+    warmth: 5, brightness: 18, contrast: 12, saturation: -5,
+    shadows: 35, liftBlacks: 5, vignette: 0, grain: 1,
+    shadowTint: 0, highlightRecovery: 25
+  },
+  'newton': {
+    label: 'Newton', color: '#2A2A2A',
+    warmth: 8, brightness: -5, contrast: 55, saturation: 15,
+    shadows: -5, liftBlacks: 0, vignette: 35, grain: 4,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'eggleston': {
+    label: 'Eggleston', color: '#B84020',
+    warmth: 32, brightness: 5, contrast: 18, saturation: 55,
+    shadows: 15, liftBlacks: 5, vignette: 8, grain: 3,
+    shadowTint: 0, highlightRecovery: 8
+  },
+  'shore': {
+    label: 'Shore', color: '#C8A870',
+    warmth: 28, brightness: 8, contrast: -5, saturation: -25,
+    shadows: 22, liftBlacks: 28, vignette: 5, grain: 5,
+    shadowTint: 3, highlightRecovery: 12
+  },
+  'frank': {
+    label: 'Frank', color: '#4A4A4A',
+    warmth: 0, brightness: -5, contrast: 42, saturation: -100,
+    shadows: -8, liftBlacks: 0, vignette: 28, grain: 55,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'nadar': {
+    label: 'Nadar', color: '#8B6040',
+    warmth: 45, brightness: -5, contrast: 15, saturation: -65,
+    shadows: 10, liftBlacks: 8, vignette: 35, grain: 15,
+    shadowTint: 8, highlightRecovery: 0
+  },
+  'strand': {
+    label: 'Strand', color: '#606060',
+    warmth: -5, brightness: 3, contrast: 48, saturation: -100,
+    shadows: 5, liftBlacks: 3, vignette: 15, grain: 12,
+    shadowTint: -3, highlightRecovery: 8
   },
 
   // — Blanco y negro —
@@ -1098,12 +1160,22 @@ const PRESET_ICONS = {
   'm-system':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>`,
   'f-chrome':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 L21 20 L3 20 Z"/><line x1="7.5" y1="14" x2="16.5" y2="14"/><line x1="9.5" y1="10" x2="14.5" y2="10"/></svg>`,
   'h-format':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="7" x2="2" y2="2"/><line x1="2" y1="2" x2="7" y2="2"/><line x1="22" y1="7" x2="22" y2="2"/><line x1="22" y1="2" x2="17" y2="2"/><line x1="2" y1="17" x2="2" y2="22"/><line x1="2" y1="22" x2="7" y2="22"/><line x1="22" y1="17" x2="22" y2="22"/><line x1="22" y1="22" x2="17" y2="22"/></svg>`,
-  'leica':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg>`,
+  'wetzlar':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg>`,
   'capa':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M8 7 V5 a1 1 0 0 1 1-1 h6 a1 1 0 0 1 1 1 V7"/><circle cx="12" cy="14" r="3.5"/></svg>`,
   'tobacco':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 19 C9 15 15 15 15 11 C15 7 9 7 9 3"/><path d="M14 19 C14 16 18 15 18 12 C18 9 14 8 14 5"/><line x1="5" y1="19" x2="19" y2="19"/></svg>`,
   'old-money':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 L3 9 L8 14 L12 5 L16 14 L21 9 L21 18 Z"/><line x1="3" y1="21" x2="21" y2="21"/></svg>`,
   'matte':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="8" width="17" height="13"/><rect x="6" y="5" width="17" height="13"/></svg>`,
-  'kodak':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><circle cx="12" cy="12" r="2"/></svg>`,
+  'eastman':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><circle cx="12" cy="12" r="2"/></svg>`,
+  'cartier':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="5" width="20" height="14"/><rect x="8" y="9" width="8" height="6"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg>`,
+  'brassai':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="8"/><circle cx="12" cy="11" r="3"/><path d="M5 21 Q12 14 19 21"/><line x1="8" y1="21" x2="16" y2="21"/></svg>`,
+  'doisneau':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 Q3 10 12 8 Q21 10 21 18"/><path d="M8 18 Q8 13 12 12 Q16 13 16 18"/></svg>`,
+  'avedon':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18"/><line x1="3" y1="8" x2="21" y2="8"/></svg>`,
+  'newton':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 L20 21 L4 21 Z"/><line x1="4" y1="21" x2="20" y2="21"/></svg>`,
+  'eggleston':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3 Q18 12 12 21" fill="currentColor" opacity="0.3" stroke="none"/><path d="M12 3 Q6 12 12 21" fill="none"/></svg>`,
+  'shore':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="20" x2="12" y2="20"/><path d="M3 20 Q8 8 12 7 Q16 8 21 20"/><line x1="3" y1="20" x2="21" y2="20"/><line x1="7" y1="14" x2="17" y2="14"/></svg>`,
+  'frank':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" transform="rotate(-4 12 12)"/><line x1="3" y1="9" x2="21" y2="9" transform="rotate(-4 12 12)"/></svg>`,
+  'nadar':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><ellipse cx="12" cy="9" rx="7" ry="5"/><path d="M5 9 Q5 18 12 20 Q19 18 19 9"/><line x1="12" y1="14" x2="12" y2="20"/></svg>`,
+  'strand':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="3" x2="21" y2="3"/><line x1="3" y1="21" x2="21" y2="21"/><line x1="3" y1="3" x2="3" y2="21"/><line x1="21" y1="3" x2="21" y2="21"/><line x1="8" y1="3" x2="8" y2="21"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
   'japanese-grain': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="7" x2="22" y2="7"/><line x1="4" y1="4" x2="20" y2="4"/><line x1="7" y1="7" x2="7" y2="22"/><line x1="17" y1="7" x2="17" y2="22"/><line x1="7" y1="13" x2="17" y2="13"/></svg>`,
   'silver':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="5" width="18" height="14"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="7" y1="5" x2="7" y2="19"/></svg>`,
 };
