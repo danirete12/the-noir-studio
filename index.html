@@ -18,23 +18,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:        #ffffff;
-      --panel:     #f8f8f6;
-      --border:    #e0ddd8;
-      --text:      #1a1a1a;
-      --muted:     #aaa;
-      --accent:    #C8201A;
+      --bg:         #ffffff;
+      --panel:      #f8f8f6;
+      --border:     #e0ddd8;
+      --text:       #1a1a1a;
+      --muted:      #aaa;
+      --canvas-bg:  #141414;
+      --accent:     #C8201A;
       --font-serif: 'Cormorant Garamond', Georgia, serif;
       --font-sans:  'Inter', system-ui, sans-serif;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* html + body anclados al viewport: nada scrollea a nivel de página */
-    html {
-      height: 100%;
-      overflow: hidden;
-    }
+    html { height: 100%; overflow: hidden; }
 
     body {
       background: var(--bg);
@@ -43,7 +40,7 @@
       font-size: 12px;
       font-weight: 300;
       letter-spacing: 0.08em;
-      height: 100%;      /* ocupa exactamente el viewport, sin crecer */
+      height: 100%;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -52,261 +49,294 @@
     /* ── Header ── */
     header {
       border-bottom: 1px solid var(--border);
-      padding: 18px 32px;
+      padding: 14px 28px;
       display: flex;
       align-items: baseline;
-      gap: 20px;
+      gap: 16px;
+      flex-shrink: 0;
     }
 
     header h1 {
       font-family: var(--font-serif);
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       font-weight: 300;
       letter-spacing: 0.35em;
       text-transform: uppercase;
       color: var(--text);
     }
 
-    header span {
-      font-size: 0.6rem;
+    header .tagline {
+      font-size: 0.55rem;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--muted);
     }
 
-    /* ── Layout ── */
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Candado */
+    #btn-lock {
+      background: none;
+      border: 1px solid var(--border);
+      padding: 5px 7px;
+      cursor: pointer;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    #btn-lock:hover { color: var(--text); border-color: #aaa; }
+    #btn-lock.locked { color: var(--accent); border-color: var(--accent); }
+    #btn-lock svg { width: 13px; height: 13px; display: block; }
+
+    /* ── Barra de presets ── */
+    .presets-bar-wrapper {
+      flex-shrink: 0;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    /* Fade derecho */
+    .presets-bar-wrapper::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 40px; height: 100%;
+      background: linear-gradient(to right, transparent, var(--bg));
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .presets-bar {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-evenly;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .presets-bar::-webkit-scrollbar { display: none; }
+
+    .btn-preset {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      flex: 1 1 0;
+      min-width: 52px;
+      background: none;
+      border: none;
+      border-bottom: 1.5px solid transparent;
+      padding: 7px 4px 6px;
+      cursor: pointer;
+      transition: color 0.22s, border-color 0.22s;
+    }
+    .btn-preset:hover .preset-icon { color: #666; }
+    .btn-preset:hover .preset-label { color: #666; }
+
+    .preset-icon {
+      width: 16px; height: 16px;
+      color: #bbb;
+      flex-shrink: 0;
+      transition: color 0.22s;
+    }
+    .preset-icon svg { width: 100%; height: 100%; display: block; }
+
+    .preset-label {
+      font-family: var(--font-serif);
+      font-size: 0.48rem;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      transition: color 0.22s;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+
+    /* Mobile: carrusel */
+    @media (max-width: 700px) {
+      .presets-bar {
+        justify-content: flex-start;
+        padding: 0 12px;
+        gap: 0;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+      }
+      .btn-preset {
+        flex: 0 0 64px;
+        scroll-snap-align: start;
+      }
+    }
+
+    /* ── Layout principal ── */
     .workspace {
       flex: 1;
-      height: 0;          /* con flex:1, height:0 fuerza que ocupe solo el espacio disponible */
+      height: 0;
       display: grid;
-      grid-template-columns: 1fr 280px;
-      grid-template-rows: 1fr;
+      grid-template-columns: 1fr 256px;
       overflow: hidden;
     }
 
-    /* ── Área de imagen ── */
+    /* ── Canvas area – negativo ── */
     .canvas-area {
-      height: 100%;       /* rellena su celda del grid */
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 48px;
-      background: radial-gradient(ellipse at center, #efefed 0%, #e8e6e2 70%);
+      padding: 40px;
+      background: var(--canvas-bg);
       overflow: hidden;
+      position: relative;
     }
 
     .drop-zone {
-      border: 1px solid var(--border);
+      border: 1px solid #3a3a3a;
       width: 100%;
-      max-width: 460px;
+      max-width: 420px;
       aspect-ratio: 4/5;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 14px;
       cursor: pointer;
       transition: border-color 0.3s;
     }
-
-    .drop-zone:hover,
-    .drop-zone.drag-over { border-color: var(--accent); }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: #666; }
 
     .drop-zone p {
-      color: var(--muted);
-      font-size: 0.6rem;
+      color: #555;
+      font-size: 0.55rem;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       text-align: center;
-      line-height: 2.2;
+      line-height: 2.4;
     }
 
     .drop-zone .icon {
-      font-size: 1rem;
-      color: var(--muted);
-      letter-spacing: 0.5em;
+      font-size: 0.9rem;
+      color: #333;
+      letter-spacing: 0.6em;
     }
 
     #canvas {
       display: none;
       max-width: 100%;
-      max-height: calc(100vh - 120px);
-      box-shadow: 0 12px 48px rgba(0,0,0,0.18);
+      max-height: calc(100vh - 140px);
+      box-shadow: 0 16px 64px rgba(0,0,0,0.6);
+      transition: transform 0.2s ease;
     }
 
-    /* ── Botón cambiar foto ── */
     #btn-change-photo {
       display: none;
       position: absolute;
-      bottom: 16px;
+      bottom: 14px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(255,255,255,0.88);
-      border: 1px solid var(--border);
-      color: var(--muted);
+      background: rgba(20,20,20,0.75);
+      border: 1px solid #3a3a3a;
+      color: #666;
       font-family: var(--font-sans);
-      font-size: 0.5rem;
+      font-size: 0.48rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      padding: 6px 14px;
+      padding: 5px 13px;
       cursor: pointer;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(6px);
       transition: color 0.2s, border-color 0.2s;
     }
-    #btn-change-photo:hover { color: var(--text); border-color: #aaa; }
+    #btn-change-photo:hover { color: #aaa; border-color: #555; }
 
-    /* ── Indicador Antes/Después ── */
     #before-badge {
       display: none;
       position: absolute;
-      top: 16px;
+      top: 14px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.55);
+      background: rgba(0,0,0,0.6);
       color: #fff;
-      font-family: var(--font-sans);
-      font-size: 0.45rem;
+      font-size: 0.42rem;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       padding: 4px 10px;
       pointer-events: none;
     }
 
-    /* ── Panel ── */
+    /* ── Panel derecho ── */
     .panel {
-      height: 100%;       /* rellena su celda del grid */
+      height: 100%;
       border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       overflow-y: scroll;
       background: var(--panel);
     }
+    .panel::-webkit-scrollbar { width: 2px; }
+    .panel::-webkit-scrollbar-thumb { background: #ccc; }
 
-    /* Scrollbar del panel siempre visible y con estilo */
-    .panel::-webkit-scrollbar { width: 3px; }
-    .panel::-webkit-scrollbar-track { background: transparent; }
-    .panel::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
-    .panel::-webkit-scrollbar-thumb:hover { background: #aaa; }
+    /* ── Pilares (Los 4 Laboratorios) ── */
+    .pillar { border-bottom: 1px solid var(--border); }
 
-    .panel-section {
-      padding: 24px 22px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .panel-section h2 {
-      font-size: 0.55rem;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 16px;
-    }
-
-    /* ── Barra de presets (top, ancho completo) ── */
-    .presets-bar {
-      flex-shrink: 0;
-      background: var(--panel);
-      padding: 8px 16px;
+    .pillar-header {
       display: flex;
       align-items: center;
       gap: 10px;
-      overflow-x: auto;
-      scrollbar-width: none;
+      padding: 14px 18px;
+      cursor: pointer;
+      user-select: none;
     }
+    .pillar-header:hover { background: rgba(0,0,0,0.02); }
 
-    .presets-bar::-webkit-scrollbar { display: none; }
-
-    /* Wrapper para el fade de overflow en los bordes */
-    .presets-bar-wrapper {
+    .pillar-icon {
+      width: 22px;
+      height: 22px;
+      color: var(--muted);
       flex-shrink: 0;
-      position: relative;
-      border-bottom: 1px solid var(--border);
     }
+    .pillar-icon svg { width: 100%; height: 100%; }
 
-    .presets-bar-wrapper::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 48px;
-      height: 100%;
-      background: linear-gradient(to right, transparent, var(--panel));
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .presets-bar-label {
-      font-size: 0.5rem;
+    .pillar-title {
+      font-size: 0.52rem;
       letter-spacing: 0.28em;
       text-transform: uppercase;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .pillar-toggle {
+      font-size: 0.5rem;
       color: var(--muted);
-      white-space: nowrap;
-      flex-shrink: 0;
-      padding-right: 10px;
-      border-right: 1px solid var(--border);
+      transition: transform 0.2s;
     }
+    .pillar.collapsed .pillar-toggle { transform: rotate(-90deg); }
 
-    .preset-grid {
-      display: flex;
-      flex-direction: row;
-      gap: 3px;
+    .pillar-body {
+      padding: 4px 18px 18px;
+      overflow: hidden;
     }
+    .pillar.collapsed .pillar-body { display: none; }
 
-    .btn-preset {
-      background: #ffffff;
-      border: 1px solid #e0ddd8;
-      font-family: var(--font-sans);
-      cursor: pointer;
-      text-align: center;
-      transition: border-color 0.2s, color 0.2s;
-      padding: 8px 6px 6px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-      flex: 0 0 52px;
-    }
-
-    .btn-preset .preset-icon {
-      display: block;
-      width: 20px;
-      height: 20px;
-      color: #bbb;
-      transition: color 0.2s;
-      flex-shrink: 0;
-    }
-
-    .btn-preset .preset-icon svg { width: 100%; height: 100%; }
-
-    .btn-preset .preset-label {
-      font-size: 0.38rem;
-      font-weight: 400;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #aaa;
-      line-height: 1.4;
-      transition: color 0.2s;
-    }
-
-    .btn-preset:hover { border-color: #bbb; }
-    .btn-preset:hover .preset-icon { color: #555; }
-    .btn-preset:hover .preset-label { color: #555; }
-
-    .btn-preset.active { border-color: var(--accent); }
-    .btn-preset.active .preset-icon { color: var(--accent); }
-    .btn-preset.active .preset-label { color: var(--accent); }
-
-    /* ── Sliders ── */
-    .control { margin-bottom: 13px; }
+    /* ── Controles ── */
+    .control { margin-bottom: 14px; }
     .control:last-child { margin-bottom: 0; }
 
     .control label {
       display: flex;
       justify-content: space-between;
-      font-size: 0.58rem;
+      font-size: 0.52rem;
       letter-spacing: 0.15em;
       text-transform: uppercase;
       color: var(--text);
-      margin-bottom: 9px;
+      margin-bottom: 8px;
     }
 
     .control label span {
@@ -317,81 +347,302 @@
 
     input[type="range"] {
       -webkit-appearance: none;
-      appearance: none;
       width: 100%;
       height: 1px;
       background: #d8d5d0;
       outline: none;
       cursor: pointer;
     }
-
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 10px;
-      height: 10px;
+      width: 9px; height: 9px;
       border-radius: 50%;
       background: var(--accent);
       cursor: pointer;
       transition: transform 0.15s;
     }
-
     input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.3); }
 
-    /* ── Botones ── */
-    .btn {
-      width: 100%;
-      padding: 11px;
-      font-family: var(--font-sans);
-      font-size: 0.55rem;
-      font-weight: 400;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: none;
-      transition: opacity 0.2s;
+    /* ── Anotación ── */
+    .annotation-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
     }
 
-    .btn:hover { opacity: 0.75; }
-    .btn-primary { background: var(--accent); color: #000; }
+    .annotation-label {
+      font-size: 0.52rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text);
+      flex: 1;
+    }
+
+    /* Toggle switch */
+    .toggle {
+      position: relative;
+      width: 28px; height: 15px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: #d0cdc8;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle input:checked + .toggle-track { background: var(--accent); }
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 11px; height: 11px;
+      top: 2px; left: 2px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    .toggle input:checked + .toggle-track::after { transform: translateX(13px); }
+
+    .annotation-input {
+      display: none;
+      width: 100%;
+      margin-top: 8px;
+      font-family: var(--font-sans);
+      font-size: 0.52rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      padding: 4px 0;
+      outline: none;
+    }
+    .annotation-input:focus { border-bottom-color: var(--accent); }
+    .annotation-input.visible { display: block; }
+
+    /* ── Reset ── */
+    .panel-footer {
+      padding: 16px 18px;
+      margin-top: auto;
+    }
+
     .btn-secondary {
+      width: 100%;
+      padding: 9px;
+      font-family: var(--font-sans);
+      font-size: 0.5rem;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      cursor: pointer;
       background: transparent;
       color: var(--muted);
       border: 1px solid var(--border);
-      margin-top: 7px;
+      transition: opacity 0.2s;
+    }
+    .btn-secondary:hover { opacity: 0.6; }
+
+    /* ── Footer / Export bar ── */
+    footer {
+      flex-shrink: 0;
+      border-top: 1px solid var(--border);
+      padding: 9px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
     }
 
+    .footer-info {
+      font-size: 0.45rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    #btn-export {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 0.5rem;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    #btn-export:hover { opacity: 0.82; }
+
     #file-input { display: none; }
+
+    /* ── Recorte ── */
+    .crop-header {
+      font-size: 0.52rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin: 14px 0 10px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .crop-formats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+
+    .btn-crop {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 3px;
+      background: #fff;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .btn-crop:hover { border-color: #aaa; }
+    .btn-crop.active { border-color: var(--accent); }
+    .btn-crop.active .crop-shape { stroke: var(--accent); }
+    .btn-crop.active .crop-name { color: var(--accent); }
+
+    .crop-shape { width: 22px; height: 22px; display: block; }
+    .crop-name {
+      font-size: 0.38rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    .crop-custom-inputs {
+      display: none;
+      gap: 6px;
+      margin-top: 8px;
+      align-items: center;
+    }
+    .crop-custom-inputs.visible { display: flex; }
+    .crop-custom-inputs input[type="number"] {
+      width: 48px;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      background: transparent;
+      font-family: var(--font-sans);
+      font-size: 0.52rem;
+      letter-spacing: 0.1em;
+      text-align: center;
+      color: var(--text);
+      outline: none;
+      padding: 3px 0;
+    }
+    .crop-custom-inputs span {
+      font-size: 0.52rem;
+      color: var(--muted);
+    }
+
+    /* Overlay de recorte sobre el canvas */
+    #crop-overlay-canvas {
+      position: absolute;
+      pointer-events: none;
+      display: none;
+    }
+
+    /* ── Mobile nav (oculto en desktop) ── */
+    .mobile-nav { display: none; }
 
     /* ── Mobile ── */
     @media (max-width: 700px) {
 
-      /* header ~57px + presets-bar ~58px */
+      /* Footer oculto en móvil */
+      footer { display: none; }
+
+      /* Workspace: solo canvas, sin panel */
       .workspace {
         grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-        height: calc(100vh - 115px);
+        grid-template-rows: 1fr;
         overflow: hidden;
       }
 
-      .presets-bar-label { display: none; }
-
-      /* La imagen queda fija arriba, el panel scrollea debajo */
-      .canvas-area {
-        padding: 16px 20px;
-        max-height: 40vh;
-        flex-shrink: 0;
-        touch-action: none;
-      }
-
-      #canvas { max-height: 36vh; }
-
+      /* Panel oculto: se convierte en bottom sheet */
       .panel {
-        border-left: none;
-        border-top: 1px solid var(--border);
+        display: block;
+        position: fixed;
+        bottom: 58px; left: 0; right: 0;
+        max-height: 60vh;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        overscroll-behavior-y: contain;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        border-radius: 14px 14px 0 0;
+        transform: translateY(105%);
+        transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+        z-index: 100;
+        box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
       }
+      .panel.sheet-open { transform: translateY(0); }
+
+      /* Canvas area: ocupa todo el espacio disponible */
+      .canvas-area {
+        padding: 10px;
+        height: 100%;
+        touch-action: none;
+      }
+      #canvas { max-height: calc(100dvh - 160px); }
+
+      /* Presets: carrusel sin fade en móvil */
+      .presets-bar-wrapper::after { display: none; }
+
+      /* Nav inferior */
+      .mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        height: 58px;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+        z-index: 200;
+      }
+
+      .mobile-nav-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: var(--font-sans);
+        font-size: 0.38rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--muted);
+        padding: 8px 2px 6px;
+        transition: color 0.2s;
+      }
+      .mobile-nav-btn svg { width: 20px; height: 20px; }
+      .mobile-nav-btn.active { color: var(--accent); }
+
+      .mobile-nav-export {
+        background: var(--accent);
+        color: #fff !important;
+      }
+      .mobile-nav-export:active { opacity: 0.8; }
+
+      /* Crop formats: 2 cols en móvil */
+      .crop-formats { grid-template-columns: repeat(4, 1fr); }
     }
   </style>
 </head>
@@ -399,291 +650,591 @@
 
 <header>
   <h1>The Noir Studio</h1>
-  <span>Editor de Fotografía</span>
+  <span class="tagline">Editor de Fotografía</span>
+  <div class="header-actions">
+    <button id="btn-lock" title="Bloquear configuración al cambiar foto">
+      <svg id="lock-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="1"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+      </svg>
+      <svg id="lock-icon-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+        <rect x="3" y="11" width="18" height="11" rx="1"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </button>
+  </div>
 </header>
 
+<!-- La Curaduría: presets serif text-only -->
 <div class="presets-bar-wrapper">
-  <div class="presets-bar">
-    <span class="presets-bar-label">Presets</span>
-    <div class="preset-grid" id="preset-grid">
-      <!-- generado por JS -->
-    </div>
+  <div class="presets-bar" id="preset-bar">
+    <!-- generado por JS -->
   </div>
 </div>
 
 <div class="workspace">
 
-  <div class="canvas-area" style="position:relative;">
+  <!-- La Obra -->
+  <div class="canvas-area" id="canvas-area">
     <div class="drop-zone" id="drop-zone">
       <div class="icon">◇ ◇ ◇</div>
       <p>Arrastra tu foto aquí<br>o haz clic para seleccionar<br>JPG · PNG · WEBP</p>
     </div>
     <canvas id="canvas"></canvas>
+    <canvas id="crop-overlay-canvas"></canvas>
     <div id="before-badge">Antes</div>
     <button id="btn-change-photo">↺ Cambiar foto</button>
   </div>
 
+  <!-- El Laboratorio -->
   <div class="panel">
 
-    <!-- Exposición -->
-    <div class="panel-section">
-      <h2>Exposición</h2>
-
-      <div class="control">
-        <label>Temperatura <span id="val-warmth">0</span></label>
-        <input type="range" id="warmth" min="-100" max="100" value="0">
+    <!-- A. Geometría -->
+    <div class="pillar collapsed" id="pillar-geo">
+      <div class="pillar-header" onclick="togglePillar('pillar-geo')">
+        <span class="pillar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21 L3 3 L21 3"/><path d="M3 3 L21 21"/>
+          </svg>
+        </span>
+        <span class="pillar-title">Geometría</span>
+        <span class="pillar-toggle">▾</span>
       </div>
+      <div class="pillar-body">
 
-      <div class="control">
-        <label>Brillo <span id="val-brightness">0</span></label>
-        <input type="range" id="brightness" min="-100" max="100" value="0">
-      </div>
+        <div class="control">
+          <label>Marco blanco <span id="val-borderSize">0</span></label>
+          <input type="range" id="borderSize" min="0" max="120" value="0">
+        </div>
 
-      <div class="control">
-        <label>Contraste <span id="val-contrast">0</span></label>
-        <input type="range" id="contrast" min="-100" max="100" value="0">
-      </div>
+        <div class="control">
+          <label>Nivelar <span id="val-nivelar">0°</span></label>
+          <input type="range" id="nivelar" min="-10" max="10" step="0.5" value="0">
+        </div>
 
-      <div class="control">
-        <label>Saturación <span id="val-saturation">0</span></label>
-        <input type="range" id="saturation" min="-100" max="100" value="0">
-      </div>
+        <div class="annotation-row">
+          <span class="annotation-label">Anotación</span>
+          <label class="toggle">
+            <input type="checkbox" id="annotation-toggle">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <input type="text" class="annotation-input" id="annotation-text" placeholder="CARAVAGGIO / SEVILLA 2026" maxlength="40">
 
-      <div class="control">
-        <label>Sombras <span id="val-shadows">0</span></label>
-        <input type="range" id="shadows" min="-100" max="100" value="0">
-      </div>
-    </div>
+        <!-- Recorte -->
+        <p class="crop-header">Recorte</p>
+        <div class="crop-formats" id="crop-formats">
+          <!-- generado por JS -->
+        </div>
+        <div class="crop-custom-inputs" id="crop-custom-inputs">
+          <input type="number" id="crop-custom-w" placeholder="W" min="1" max="9999" value="4">
+          <span>:</span>
+          <input type="number" id="crop-custom-h" placeholder="H" min="1" max="9999" value="5">
+        </div>
 
-    <!-- Máscaras de luminancia -->
-    <div class="panel-section">
-      <h2>Máscaras de Luminancia</h2>
-
-      <div class="control">
-        <label>Tinte en sombras <span id="val-shadowTint">0</span></label>
-        <input type="range" id="shadowTint" min="-100" max="100" value="0">
-      </div>
-
-      <div class="control">
-        <label>Recuperar luces <span id="val-highlightRecovery">0</span></label>
-        <input type="range" id="highlightRecovery" min="0" max="100" value="0">
-      </div>
-    </div>
-
-    <!-- Identidad visual -->
-    <div class="panel-section">
-      <h2>Identidad Visual</h2>
-
-      <div class="control">
-        <label>Negros lavados <span id="val-liftBlacks">0</span></label>
-        <input type="range" id="liftBlacks" min="0" max="100" value="0">
-      </div>
-
-      <div class="control">
-        <label>Viñeta <span id="val-vignette">0</span></label>
-        <input type="range" id="vignette" min="0" max="100" value="0">
-      </div>
-
-      <div class="control">
-        <label>Marco blanco <span id="val-borderSize">0</span></label>
-        <input type="range" id="borderSize" min="0" max="120" value="0">
-      </div>
-
-      <div class="control">
-        <label>Grano <span id="val-grain">0</span></label>
-        <input type="range" id="grain" min="0" max="100" value="0">
       </div>
     </div>
 
-    <!-- Exportar -->
-    <div class="panel-section">
-      <h2>Exportar</h2>
-      <button class="btn btn-primary" id="btn-export">Exportar para Instagram</button>
-      <button class="btn btn-secondary" id="btn-reset">Resetear todo</button>
+    <!-- B. Revelado -->
+    <div class="pillar collapsed" id="pillar-rev">
+      <div class="pillar-header" onclick="togglePillar('pillar-rev')">
+        <span class="pillar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="8"/>
+            <line x1="12" y1="4" x2="12" y2="7"/>
+            <line x1="12" y1="17" x2="12" y2="20"/>
+            <line x1="4" y1="12" x2="7" y2="12"/>
+            <line x1="17" y1="12" x2="20" y2="12"/>
+            <line x1="12" y1="12" x2="16" y2="9"/>
+          </svg>
+        </span>
+        <span class="pillar-title">Revelado</span>
+        <span class="pillar-toggle">▾</span>
+      </div>
+      <div class="pillar-body">
+
+        <div class="control">
+          <label>Luminancia <span id="val-brightness">0</span></label>
+          <input type="range" id="brightness" min="-100" max="100" value="0">
+        </div>
+
+        <div class="control">
+          <label>Contraste <span id="val-contrast">0</span></label>
+          <input type="range" id="contrast" min="-100" max="100" value="0">
+        </div>
+
+        <div class="control">
+          <label>Sombras <span id="val-shadows">0</span></label>
+          <input type="range" id="shadows" min="-100" max="100" value="0">
+        </div>
+
+        <div class="control">
+          <label>Luces <span id="val-highlightRecovery">0</span></label>
+          <input type="range" id="highlightRecovery" min="0" max="100" value="0">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- C. Textura -->
+    <div class="pillar collapsed" id="pillar-tex">
+      <div class="pillar-header" onclick="togglePillar('pillar-tex')">
+        <span class="pillar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+            <circle cx="5" cy="6" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="10" cy="4" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="15" cy="7" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="20" cy="5" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="7" cy="11" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="13" cy="12" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="18" cy="10" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="4" cy="16" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="9" cy="18" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="16" cy="17" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="21" cy="15" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+        </span>
+        <span class="pillar-title">Textura</span>
+        <span class="pillar-toggle">▾</span>
+      </div>
+      <div class="pillar-body">
+
+        <div class="control">
+          <label>Grano <span id="val-grain">0</span></label>
+          <input type="range" id="grain" min="0" max="100" value="0">
+        </div>
+
+        <div class="control">
+          <label>Nitidez <span id="val-sharpness">45</span></label>
+          <input type="range" id="sharpness" min="0" max="100" value="45">
+        </div>
+
+        <div class="control">
+          <label>Viñeta <span id="val-vignette">0</span></label>
+          <input type="range" id="vignette" min="0" max="100" value="0">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- D. Color HSL -->
+    <div class="pillar collapsed" id="pillar-color">
+      <div class="pillar-header" onclick="togglePillar('pillar-color')">
+        <span class="pillar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c3.1 0 5.6-2.5 5.6-5.6C22 6 17.5 2 12 2z"/>
+            <circle cx="7" cy="10" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="11" cy="7" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="16" cy="9" r="1.2" fill="currentColor" stroke="none"/>
+          </svg>
+        </span>
+        <span class="pillar-title">Color</span>
+        <span class="pillar-toggle">▾</span>
+      </div>
+      <div class="pillar-body">
+
+        <div class="control">
+          <label>Temperatura <span id="val-warmth">0</span></label>
+          <input type="range" id="warmth" min="-100" max="100" value="0">
+        </div>
+
+        <div class="control">
+          <label>Saturación <span id="val-saturation">0</span></label>
+          <input type="range" id="saturation" min="-100" max="100" value="0">
+        </div>
+
+        <div class="control">
+          <label>Negros lavados <span id="val-liftBlacks">0</span></label>
+          <input type="range" id="liftBlacks" min="0" max="100" value="0">
+        </div>
+
+        <div class="control">
+          <label>Tinte sombras <span id="val-shadowTint">0</span></label>
+          <input type="range" id="shadowTint" min="-100" max="100" value="0">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Reset -->
+    <div class="panel-footer">
+      <button class="btn-secondary" id="btn-reset">Resetear todo</button>
     </div>
 
   </div>
 </div>
 
+<!-- La Salida -->
+<footer>
+  <span class="footer-info">JPG · 1080×1350 · sRGB</span>
+  <button id="btn-export">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:7px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Descargar
+  </button>
+</footer>
+
 <input type="file" id="file-input" accept="image/*">
 
-<script>
-// ── Definición de los 15 presets ──
-// Cada preset es un objeto con los valores de todos los sliders
-// warmth: positivo=cálido/naranja, negativo=frío/azul
-// liftBlacks: sube el suelo de los negros (efecto matte/desvanecido)
-// vignette: oscurece las esquinas (0–100)
+<!-- Barra de navegación inferior (solo móvil) -->
+<nav class="mobile-nav" id="mobile-nav">
+  <button class="mobile-nav-btn" data-pillar="pillar-geo" onclick="toggleMobileSheet('pillar-geo', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21 L3 3 L21 3"/><path d="M3 3 L21 21"/></svg>
+    <span>Geometría</span>
+  </button>
+  <button class="mobile-nav-btn" data-pillar="pillar-rev" onclick="toggleMobileSheet('pillar-rev', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="12" y1="12" x2="16" y2="9"/></svg>
+    <span>Revelado</span>
+  </button>
+  <button class="mobile-nav-btn" data-pillar="pillar-tex" onclick="toggleMobileSheet('pillar-tex', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="5" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="4" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="7" r="1.2" fill="currentColor" stroke="none"/><circle cx="20" cy="5" r="1.2" fill="currentColor" stroke="none"/><circle cx="7" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="13" cy="13" r="1.2" fill="currentColor" stroke="none"/><circle cx="18" cy="11" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="19" r="1.2" fill="currentColor" stroke="none"/><circle cx="17" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
+    <span>Textura</span>
+  </button>
+  <button class="mobile-nav-btn" data-pillar="pillar-color" onclick="toggleMobileSheet('pillar-color', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c3.1 0 5.6-2.5 5.6-5.6C22 6 17.5 2 12 2z"/><circle cx="7" cy="10" r="1.2" fill="currentColor" stroke="none"/><circle cx="11" cy="7" r="1.2" fill="currentColor" stroke="none"/></svg>
+    <span>Color</span>
+  </button>
+  <button class="mobile-nav-btn mobile-nav-export" id="btn-export-mobile">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span>Guardar</span>
+  </button>
+</nav>
 
+<script>
+// ── Los 20 presets ──
+// Cada preset: label, color (iluminación al seleccionar), y valores de sliders.
 const PRESETS = {
+
+  // — Luz y tiempo —
   'golden-hour': {
-    label: '19:24\nGolden Hour',
+    label: 'Golden Hour', color: '#C8A84B',
     warmth: 55, brightness: 8, contrast: 22, saturation: 18,
-    shadows: 28, liftBlacks: 0, vignette: 18, grain: 5, borderSize: 0,
+    shadows: 28, liftBlacks: 0, vignette: 18, grain: 5,
     shadowTint: 0, highlightRecovery: 0
   },
   'first-light': {
-    label: '06:45\nFirst Light',
+    label: 'First Light', color: '#7BAFC4',
     warmth: -35, brightness: 6, contrast: 15, saturation: -12,
-    shadows: 22, liftBlacks: 10, vignette: 14, grain: 8, borderSize: 0,
+    shadows: 22, liftBlacks: 10, vignette: 14, grain: 8,
     shadowTint: -5, highlightRecovery: 8
   },
   'dead-of-night': {
-    label: '00:00\nDead of Night',
+    label: 'Dead of Night', color: '#4A3570',
     warmth: -12, brightness: -22, contrast: 75, saturation: -22,
-    shadows: -18, liftBlacks: 0, vignette: 62, grain: 12, borderSize: 0,
+    shadows: -18, liftBlacks: 0, vignette: 62, grain: 12,
     shadowTint: 0, highlightRecovery: 0
   },
+
+  // — Directores —
   'quentin': {
-    label: 'QUENTIN',
+    label: 'Quentin', color: '#B03030',
     warmth: 42, brightness: 5, contrast: 32, saturation: 48,
-    shadows: 10, liftBlacks: 0, vignette: 22, grain: 48, borderSize: 0,
+    shadows: 10, liftBlacks: 0, vignette: 22, grain: 48,
     shadowTint: 0, highlightRecovery: 0
   },
   'wes': {
-    label: 'WES',
+    label: 'Wes', color: '#C49080',
     warmth: 14, brightness: 10, contrast: -22, saturation: -35,
-    shadows: 32, liftBlacks: 38, vignette: 0, grain: 6, borderSize: 0,
+    shadows: 32, liftBlacks: 38, vignette: 0, grain: 6,
     shadowTint: 5, highlightRecovery: 18
   },
+  'andy': {
+    label: 'Andy', color: '#D91E8C',
+    warmth: 10, brightness: 15, contrast: 28, saturation: 85,
+    shadows: 20, liftBlacks: 12, vignette: 0, grain: 2,
+    shadowTint: 0, highlightRecovery: 0
+  },
+
+  // — Pintores —
   'caravaggio': {
-    label: 'CARAVAGGIO',
+    label: 'Caravaggio', color: '#8B6A1A',
     warmth: -8, brightness: -5, contrast: 65, saturation: -15,
-    shadows: 55, liftBlacks: 0, vignette: 45, grain: 6, borderSize: 0,
+    shadows: 55, liftBlacks: 0, vignette: 45, grain: 6,
     shadowTint: 0, highlightRecovery: 0
-  },
-  'tobacco': {
-    label: 'TOBACCO',
-    warmth: 55, brightness: -6, contrast: 25, saturation: -45,
-    shadows: -12, liftBlacks: 5, vignette: 42, grain: 22, borderSize: 0,
-    shadowTint: -8, highlightRecovery: 0
-  },
-  'velvet': {
-    label: 'VELVET',
-    warmth: -6, brightness: -22, contrast: 42, saturation: 22,
-    shadows: -8, liftBlacks: 0, vignette: 78, grain: 10, borderSize: 0,
-    shadowTint: 0, highlightRecovery: 0
-  },
-  'old-money': {
-    label: 'OLD\nMONEY',
-    warmth: -16, brightness: 0, contrast: 22, saturation: -58,
-    shadows: 12, liftBlacks: 12, vignette: 22, grain: 5, borderSize: 0,
-    shadowTint: 18, highlightRecovery: 8
-  },
-  'matte': {
-    label: 'MATTE\n180g',
-    warmth: 5, brightness: 5, contrast: -25, saturation: -20,
-    shadows: 16, liftBlacks: 48, vignette: 5, grain: 3, borderSize: 0,
-    shadowTint: 0, highlightRecovery: 5
   },
   'zuloaga': {
-    label: 'ZULOAGA',
+    label: 'Zuloaga', color: '#333333',
     warmth: 0, brightness: 0, contrast: 55, saturation: -100,
-    shadows: 0, liftBlacks: 5, vignette: 25, grain: 35, borderSize: 0,
+    shadows: 0, liftBlacks: 5, vignette: 25, grain: 35,
     shadowTint: 0, highlightRecovery: 0
   },
-  'japanese-grain': {
-    label: 'JAPANESE\nGRAIN',
-    warmth: 0, brightness: -5, contrast: -5, saturation: -100,
-    shadows: 22, liftBlacks: 8, vignette: 10, grain: 82, borderSize: 0,
+  'velvet': {
+    label: 'Velvet', color: '#6B3FA0',
+    warmth: -6, brightness: -22, contrast: 42, saturation: 22,
+    shadows: -8, liftBlacks: 0, vignette: 78, grain: 10,
     shadowTint: 0, highlightRecovery: 0
   },
+
+  // — Cámaras / sistemas —
   'm-system': {
-    label: 'M-SYSTEM',
+    label: 'M-System', color: '#C8201A',
     warmth: 5, brightness: 2, contrast: 18, saturation: 8,
-    shadows: 16, liftBlacks: 0, vignette: 12, grain: 2, borderSize: 0,
+    shadows: 16, liftBlacks: 0, vignette: 12, grain: 2,
     shadowTint: 0, highlightRecovery: 5
   },
   'f-chrome': {
-    label: 'F-CHROME',
+    label: 'F-Chrome', color: '#1A5276',
     warmth: -25, brightness: 5, contrast: 28, saturation: 32,
-    shadows: 10, liftBlacks: 0, vignette: 20, grain: 5, borderSize: 0,
+    shadows: 10, liftBlacks: 0, vignette: 20, grain: 5,
     shadowTint: -5, highlightRecovery: 0
   },
   'h-format': {
-    label: 'H-FORMAT',
+    label: 'H-Format', color: '#4A5D23',
     warmth: 8, brightness: 8, contrast: -8, saturation: 12,
-    shadows: 32, liftBlacks: 5, vignette: 8, grain: 3, borderSize: 0,
+    shadows: 32, liftBlacks: 5, vignette: 8, grain: 3,
     shadowTint: 0, highlightRecovery: 22
+  },
+  'leica': {
+    label: 'Leica', color: '#B8860B',
+    warmth: 28, brightness: 3, contrast: 20, saturation: 5,
+    shadows: 18, liftBlacks: 0, vignette: 15, grain: 3,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'capa': {
+    label: 'Capa', color: '#555555',
+    warmth: 0, brightness: -8, contrast: 72, saturation: -100,
+    shadows: -5, liftBlacks: 0, vignette: 35, grain: 45,
+    shadowTint: 0, highlightRecovery: 0
+  },
+
+  // — Materiales / procesos —
+  'tobacco': {
+    label: 'Tobacco', color: '#7B4B2A',
+    warmth: 55, brightness: -6, contrast: 25, saturation: -45,
+    shadows: -12, liftBlacks: 5, vignette: 42, grain: 22,
+    shadowTint: -8, highlightRecovery: 0
+  },
+  'old-money': {
+    label: 'Old Money', color: '#2C5F4A',
+    warmth: -16, brightness: 0, contrast: 22, saturation: -58,
+    shadows: 12, liftBlacks: 12, vignette: 22, grain: 5,
+    shadowTint: 18, highlightRecovery: 8
+  },
+  'matte': {
+    label: 'Matte 180g', color: '#888888',
+    warmth: 5, brightness: 5, contrast: -25, saturation: -20,
+    shadows: 16, liftBlacks: 48, vignette: 5, grain: 3,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'kodak': {
+    label: 'Kodak', color: '#D4880A',
+    warmth: 38, brightness: 5, contrast: 8, saturation: -15,
+    shadows: 28, liftBlacks: 18, vignette: 8, grain: 8,
+    shadowTint: 0, highlightRecovery: 12
+  },
+
+  // — Blanco y negro —
+  'japanese-grain': {
+    label: 'Japanese Grain', color: '#8B7355',
+    warmth: 0, brightness: -5, contrast: -5, saturation: -100,
+    shadows: 22, liftBlacks: 8, vignette: 10, grain: 82,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'silver': {
+    label: 'Silver', color: '#708090',
+    warmth: -8, brightness: 2, contrast: 38, saturation: -100,
+    shadows: 12, liftBlacks: 8, vignette: 18, grain: 22,
+    shadowTint: -8, highlightRecovery: 10
   },
 };
 
-// ── Iconos SVG de cada preset ──
-// Trazo minimalista sobre viewBox 24×24, stroke="currentColor"
-const PRESET_ICONS = {
-  'golden-hour': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7.1" y2="7.1"/><line x1="16.9" y1="16.9" x2="19.1" y2="19.1"/><line x1="19.1" y1="4.9" x2="16.9" y2="7.1"/><line x1="7.1" y1="16.9" x2="4.9" y2="19.1"/></svg>`,
-  'first-light':  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 17 Q12 5 21 17"/><line x1="3" y1="20" x2="21" y2="20"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="6" y1="7" x2="7.5" y2="8.5"/><line x1="18" y1="7" x2="16.5" y2="8.5"/></svg>`,
-  'dead-of-night':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 4 A8 8 0 1 0 14 20 A6 6 0 1 1 14 4Z"/></svg>`,
-  'quentin':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="20" height="16"/><line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/><rect x="3" y="7" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="3" y="11" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="3" y="15" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="18.5" y="7" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="18.5" y="11" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="18.5" y="15" width="2.5" height="2" fill="currentColor" stroke="none"/></svg>`,
-  'wes':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="20" height="20"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>`,
-  'caravaggio':   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3 C9 7 7 9 7 12 A5 5 0 0 0 17 12 C17 9 15 7 12 3Z"/><line x1="12" y1="17" x2="12" y2="20"/><line x1="9" y1="20" x2="15" y2="20"/></svg>`,
-  'tobacco':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 19 C9 15 15 15 15 11 C15 7 9 7 9 3"/><path d="M14 19 C14 16 18 15 18 12 C18 9 14 8 14 5"/><line x1="5" y1="19" x2="19" y2="19"/></svg>`,
-  'velvet':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L22 12 L12 22 L2 12 Z"/><path d="M12 7 L17 12 L12 17 L7 12 Z"/></svg>`,
-  'old-money':    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 L3 9 L8 14 L12 5 L16 14 L21 9 L21 18 Z"/><line x1="3" y1="21" x2="21" y2="21"/></svg>`,
-  'matte':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="8" width="17" height="13"/><rect x="6" y="5" width="17" height="13"/></svg>`,
-  'zuloaga':      `<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9" fill="none"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor" stroke="none"/><line x1="12" y1="3" x2="12" y2="21" stroke-linecap="round"/></svg>`,
-  'japanese-grain':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="7" x2="22" y2="7"/><line x1="4" y1="4" x2="20" y2="4"/><line x1="7" y1="7" x2="7" y2="22"/><line x1="17" y1="7" x2="17" y2="22"/><line x1="7" y1="13" x2="17" y2="13"/></svg>`,
-  'm-system':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>`,
-  'f-chrome':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 L21 20 L3 20 Z"/><line x1="7.5" y1="14" x2="16.5" y2="14"/><line x1="9.5" y1="10" x2="14.5" y2="10"/></svg>`,
-  'h-format':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="7" x2="2" y2="2"/><line x1="2" y1="2" x2="7" y2="2"/><line x1="22" y1="7" x2="22" y2="2"/><line x1="22" y1="2" x2="17" y2="2"/><line x1="2" y1="17" x2="2" y2="22"/><line x1="2" y1="22" x2="7" y2="22"/><line x1="22" y1="17" x2="22" y2="22"/><line x1="22" y1="22" x2="17" y2="22"/></svg>`,
-};
+// ── Formatos de recorte ──
+const CROP_FORMATS = [
+  { id: 'free',     label: 'Libre',      sub: 'Sin recorte', ratio: null,    exportW: 1080, exportH: 1350, svgRect: [4,2,16,20] },
+  { id: 'story',    label: 'Story',      sub: '9:16',        ratio: 9/16,    exportW: 1080, exportH: 1920, svgRect: [8,1,8,22] },
+  { id: 'post45',   label: 'Post 4:5',   sub: '4:5',         ratio: 4/5,     exportW: 1080, exportH: 1350, svgRect: [5,2,14,18] },
+  { id: 'square',   label: 'Cuadrado',   sub: '1:1',         ratio: 1,       exportW: 1080, exportH: 1080, svgRect: [3,3,18,18] },
+  { id: 'retrato',  label: 'Retrato',    sub: '3:4',         ratio: 3/4,     exportW: 1080, exportH: 1440, svgRect: [5,3,14,18] },
+  { id: 'horiz',    label: 'Horizontal', sub: '16:9',        ratio: 16/9,    exportW: 1920, exportH: 1080, svgRect: [1,6,22,12] },
+  { id: 'cine',     label: 'Cine',       sub: '2.35:1',      ratio: 2.35,    exportW: 2350, exportH: 1000, svgRect: [1,8,22,8] },
+  { id: 'custom',   label: 'Personaliz.', sub: 'W:H',        ratio: 'custom',exportW: null, exportH: null, svgRect: [3,3,18,18] },
+];
 
-// ── Referencias al DOM ──
-const dropZone  = document.getElementById('drop-zone');
-const canvas    = document.getElementById('canvas');
-const ctx       = canvas.getContext('2d');
-const fileInput = document.getElementById('file-input');
-
-// Mapa de todos los sliders
-const sliders = {
-  warmth:             document.getElementById('warmth'),
-  brightness:         document.getElementById('brightness'),
-  contrast:           document.getElementById('contrast'),
-  saturation:         document.getElementById('saturation'),
-  shadows:            document.getElementById('shadows'),
-  shadowTint:         document.getElementById('shadowTint'),
-  highlightRecovery:  document.getElementById('highlightRecovery'),
-  liftBlacks:         document.getElementById('liftBlacks'),
-  vignette:           document.getElementById('vignette'),
-  borderSize:         document.getElementById('borderSize'),
-  grain:              document.getElementById('grain'),
-};
-
-// Mapa de los valores mostrados
-const vals = {};
-Object.keys(sliders).forEach(k => {
-  vals[k] = document.getElementById('val-' + k);
-});
-
+// ── Estado ──
 let originalImage    = null;
 let activePreset     = null;
+let lockOn           = false;
+let showBefore       = false;
+let activeCropFormat = 'free';
 
-// ── Construir grid de presets ──
-const presetGrid = document.getElementById('preset-grid');
+// ── DOM ──
+const dropZone    = document.getElementById('drop-zone');
+const canvas      = document.getElementById('canvas');
+const ctx         = canvas.getContext('2d');
+const fileInput   = document.getElementById('file-input');
+const presetBar   = document.getElementById('preset-bar');
+
+// Sliders del motor de píxeles
+const sliders = {
+  brightness:        document.getElementById('brightness'),
+  contrast:          document.getElementById('contrast'),
+  saturation:        document.getElementById('saturation'),
+  shadows:           document.getElementById('shadows'),
+  warmth:            document.getElementById('warmth'),
+  liftBlacks:        document.getElementById('liftBlacks'),
+  vignette:          document.getElementById('vignette'),
+  grain:             document.getElementById('grain'),
+  shadowTint:        document.getElementById('shadowTint'),
+  highlightRecovery: document.getElementById('highlightRecovery'),
+  borderSize:        document.getElementById('borderSize'),
+};
+
+// Sliders que se muestran pero no van al motor de píxeles directamente
+const nivelarSlider  = document.getElementById('nivelar');
+const sharpnessSlider = document.getElementById('sharpness');
+
+// Valores mostrados
+const vals = {};
+Object.keys(sliders).forEach(k => { vals[k] = document.getElementById('val-' + k); });
+
+// ── Iconos SVG para los 20 presets ──
+const PRESET_ICONS = {
+  'golden-hour':    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7.1" y2="7.1"/><line x1="16.9" y1="16.9" x2="19.1" y2="19.1"/><line x1="19.1" y1="4.9" x2="16.9" y2="7.1"/><line x1="7.1" y1="16.9" x2="4.9" y2="19.1"/></svg>`,
+  'first-light':    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 17 Q12 5 21 17"/><line x1="3" y1="20" x2="21" y2="20"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="6" y1="7" x2="7.5" y2="8.5"/><line x1="18" y1="7" x2="16.5" y2="8.5"/></svg>`,
+  'dead-of-night':  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 4 A8 8 0 1 0 14 20 A6 6 0 1 1 14 4Z"/></svg>`,
+  'quentin':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="20" height="16"/><line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/><rect x="3" y="7" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="3" y="11" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="3" y="15" width="2.5" height="2" fill="currentColor" stroke="none"/></svg>`,
+  'wes':            `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="20" height="20"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>`,
+  'andy':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="3" fill="currentColor" stroke="none" opacity="0.6"/><circle cx="17" cy="7" r="3" fill="currentColor" stroke="none" opacity="0.4"/><circle cx="7" cy="17" r="3" fill="currentColor" stroke="none" opacity="0.3"/><circle cx="17" cy="17" r="3" fill="currentColor" stroke="none" opacity="0.7"/></svg>`,
+  'caravaggio':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3 C9 7 7 9 7 12 A5 5 0 0 0 17 12 C17 9 15 7 12 3Z"/><line x1="12" y1="17" x2="12" y2="20"/><line x1="9" y1="20" x2="15" y2="20"/></svg>`,
+  'zuloaga':        `<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9" fill="none"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor" stroke="none"/><line x1="12" y1="3" x2="12" y2="21" stroke-linecap="round"/></svg>`,
+  'velvet':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L22 12 L12 22 L2 12 Z"/><path d="M12 7 L17 12 L12 17 L7 12 Z"/></svg>`,
+  'm-system':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>`,
+  'f-chrome':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 L21 20 L3 20 Z"/><line x1="7.5" y1="14" x2="16.5" y2="14"/><line x1="9.5" y1="10" x2="14.5" y2="10"/></svg>`,
+  'h-format':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="7" x2="2" y2="2"/><line x1="2" y1="2" x2="7" y2="2"/><line x1="22" y1="7" x2="22" y2="2"/><line x1="22" y1="2" x2="17" y2="2"/><line x1="2" y1="17" x2="2" y2="22"/><line x1="2" y1="22" x2="7" y2="22"/><line x1="22" y1="17" x2="22" y2="22"/><line x1="22" y1="22" x2="17" y2="22"/></svg>`,
+  'leica':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg>`,
+  'capa':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M8 7 V5 a1 1 0 0 1 1-1 h6 a1 1 0 0 1 1 1 V7"/><circle cx="12" cy="14" r="3.5"/></svg>`,
+  'tobacco':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 19 C9 15 15 15 15 11 C15 7 9 7 9 3"/><path d="M14 19 C14 16 18 15 18 12 C18 9 14 8 14 5"/><line x1="5" y1="19" x2="19" y2="19"/></svg>`,
+  'old-money':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 L3 9 L8 14 L12 5 L16 14 L21 9 L21 18 Z"/><line x1="3" y1="21" x2="21" y2="21"/></svg>`,
+  'matte':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="8" width="17" height="13"/><rect x="6" y="5" width="17" height="13"/></svg>`,
+  'kodak':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><circle cx="12" cy="12" r="2"/></svg>`,
+  'japanese-grain': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="7" x2="22" y2="7"/><line x1="4" y1="4" x2="20" y2="4"/><line x1="7" y1="7" x2="7" y2="22"/><line x1="17" y1="7" x2="17" y2="22"/><line x1="7" y1="13" x2="17" y2="13"/></svg>`,
+  'silver':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="5" width="18" height="14"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="7" y1="5" x2="7" y2="19"/></svg>`,
+};
+
+// ── Construir formatos de recorte ──
+const cropFormatsEl = document.getElementById('crop-formats');
+CROP_FORMATS.forEach(fmt => {
+  const [rx, ry, rw, rh] = fmt.svgRect;
+  const btn = document.createElement('button');
+  btn.className = 'btn-crop' + (fmt.id === 'free' ? ' active' : '');
+  btn.dataset.id = fmt.id;
+  btn.innerHTML = `
+    <svg class="crop-shape" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="1.4" stroke-linecap="round">
+      <rect x="${rx}" y="${ry}" width="${rw}" height="${rh}"/>
+    </svg>
+    <span class="crop-name">${fmt.label}<br><span style="opacity:.6">${fmt.sub}</span></span>
+  `;
+  btn.addEventListener('click', () => setCropFormat(fmt.id, btn));
+  cropFormatsEl.appendChild(btn);
+});
+
+function setCropFormat(id, btn) {
+  activeCropFormat = id;
+  cropFormatsEl.querySelectorAll('.btn-crop').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const isCustom = id === 'custom';
+  document.getElementById('crop-custom-inputs').classList.toggle('visible', isCustom);
+  updateCropOverlay();
+}
+
+document.getElementById('crop-custom-w').addEventListener('input', updateCropOverlay);
+document.getElementById('crop-custom-h').addEventListener('input', updateCropOverlay);
+
+// ── Overlay de recorte ──
+const overlayCanvas = document.getElementById('crop-overlay-canvas');
+const overlayCtx    = overlayCanvas.getContext('2d');
+
+function updateCropOverlay() {
+  if (!originalImage) { overlayCanvas.style.display = 'none'; return; }
+
+  const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
+  if (!fmt || (!fmt.ratio && fmt.id !== 'custom')) {
+    overlayCanvas.style.display = 'none'; return;
+  }
+
+  let ratio = fmt.ratio;
+  if (fmt.id === 'custom') {
+    const cw = parseFloat(document.getElementById('crop-custom-w').value) || 4;
+    const ch = parseFloat(document.getElementById('crop-custom-h').value) || 5;
+    ratio = cw / ch;
+  }
+
+  const canvasRect = canvas.getBoundingClientRect();
+  const areaRect   = document.getElementById('canvas-area').getBoundingClientRect();
+
+  overlayCanvas.width  = canvasRect.width;
+  overlayCanvas.height = canvasRect.height;
+  overlayCanvas.style.width  = canvasRect.width  + 'px';
+  overlayCanvas.style.height = canvasRect.height + 'px';
+  overlayCanvas.style.left   = (canvasRect.left - areaRect.left) + 'px';
+  overlayCanvas.style.top    = (canvasRect.top  - areaRect.top)  + 'px';
+  overlayCanvas.style.display = 'block';
+
+  const w = canvasRect.width, h = canvasRect.height;
+  const canvasRatio = w / h;
+  let cropW, cropH;
+  if (canvasRatio > ratio) { cropH = h; cropW = h * ratio; }
+  else                     { cropW = w; cropH = w / ratio; }
+  const cropX = (w - cropW) / 2;
+  const cropY = (h - cropH) / 2;
+
+  overlayCtx.clearRect(0, 0, w, h);
+  // oscurecer fuera
+  overlayCtx.fillStyle = 'rgba(0,0,0,0.55)';
+  overlayCtx.fillRect(0, 0, w, h);
+  // limpiar dentro
+  overlayCtx.clearRect(cropX, cropY, cropW, cropH);
+  // borde blanco
+  overlayCtx.strokeStyle = 'rgba(255,255,255,0.85)';
+  overlayCtx.lineWidth = 1;
+  overlayCtx.strokeRect(cropX, cropY, cropW, cropH);
+  // tercios
+  overlayCtx.strokeStyle = 'rgba(255,255,255,0.22)';
+  overlayCtx.lineWidth = 0.5;
+  overlayCtx.beginPath();
+  for (let i = 1; i < 3; i++) {
+    overlayCtx.moveTo(cropX + cropW * i/3, cropY);
+    overlayCtx.lineTo(cropX + cropW * i/3, cropY + cropH);
+    overlayCtx.moveTo(cropX, cropY + cropH * i/3);
+    overlayCtx.lineTo(cropX + cropW, cropY + cropH * i/3);
+  }
+  overlayCtx.stroke();
+}
+
+// ── Construir barra de presets (icono + serif label) ──
 Object.entries(PRESETS).forEach(([key, preset]) => {
   const btn = document.createElement('button');
   btn.className = 'btn-preset';
   btn.dataset.key = key;
   btn.innerHTML = `
     <span class="preset-icon">${PRESET_ICONS[key] || ''}</span>
-    <span class="preset-label">${preset.label.replace('\n', '<br>')}</span>
+    <span class="preset-label">${preset.label}</span>
   `;
   btn.addEventListener('click', () => applyPreset(key, btn));
-  presetGrid.appendChild(btn);
+  presetBar.appendChild(btn);
 });
 
+// ── Aplicar preset ──
 function applyPreset(key, btn) {
-  // Toggle: si ya estaba activo, resetea
   if (activePreset === key) {
     resetSliders();
-    activePreset = null;
     return;
   }
   activePreset = key;
-  // Desactiva todos los botones
-  presetGrid.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
 
-  // Aplica los valores del preset a los sliders
+  // Desactiva todos
+  presetBar.querySelectorAll('.btn-preset').forEach(b => {
+    b.classList.remove('active');
+    b.style.borderBottomColor = 'transparent';
+    b.querySelector('.preset-icon').style.color  = '';
+    b.querySelector('.preset-label').style.color = '';
+  });
+
+  // Activa este con su color
+  btn.classList.add('active');
+  const color = PRESETS[key].color;
+  btn.style.borderBottomColor = color;
+  btn.querySelector('.preset-icon').style.color  = color;
+  btn.querySelector('.preset-label').style.color = color;
+
+  // Aplica valores
   const p = PRESETS[key];
   Object.keys(sliders).forEach(k => {
     if (p[k] !== undefined) {
@@ -691,6 +1242,11 @@ function applyPreset(key, btn) {
       if (vals[k]) vals[k].textContent = p[k];
     }
   });
+
+  // Actualiza texto de anotación con nombre del preset si está vacío
+  const annotInput = document.getElementById('annotation-text');
+  if (!annotInput.value) annotInput.placeholder = preset.label.toUpperCase() + ' / SEVILLA 2026';
+
   applyFilters();
 }
 
@@ -718,9 +1274,16 @@ function loadImage(file) {
     img.onload = () => {
       originalImage = img;
       dropZone.style.display = 'none';
-      canvas.style.display   = 'block';
+      canvas.style.display = 'block';
       document.getElementById('btn-change-photo').style.display = 'block';
-      applyFilters();
+
+      // Si Lock ON, re-aplica el preset activo a la nueva foto
+      if (lockOn && activePreset) {
+        const btn = presetBar.querySelector(`[data-key="${activePreset}"]`);
+        applyPreset(activePreset, btn);
+      } else {
+        applyFilters();
+      }
     };
     img.src = e.target.result;
   };
@@ -730,16 +1293,38 @@ function loadImage(file) {
 // ── Cambiar foto ──
 document.getElementById('btn-change-photo').addEventListener('click', () => {
   originalImage = null;
-  activePreset  = null;
+  if (!lockOn) {
+    activePreset = null;
+    resetSliders();
+  }
   canvas.style.display = 'none';
   document.getElementById('btn-change-photo').style.display = 'none';
   document.getElementById('before-badge').style.display = 'none';
+  canvas.style.transform = '';
   dropZone.style.display = '';
-  presetGrid.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
-  resetSliders();
+  if (!lockOn) {
+    presetBar.querySelectorAll('.btn-preset').forEach(b => {
+      b.classList.remove('active');
+      b.style.color = '';
+      b.style.borderBottomColor = 'transparent';
+    });
+  }
+  fileInput.value = '';
 });
 
-// ── Motor de píxeles (reutilizable para vista principal y thumbnails) ──
+// ── Nivelar: CSS transform en preview ──
+nivelarSlider.addEventListener('input', () => {
+  const deg = parseFloat(nivelarSlider.value);
+  document.getElementById('val-nivelar').textContent = deg + '°';
+  canvas.style.transform = deg !== 0 ? `rotate(${deg}deg)` : '';
+});
+
+// ── Sharpness: solo afecta al export (muestra valor en UI) ──
+sharpnessSlider.addEventListener('input', () => {
+  document.getElementById('val-sharpness').textContent = sharpnessSlider.value;
+});
+
+// ── Motor de píxeles ──
 function processPixels(data, p) {
   const contrastFactor = (259 * (p.contrast + 255)) / (255 * (259 - p.contrast));
   const satFactor      = (p.saturation + 100) / 100;
@@ -750,39 +1335,48 @@ function processPixels(data, p) {
     let r = data[i], g = data[i+1], b = data[i+2];
     const lum = 0.299 * r + 0.587 * g + 0.114 * b;
 
+    // Saturación
     r = lum + (r - lum) * satFactor;
     g = lum + (g - lum) * satFactor;
     b = lum + (b - lum) * satFactor;
 
+    // Tinte en sombras
     if (p.shadowTint !== 0 && lum < 140) {
       const t = (p.shadowTint / 100) * (1 - lum / 140) * 20;
       g += t; r -= t * 0.25; b -= t * 0.15;
     }
 
+    // Temperatura
     r += w * 28; g += w * 8; b -= w * 22;
 
+    // Sombras
     if (p.shadows !== 0 && lum < 128) {
       const boost = (p.shadows / 100) * (1 - lum / 128) * 55;
       r += boost; g += boost; b += boost;
     }
 
+    // Brillo
     r += p.brightness; g += p.brightness; b += p.brightness;
 
+    // Contraste
     r = contrastFactor * (r - 128) + 128;
     g = contrastFactor * (g - 128) + 128;
     b = contrastFactor * (b - 128) + 128;
 
+    // Recuperar luces
     if (p.highlightRecovery > 0 && lum > 190) {
       const pull = ((lum - 190) / 65) * (p.highlightRecovery / 100) * 40;
       r -= pull; g -= pull; b -= pull;
     }
 
+    // Lift blacks (matte)
     if (lift > 0) {
       r = (r / 255) * (255 - lift) + lift;
       g = (g / 255) * (255 - lift) + lift;
       b = (b / 255) * (255 - lift) + lift;
     }
 
+    // Grano
     if (p.grain > 0) {
       const noise = (Math.random() - 0.5) * p.grain * 0.85;
       r += noise; g += noise; b += noise;
@@ -804,23 +1398,12 @@ function applyVignette(c, w, h, vignette) {
   c.fillRect(0, 0, w, h);
 }
 
-// ── Motor de filtros (vista principal) ──
 function applyFilters() {
   if (!originalImage) return;
 
   const border = parseInt(sliders.borderSize.value);
-  const p = {
-    brightness:        parseInt(sliders.brightness.value),
-    contrast:          parseInt(sliders.contrast.value),
-    saturation:        parseInt(sliders.saturation.value),
-    shadows:           parseInt(sliders.shadows.value),
-    warmth:            parseInt(sliders.warmth.value),
-    liftBlacks:        parseInt(sliders.liftBlacks.value),
-    vignette:          parseInt(sliders.vignette.value),
-    grain:             parseInt(sliders.grain.value),
-    shadowTint:        parseInt(sliders.shadowTint.value),
-    highlightRecovery: parseInt(sliders.highlightRecovery.value),
-  };
+  const p = {};
+  Object.keys(sliders).forEach(k => { p[k] = parseInt(sliders[k].value); });
 
   canvas.width  = originalImage.width  + border * 2;
   canvas.height = originalImage.height + border * 2;
@@ -837,15 +1420,18 @@ function applyFilters() {
 // ── Sliders: escuchar cambios ──
 Object.entries(sliders).forEach(([key, slider]) => {
   slider.addEventListener('input', () => {
-    vals[key].textContent = slider.value;
-    // Si el usuario mueve un slider, desactiva el preset activo
+    if (vals[key]) vals[key].textContent = slider.value;
     activePreset = null;
-    presetGrid.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+    presetBar.querySelectorAll('.btn-preset').forEach(b => {
+      b.classList.remove('active');
+      b.style.color = '';
+      b.style.borderBottomColor = 'transparent';
+    });
     applyFilters();
   });
 });
 
-// ── Exportar para Instagram ──
+// ── Exportar ──
 document.getElementById('btn-export').addEventListener('click', () => {
   if (!originalImage) return;
 
@@ -853,38 +1439,86 @@ document.getElementById('btn-export').addEventListener('click', () => {
   btn.textContent = 'Procesando...';
   btn.style.opacity = '0.6';
 
-  // Defer para que el botón repinte antes de bloquear el hilo con la convolución
   setTimeout(() => {
     const exp    = document.createElement('canvas');
     const expCtx = exp.getContext('2d');
-    exp.width    = 1080;
-    exp.height   = 1350; // proporción 4:5
-    expCtx.drawImage(canvas, 0, 0, 1080, 1350);
 
-    // Output sharpening — se aplica solo al exportar, no en preview en tiempo real
-    const imgData = expCtx.getImageData(0, 0, 1080, 1350);
-    sharpenImageData(imgData, 0.45);
-    expCtx.putImageData(imgData, 0, 0);
+    // Calcular tamaño y recorte
+    const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
+    let ratio = fmt ? fmt.ratio : null;
+    if (activeCropFormat === 'custom') {
+      const cw = parseFloat(document.getElementById('crop-custom-w').value) || 4;
+      const ch = parseFloat(document.getElementById('crop-custom-h').value) || 5;
+      ratio = cw / ch;
+    }
+
+    let srcX = 0, srcY = 0, srcW = canvas.width, srcH = canvas.height;
+    let expW = fmt?.exportW || 1080;
+    let expH = fmt?.exportH || 1350;
+
+    if (ratio && ratio !== 'custom') {
+      const canvasRatio = canvas.width / canvas.height;
+      if (canvasRatio > ratio) { srcH = canvas.height; srcW = srcH * ratio; }
+      else                     { srcW = canvas.width;  srcH = srcW / ratio; }
+      srcX = (canvas.width  - srcW) / 2;
+      srcY = (canvas.height - srcH) / 2;
+      if (activeCropFormat === 'custom') {
+        expW = 1080; expH = Math.round(1080 / ratio);
+      }
+    }
+
+    exp.width  = expW;
+    exp.height = expH;
+
+    // Aplicar rotación (nivelar) al exportar
+    const deg = parseFloat(nivelarSlider.value);
+    if (deg !== 0) {
+      expCtx.save();
+      expCtx.translate(expW / 2, expH / 2);
+      expCtx.rotate(deg * Math.PI / 180);
+      expCtx.drawImage(canvas, srcX, srcY, srcW, srcH, -expW / 2, -expH / 2, expW, expH);
+      expCtx.restore();
+    } else {
+      expCtx.drawImage(canvas, srcX, srcY, srcW, srcH, 0, 0, expW, expH);
+    }
+
+    // Anotación en el borde blanco
+    const annotToggle = document.getElementById('annotation-toggle');
+    const annotInput  = document.getElementById('annotation-text');
+    const border = parseInt(sliders.borderSize.value);
+    if (annotToggle.checked && border > 0) {
+      const text = annotInput.value || annotInput.placeholder;
+      const scaledBorder = border * (1080 / (originalImage.width + border * 2));
+      expCtx.font = `300 ${Math.max(18, scaledBorder * 0.28)}px 'Cormorant Garamond', Georgia, serif`;
+      expCtx.fillStyle = '#999';
+      expCtx.letterSpacing = '3px';
+      expCtx.textAlign = 'center';
+      expCtx.fillText(text.toUpperCase(), 540, 1350 - scaledBorder * 0.32);
+    }
+
+    // Nitidez al exportar
+    const sharpAmount = parseInt(sharpnessSlider.value) / 100;
+    if (sharpAmount > 0) {
+      const imgData = expCtx.getImageData(0, 0, 1080, 1350);
+      sharpenImageData(imgData, sharpAmount * 0.8);
+      expCtx.putImageData(imgData, 0, 0);
+    }
 
     const link    = document.createElement('a');
     link.download = 'noir-studio.jpg';
     link.href     = exp.toDataURL('image/jpeg', 0.93);
     link.click();
 
-    btn.textContent = 'Exportar para Instagram';
+    btn.textContent = 'Generar 1080×1350';
     btn.style.opacity = '';
   }, 16);
 });
 
-// ── Algoritmo de sharpening (Laplacian unsharp mask) ──
-// Cómo funciona: para cada píxel, calcula su diferencia con los 4 vecinos.
-// Esa diferencia es el "detalle" o "borde". Sumamos `amount * detalle` al píxel.
-// amount=0.45 es conservador: evita halos pero compensa la pérdida de nitidez
-// al redimensionar a 1080px y al comprimir en JPEG.
+// ── Sharpening (Laplacian unsharp mask) ──
 function sharpenImageData(imageData, amount) {
   const w   = imageData.width;
   const h   = imageData.height;
-  const src = new Uint8ClampedArray(imageData.data); // copia inmutable del original
+  const src = new Uint8ClampedArray(imageData.data);
   const dst = imageData.data;
 
   for (let y = 1; y < h - 1; y++) {
@@ -896,7 +1530,6 @@ function sharpenImageData(imageData, amount) {
                         + src[((y + 1) * w + x) * 4 + c]
                         + src[(y * w + x - 1) * 4 + c]
                         + src[(y * w + x + 1) * 4 + c];
-        // Laplacian = center*4 - sum_of_4_neighbors
         dst[i + c] = Math.min(255, Math.max(0,
           Math.round(center + amount * (4 * center - neighbors))
         ));
@@ -908,46 +1541,96 @@ function sharpenImageData(imageData, amount) {
 // ── Reset ──
 function resetSliders() {
   Object.values(sliders).forEach(s => { s.value = s.defaultValue; });
-  Object.keys(vals).forEach(k => { vals[k].textContent = sliders[k].defaultValue; });
-  presetGrid.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+  Object.keys(vals).forEach(k => { if (vals[k]) vals[k].textContent = sliders[k].defaultValue; });
+  nivelarSlider.value = 0;
+  document.getElementById('val-nivelar').textContent = '0°';
+  canvas.style.transform = '';
+  presetBar.querySelectorAll('.btn-preset').forEach(b => {
+    b.classList.remove('active');
+    b.style.borderBottomColor = 'transparent';
+    b.querySelector('.preset-icon').style.color  = '';
+    b.querySelector('.preset-label').style.color = '';
+  });
   activePreset = null;
   applyFilters();
 }
 
 document.getElementById('btn-reset').addEventListener('click', resetSliders);
 
+// ── Candado ──
+document.getElementById('btn-lock').addEventListener('click', () => {
+  lockOn = !lockOn;
+  const lockBtn = document.getElementById('btn-lock');
+  lockBtn.classList.toggle('locked', lockOn);
+  document.getElementById('lock-icon-open').style.display   = lockOn ? 'none' : 'block';
+  document.getElementById('lock-icon-closed').style.display = lockOn ? 'block' : 'none';
+  lockBtn.title = lockOn
+    ? 'Configuración bloqueada — la próxima foto mantendrá el preset'
+    : 'Bloquear configuración al cambiar foto';
+});
+
+// ── Anotación toggle ──
+document.getElementById('annotation-toggle').addEventListener('change', (e) => {
+  document.getElementById('annotation-text').classList.toggle('visible', e.target.checked);
+});
+
+// ── Pilares: colapsar/expandir ──
+function togglePillar(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
 // ── Atajos de teclado ──
-// A: mantener pulsado = ver original (antes/después)
-// V: toggle marco blanco (on/off con 60px)
-// B: aplica ZULOAGA
+// A / Espacio: ver antes (mantener pulsado)
+// V: toggle marco blanco
+// B: aplica Zuloaga
 // S: exportar
+function showOriginal() {
+  if (!originalImage || showBefore) return;
+  showBefore = true;
+  document.getElementById('before-badge').style.display = 'block';
+  const border = parseInt(sliders.borderSize.value);
+  canvas.width  = originalImage.width  + border * 2;
+  canvas.height = originalImage.height + border * 2;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(originalImage, border, border);
+}
+
+function hideOriginal() {
+  if (!showBefore) return;
+  showBefore = false;
+  document.getElementById('before-badge').style.display = 'none';
+  applyFilters();
+}
+
+// Soporte: tecla + long press móvil
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
-  if (e.key.toLowerCase() === 'a' && originalImage && !e.repeat) {
-    const badge = document.getElementById('before-badge');
-    badge.style.display = 'block';
-    const border = parseInt(sliders.borderSize.value);
-    canvas.width  = originalImage.width  + border * 2;
-    canvas.height = originalImage.height + border * 2;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(originalImage, border, border);
+
+  if ((e.key.toLowerCase() === 'a' || e.key === ' ') && !e.repeat) {
+    if (e.key === ' ') e.preventDefault();
+    showOriginal();
     return;
   }
+
   switch (e.key.toLowerCase()) {
     case 'v': {
-      const cur = parseInt(sliders.borderSize.value);
+      const cur  = parseInt(sliders.borderSize.value);
       const next = cur > 0 ? 0 : 60;
       sliders.borderSize.value = next;
       vals.borderSize.textContent = next;
       activePreset = null;
-      presetGrid.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+      presetBar.querySelectorAll('.btn-preset').forEach(b => {
+        b.classList.remove('active');
+        b.style.color = '';
+        b.style.borderBottomColor = 'transparent';
+      });
       applyFilters();
       break;
     }
     case 'b': {
-      const zuloagaBtn = presetGrid.querySelector('[data-key="zuloaga"]');
-      if (zuloagaBtn) applyPreset('zuloaga', zuloagaBtn);
+      const btn = presetBar.querySelector('[data-key="zuloaga"]');
+      if (btn) applyPreset('zuloaga', btn);
       break;
     }
     case 's': {
@@ -958,21 +1641,70 @@ document.addEventListener('keydown', e => {
 });
 
 document.addEventListener('keyup', e => {
-  if (e.key.toLowerCase() === 'a' && originalImage) {
-    document.getElementById('before-badge').style.display = 'none';
-    applyFilters();
-  }
+  if (e.key.toLowerCase() === 'a' || e.key === ' ') hideOriginal();
 });
 
+// Long press en canvas (móvil)
+let longPressTimer = null;
+canvas.addEventListener('touchstart', e => {
+  longPressTimer = setTimeout(showOriginal, 350);
+}, { passive: true });
+canvas.addEventListener('touchend', () => {
+  clearTimeout(longPressTimer);
+  hideOriginal();
+});
+canvas.addEventListener('touchcancel', () => {
+  clearTimeout(longPressTimer);
+  hideOriginal();
+});
+
+// ── Nav móvil ──
+let activeMobileSheet = null;
+
+function toggleMobileSheet(pillarId, btn) {
+  const panel = document.querySelector('.panel');
+  const isSame = activeMobileSheet === pillarId;
+
+  // Cerrar todo
+  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+  panel.classList.remove('sheet-open');
+
+  if (isSame) {
+    activeMobileSheet = null;
+    return;
+  }
+
+  // Abrir sección correcta
+  activeMobileSheet = pillarId;
+  btn.classList.add('active');
+
+  // Expandir solo el pillar correcto
+  document.querySelectorAll('.pillar').forEach(p => p.classList.add('collapsed'));
+  document.getElementById(pillarId).classList.remove('collapsed');
+
+  panel.classList.add('sheet-open');
+}
+
+// Exportar desde móvil
+document.getElementById('btn-export-mobile').addEventListener('click', () => {
+  document.getElementById('btn-export').click();
+});
+
+// Cerrar sheet al tocar el canvas
+document.getElementById('canvas-area').addEventListener('touchstart', () => {
+  if (activeMobileSheet) {
+    document.querySelector('.panel').classList.remove('sheet-open');
+    document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+    activeMobileSheet = null;
+  }
+}, { passive: true });
+
 // ── URL params para SEO ──
-// Así, /editor/?tool=golden-hour carga esa página con el preset activo
 const params = new URLSearchParams(window.location.search);
 const toolParam = params.get('tool');
-// ?tool=noir → activa Dead of Night
 const resolvedTool = toolParam === 'noir' ? 'dead-of-night' : toolParam;
-
 if (resolvedTool && PRESETS[resolvedTool]) {
-  const btn = presetGrid.querySelector(`[data-key="${resolvedTool}"]`);
+  const btn = presetBar.querySelector(`[data-key="${resolvedTool}"]`);
   if (btn) applyPreset(resolvedTool, btn);
 }
 if (toolParam === 'border') {
@@ -980,6 +1712,5 @@ if (toolParam === 'border') {
   vals.borderSize.textContent = '60';
 }
 </script>
-
 </body>
 </html>
