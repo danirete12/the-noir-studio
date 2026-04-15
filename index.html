@@ -116,11 +116,29 @@
     .presets-bar {
       display: flex;
       align-items: stretch;
-      justify-content: space-evenly;
+      justify-content: flex-start;
       overflow-x: auto;
       scrollbar-width: none;
+      padding: 0 20px;
+      gap: 0;
     }
     .presets-bar::-webkit-scrollbar { display: none; }
+
+    .preset-group-label {
+      font-family: var(--font-sans);
+      font-size: 0.4rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #ccc;
+      white-space: nowrap;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 10px 0 16px;
+      border-right: 1px solid var(--border);
+      margin-right: 4px;
+    }
+    .preset-group-label:first-child { padding-left: 0; }
 
     .btn-preset {
       display: flex;
@@ -1270,17 +1288,38 @@ function updateCropOverlay() {
   overlayCtx.stroke();
 }
 
-// ── Construir barra de presets (icono + serif label) ──
-Object.entries(PRESETS).forEach(([key, preset]) => {
-  const btn = document.createElement('button');
-  btn.className = 'btn-preset';
-  btn.dataset.key = key;
-  btn.innerHTML = `
-    <span class="preset-icon">${PRESET_ICONS[key] || ''}</span>
-    <span class="preset-label">${preset.label}</span>
-  `;
-  btn.addEventListener('click', () => applyPreset(key, btn));
-  presetBar.appendChild(btn);
+// ── Grupos ──
+const GROUPS = [
+  { label: 'Luz',      keys: ['golden-hour','first-light','dead-of-night'] },
+  { label: 'Cine',     keys: ['quentin','wes','andy'] },
+  { label: 'Arte',     keys: ['caravaggio','zuloaga','velvet'] },
+  { label: 'Cámara',   keys: ['m-system','f-chrome','h-format','wetzlar','capa'] },
+  { label: 'Revelado', keys: ['tobacco','old-money','matte','eastman'] },
+  { label: 'Visor',    keys: ['cartier','brassai','doisneau','avedon','newton','eggleston','shore','frank','nadar','strand'] },
+  { label: 'Grano',    keys: ['japanese-grain','silver'] },
+];
+
+// ── Construir barra de presets con grupos ──
+GROUPS.forEach((group, gi) => {
+  const sep = document.createElement('span');
+  sep.className = 'preset-group-label';
+  if (gi === 0) sep.style.paddingLeft = '0';
+  sep.textContent = group.label;
+  presetBar.appendChild(sep);
+
+  group.keys.forEach(key => {
+    const preset = PRESETS[key];
+    if (!preset) return;
+    const btn = document.createElement('button');
+    btn.className = 'btn-preset';
+    btn.dataset.key = key;
+    btn.innerHTML = `
+      <span class="preset-icon">${PRESET_ICONS[key] || ''}</span>
+      <span class="preset-label">${preset.label}</span>
+    `;
+    btn.addEventListener('click', () => applyPreset(key, btn));
+    presetBar.appendChild(btn);
+  });
 });
 
 // ── Aplicar preset ──
