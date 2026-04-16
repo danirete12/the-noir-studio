@@ -79,20 +79,26 @@
       gap: 14px;
     }
 
-    /* Candado */
-    #btn-lock {
+    /* Botones de cabecera */
+    .btn-header {
       background: none;
       border: 1px solid var(--border);
-      padding: 5px 7px;
+      padding: 5px 8px;
       cursor: pointer;
       color: var(--muted);
       display: flex;
       align-items: center;
+      gap: 6px;
+      font-family: var(--font-sans);
+      font-size: 0.48rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
       transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
     }
-    #btn-lock:hover { color: var(--text); border-color: #aaa; }
-    #btn-lock.locked { color: var(--accent); border-color: var(--accent); }
-    #btn-lock svg { width: 13px; height: 13px; display: block; }
+    .btn-header:hover { color: var(--text); border-color: #aaa; }
+    .btn-header:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+    .btn-header svg { width: 13px; height: 13px; display: block; flex-shrink: 0; }
 
     /* ── Tab bar de grupos ── */
     .presets-bar-wrapper {
@@ -330,25 +336,6 @@
       transition: transform 0.2s ease;
     }
 
-    #btn-change-photo {
-      display: none;
-      position: absolute;
-      bottom: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(20,20,20,0.75);
-      border: 1px solid #3a3a3a;
-      color: #666;
-      font-family: var(--font-sans);
-      font-size: 0.48rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      padding: 5px 13px;
-      cursor: pointer;
-      backdrop-filter: blur(6px);
-      transition: color 0.2s, border-color 0.2s;
-    }
-    #btn-change-photo:hover { color: #aaa; border-color: #555; }
 
     #before-badge {
       display: none;
@@ -783,13 +770,15 @@
   <h1>The Noir Studio</h1>
   <span class="tagline">Editor de Fotografía</span>
   <div class="header-actions">
-    <button id="btn-lock" title="Bloquear configuración al cambiar foto">
-      <svg id="lock-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="1"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>
-      </svg>
-      <svg id="lock-icon-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
-        <rect x="3" y="11" width="18" height="11" rx="1"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
+    <button id="btn-change-photo" class="btn-header" title="Cambiar foto">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="12" cy="12" r="4"/><path d="M9 5 L10.5 3 L13.5 3 L15 5"/></svg>
+      Cambiar foto
+    </button>
+    <button id="btn-undo" class="btn-header" title="Deshacer (Ctrl+Z)" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11a6 6 0 0 1 0 12H8"/><polyline points="7,3 3,7 7,11"/></svg>
+    </button>
+    <button id="btn-redo" class="btn-header" title="Rehacer (Ctrl+Y)" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7H10a6 6 0 0 0 0 12h6"/><polyline points="17,3 21,7 17,11"/></svg>
     </button>
   </div>
 </header>
@@ -813,7 +802,6 @@
     <canvas id="canvas"></canvas>
     <canvas id="crop-overlay-canvas"></canvas>
     <div id="before-badge">Antes</div>
-    <button id="btn-change-photo">↺ Cambiar foto</button>
   </div>
 
   <!-- El Laboratorio -->
@@ -1570,7 +1558,62 @@ const CROP_FORMATS = [
 // ── Estado ──
 let originalImage    = null;
 let activePreset     = null;
-let lockOn           = false;
+// ── Historia undo/redo ──
+const undoStack = [];
+const redoStack = [];
+
+function captureState() {
+  const s = { preset: activePreset };
+  Object.keys(sliders).forEach(k => { s[k] = +sliders[k].value; });
+  s.nivelar   = +nivelarSlider.value;
+  s.sharpness = +sharpnessSlider.value;
+  return s;
+}
+
+function applyState(s) {
+  activePreset = s.preset;
+  Object.keys(sliders).forEach(k => {
+    sliders[k].value = s[k];
+    if (vals[k]) vals[k].textContent = s[k];
+  });
+  nivelarSlider.value  = s.nivelar;
+  sharpnessSlider.value = s.sharpness;
+  document.getElementById('val-nivelar').textContent   = s.nivelar + '°';
+  document.getElementById('val-sharpness').textContent = s.sharpness;
+  canvas.style.transform = s.nivelar != 0 ? `rotate(${s.nivelar}deg)` : '';
+  document.querySelectorAll('.btn-preset').forEach(b => {
+    const active = b.dataset.key === s.preset;
+    b.classList.toggle('active', active);
+    b.style.color = active ? (PRESETS[s.preset]?.color || '') : '';
+    b.style.borderBottomColor = active ? (PRESETS[s.preset]?.color || '') : 'transparent';
+  });
+  applyFilters();
+  updateHistoryBtns();
+}
+
+function saveHistory(preSnap) {
+  undoStack.push(preSnap);
+  if (undoStack.length > 60) undoStack.shift();
+  redoStack.length = 0;
+  updateHistoryBtns();
+}
+
+function updateHistoryBtns() {
+  document.getElementById('btn-undo').disabled = undoStack.length === 0;
+  document.getElementById('btn-redo').disabled = redoStack.length === 0;
+}
+
+function undo() {
+  if (!undoStack.length) return;
+  redoStack.push(captureState());
+  applyState(undoStack.pop());
+}
+
+function redo() {
+  if (!redoStack.length) return;
+  undoStack.push(captureState());
+  applyState(redoStack.pop());
+}
 let showBefore       = false;
 let activeCropFormat = 'free';
 
@@ -1907,9 +1950,11 @@ attachScrollFade(tabBar);
 // ── Aplicar preset ──
 function applyPreset(key, btn) {
   if (activePreset === key) {
+    saveHistory(captureState());
     resetSliders();
     return;
   }
+  saveHistory(captureState());
   activePreset = key;
 
   // Desactiva todos
@@ -1968,15 +2013,7 @@ function loadImage(file) {
       originalImage = img;
       dropZone.style.display = 'none';
       canvas.style.display = 'block';
-      document.getElementById('btn-change-photo').style.display = 'block';
-
-      // Si Lock ON, re-aplica el preset activo a la nueva foto
-      if (lockOn && activePreset) {
-        const btn = document.querySelector(`.btn-preset[data-key="${activePreset}"]`);
-        applyPreset(activePreset, btn);
-      } else {
-        applyFilters();
-      }
+      applyFilters();
     };
     img.src = e.target.result;
   };
@@ -1986,22 +2023,20 @@ function loadImage(file) {
 // ── Cambiar foto ──
 document.getElementById('btn-change-photo').addEventListener('click', () => {
   originalImage = null;
-  if (!lockOn) {
-    activePreset = null;
-    resetSliders();
-  }
+  activePreset = null;
+  resetSliders();
+  undoStack.length = 0;
+  redoStack.length = 0;
+  updateHistoryBtns();
   canvas.style.display = 'none';
-  document.getElementById('btn-change-photo').style.display = 'none';
   document.getElementById('before-badge').style.display = 'none';
   canvas.style.transform = '';
   dropZone.style.display = '';
-  if (!lockOn) {
-    document.querySelectorAll('.btn-preset').forEach(b => {
-      b.classList.remove('active');
-      b.style.color = '';
-      b.style.borderBottomColor = 'transparent';
-    });
-  }
+  document.querySelectorAll('.btn-preset').forEach(b => {
+    b.classList.remove('active');
+    b.style.color = '';
+    b.style.borderBottomColor = 'transparent';
+  });
   fileInput.value = '';
 });
 
@@ -2112,6 +2147,10 @@ function applyFilters() {
 
 // ── Sliders: escuchar cambios ──
 Object.entries(sliders).forEach(([key, slider]) => {
+  let _pre = null;
+  slider.addEventListener('mousedown',  () => { _pre = captureState(); });
+  slider.addEventListener('touchstart', () => { _pre = captureState(); }, { passive: true });
+  slider.addEventListener('change',     () => { if (_pre) { saveHistory(_pre); _pre = null; } });
   slider.addEventListener('input', () => {
     if (vals[key]) vals[key].textContent = slider.value;
     activePreset = null;
@@ -2251,17 +2290,9 @@ function resetSliders() {
 
 document.getElementById('btn-reset').addEventListener('click', resetSliders);
 
-// ── Candado ──
-document.getElementById('btn-lock').addEventListener('click', () => {
-  lockOn = !lockOn;
-  const lockBtn = document.getElementById('btn-lock');
-  lockBtn.classList.toggle('locked', lockOn);
-  document.getElementById('lock-icon-open').style.display   = lockOn ? 'none' : 'block';
-  document.getElementById('lock-icon-closed').style.display = lockOn ? 'block' : 'none';
-  lockBtn.title = lockOn
-    ? 'Configuración bloqueada — la próxima foto mantendrá el preset'
-    : 'Bloquear configuración al cambiar foto';
-});
+// ── Undo / Redo ──
+document.getElementById('btn-undo').addEventListener('click', undo);
+document.getElementById('btn-redo').addEventListener('click', redo);
 
 // ── Anotación toggle ──
 document.getElementById('annotation-toggle').addEventListener('change', (e) => {
@@ -2300,6 +2331,16 @@ function hideOriginal() {
 // Soporte: tecla + long press móvil
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
+
+  // Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z
+  if (e.ctrlKey || e.metaKey) {
+    if (e.key === 'z' || e.key === 'Z') {
+      e.preventDefault();
+      if (e.shiftKey) redo(); else undo();
+      return;
+    }
+    if (e.key === 'y' || e.key === 'Y') { e.preventDefault(); redo(); return; }
+  }
 
   if ((e.key.toLowerCase() === 'a' || e.key === ' ') && !e.repeat) {
     if (e.key === ' ') e.preventDefault();
