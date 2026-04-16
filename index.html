@@ -622,27 +622,65 @@
 
     .crop-custom-inputs {
       display: none;
-      gap: 6px;
-      margin-top: 8px;
-      align-items: center;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
     }
     .crop-custom-inputs.visible { display: flex; }
+    .crop-custom-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .crop-custom-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+    .crop-custom-lbl {
+      font-family: var(--font-sans);
+      font-size: 0.44rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+    }
     .crop-custom-inputs input[type="number"] {
-      width: 48px;
+      width: 100%;
       border: none;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1.5px solid var(--border);
       background: transparent;
       font-family: var(--font-sans);
-      font-size: 0.52rem;
-      letter-spacing: 0.1em;
+      font-size: 1.1rem;
+      font-weight: 300;
+      letter-spacing: 0.02em;
       text-align: center;
       color: var(--text);
       outline: none;
-      padding: 3px 0;
+      padding: 4px 0 3px;
+      -moz-appearance: textfield;
+      appearance: textfield;
     }
-    .crop-custom-inputs span {
-      font-size: 0.52rem;
+    .crop-custom-inputs input[type="number"]::-webkit-inner-spin-button,
+    .crop-custom-inputs input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .crop-custom-sep {
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
       color: var(--muted);
+      padding-bottom: 6px;
+      flex-shrink: 0;
+    }
+    .crop-custom-px {
+      font-family: var(--font-sans);
+      font-size: 0.44rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 2px;
     }
 
     /* Overlay de recorte sobre el canvas */
@@ -816,9 +854,18 @@
         <p class="crop-header">Recorte</p>
         <div class="crop-formats" id="crop-formats"></div>
         <div class="crop-custom-inputs" id="crop-custom-inputs">
-          <input type="number" id="crop-custom-w" placeholder="W" min="1" max="9999" value="4">
-          <span>:</span>
-          <input type="number" id="crop-custom-h" placeholder="H" min="1" max="9999" value="5">
+          <div class="crop-custom-row">
+            <div class="crop-custom-field">
+              <span class="crop-custom-lbl">Ancho</span>
+              <input type="number" id="crop-custom-w" placeholder="1080" min="1" max="9999" value="1080">
+            </div>
+            <span class="crop-custom-sep">×</span>
+            <div class="crop-custom-field">
+              <span class="crop-custom-lbl">Alto</span>
+              <input type="number" id="crop-custom-h" placeholder="1350" min="1" max="9999" value="1350">
+            </div>
+          </div>
+          <p class="crop-custom-px">píxeles</p>
         </div>
 
       </div>
@@ -1455,7 +1502,7 @@ const CROP_FORMATS = [
   { id: 'retrato',  label: 'Retrato',    sub: '3:4',         ratio: 3/4,     exportW: 1080, exportH: 1440, svgRect: [5,3,14,18] },
   { id: 'horiz',    label: 'Horizontal', sub: '16:9',        ratio: 16/9,    exportW: 1920, exportH: 1080, svgRect: [1,6,22,12] },
   { id: 'cine',     label: 'Cine',       sub: '2.35:1',      ratio: 2.35,    exportW: 2350, exportH: 1000, svgRect: [1,8,22,8] },
-  { id: 'custom',   label: 'Personaliz.', sub: 'W:H',        ratio: 'custom',exportW: null, exportH: null, svgRect: [3,3,18,18] },
+  { id: 'custom',   label: 'Personaliz.', sub: 'px × px',    ratio: 'custom',exportW: null, exportH: null, svgRect: [3,3,18,18] },
 ];
 
 // ── Estado ──
@@ -1624,8 +1671,8 @@ function updateCropOverlay() {
 
   let ratio = fmt.ratio;
   if (fmt.id === 'custom') {
-    const cw = parseFloat(document.getElementById('crop-custom-w').value) || 4;
-    const ch = parseFloat(document.getElementById('crop-custom-h').value) || 5;
+    const cw = parseFloat(document.getElementById('crop-custom-w').value) || 1080;
+    const ch = parseFloat(document.getElementById('crop-custom-h').value) || 1350;
     ratio = cw / ch;
   }
 
@@ -2016,10 +2063,11 @@ document.getElementById('btn-export').addEventListener('click', () => {
     // Calcular tamaño y recorte
     const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
     let ratio = fmt ? fmt.ratio : null;
+    let customW = 1080, customH = 1350;
     if (activeCropFormat === 'custom') {
-      const cw = parseFloat(document.getElementById('crop-custom-w').value) || 4;
-      const ch = parseFloat(document.getElementById('crop-custom-h').value) || 5;
-      ratio = cw / ch;
+      customW = Math.round(parseFloat(document.getElementById('crop-custom-w').value)) || 1080;
+      customH = Math.round(parseFloat(document.getElementById('crop-custom-h').value)) || 1350;
+      ratio = customW / customH;
     }
 
     let srcX = 0, srcY = 0, srcW = canvas.width, srcH = canvas.height;
@@ -2033,7 +2081,7 @@ document.getElementById('btn-export').addEventListener('click', () => {
       srcX = (canvas.width  - srcW) / 2;
       srcY = (canvas.height - srcH) / 2;
       if (activeCropFormat === 'custom') {
-        expW = 1080; expH = Math.round(1080 / ratio);
+        expW = customW; expH = customH;
       }
     }
 
