@@ -52,7 +52,7 @@
       padding: 14px 28px;
       display: flex;
       align-items: baseline;
-      gap: 16px;
+      gap: desktop16px;
       flex-shrink: 0;
     }
 
@@ -107,6 +107,12 @@
       scrollbar-width: none;
       padding: 0 16px;
       border-bottom: 1px solid var(--border);
+      -webkit-mask-image: linear-gradient(to right, black 0%, black calc(100% - 40px), transparent 100%);
+      mask-image: linear-gradient(to right, black 0%, black calc(100% - 40px), transparent 100%);
+    }
+    .tab-bar.scrolled-end {
+      -webkit-mask-image: none;
+      mask-image: none;
     }
     .tab-bar::-webkit-scrollbar { display: none; }
 
@@ -171,8 +177,14 @@
       overflow-x: auto;
       scrollbar-width: none;
       padding: 0 16px;
+      -webkit-mask-image: linear-gradient(to right, black 0%, black calc(100% - 52px), transparent 100%);
+      mask-image: linear-gradient(to right, black 0%, black calc(100% - 52px), transparent 100%);
     }
     .drawer-presets.visible { display: flex; }
+    .drawer-presets.scrolled-end {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
     .drawer-presets::-webkit-scrollbar { display: none; }
 
     .btn-preset {
@@ -1691,6 +1703,30 @@ GROUPS.forEach((group, gi) => {
   });
 });
 
+// ── Scroll hints para indicar que hay más contenido ──
+const hintedGroups = new Set();
+
+function attachScrollFade(el) {
+  if (!el) return;
+  function update() {
+    const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+    el.classList.toggle('scrolled-end', atEnd);
+  }
+  el.addEventListener('scroll', update, { passive: true });
+  update();
+}
+
+function hintScroll(container) {
+  if (!container || container.scrollWidth <= container.clientWidth + 4) return;
+  if (hintedGroups.has(container.id)) return;
+  hintedGroups.add(container.id);
+  // Pequeño bounce para indicar que hay más contenido a la derecha
+  setTimeout(() => {
+    container.scrollTo({ left: 72, behavior: 'smooth' });
+    setTimeout(() => container.scrollTo({ left: 0, behavior: 'smooth' }), 420);
+  }, 180);
+}
+
 function toggleTab(key, clickedTab) {
   const isSame = activeTab === key;
 
@@ -1706,9 +1742,19 @@ function toggleTab(key, clickedTab) {
 
   activeTab = key;
   clickedTab.classList.add('active');
-  document.getElementById('drawer-group-' + key)?.classList.add('visible');
+  const drawer = document.getElementById('drawer-group-' + key);
+  drawer?.classList.add('visible');
   tabDrawer.classList.add('open');
+
+  // Hint de scroll al abrir el drawer
+  if (drawer) {
+    attachScrollFade(drawer);
+    hintScroll(drawer);
+  }
 }
+
+// Fade en tab-bar al cargar
+attachScrollFade(tabBar);
 
 // ── Aplicar preset ──
 function applyPreset(key, btn) {
