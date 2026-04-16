@@ -1156,6 +1156,258 @@ const PRESETS = {
     shadows: 12, liftBlacks: 8, vignette: 18, grain: 22,
     shadowTint: -8, highlightRecovery: 10
   },
+
+  // — Luz y tiempo (nuevos) —
+  'blue-hour': {
+    label: 'Blue Hour', color: '#3A5F8A',
+    warmth: -45, brightness: -8, contrast: 28, saturation: -15,
+    shadows: -12, liftBlacks: 5, vignette: 25, grain: 3,
+    shadowTint: -12, highlightRecovery: 5
+  },
+  'midday': {
+    label: 'Midday', color: '#E8D870',
+    warmth: 15, brightness: 18, contrast: 38, saturation: 25,
+    shadows: -20, liftBlacks: 0, vignette: 5, grain: 1,
+    shadowTint: 0, highlightRecovery: 15
+  },
+  'overcast': {
+    label: 'Overcast', color: '#A0A8B0',
+    warmth: -12, brightness: 5, contrast: -15, saturation: -20,
+    shadows: 35, liftBlacks: 15, vignette: 5, grain: 3,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'storm-light': {
+    label: 'Storm Light', color: '#4A5A6A',
+    warmth: -8, brightness: -15, contrast: 55, saturation: -30,
+    shadows: -15, liftBlacks: 0, vignette: 45, grain: 8,
+    shadowTint: -5, highlightRecovery: 0
+  },
+  'candlelight': {
+    label: 'Candlelight', color: '#D4780A',
+    warmth: 75, brightness: -10, contrast: 35, saturation: -25,
+    shadows: -15, liftBlacks: 0, vignette: 55, grain: 12,
+    shadowTint: 8, highlightRecovery: 0
+  },
+  'neon-night': {
+    label: 'Neon Night', color: '#FF2D6B',
+    warmth: -15, brightness: -18, contrast: 42, saturation: 45,
+    shadows: -20, liftBlacks: 0, vignette: 40, grain: 15,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'platinum-sky': {
+    label: 'Platinum Sky', color: '#C8C8C8',
+    warmth: -5, brightness: 22, contrast: -18, saturation: -35,
+    shadows: 45, liftBlacks: 30, vignette: 0, grain: 2,
+    shadowTint: 0, highlightRecovery: 35
+  },
+
+  // — Directores (nuevos) —
+  'kubrick': {
+    label: 'Kubrick', color: '#1A2A4A',
+    warmth: -28, brightness: 0, contrast: 48, saturation: -25,
+    shadows: -8, liftBlacks: 5, vignette: 18, grain: 3,
+    shadowTint: -8, highlightRecovery: 0
+  },
+  'lynch': {
+    label: 'Lynch', color: '#2A1A3A',
+    warmth: -8, brightness: -25, contrast: 65, saturation: 15,
+    shadows: -22, liftBlacks: 0, vignette: 70, grain: 8,
+    shadowTint: -5, highlightRecovery: 0
+  },
+  'fellini': {
+    label: 'Fellini', color: '#C4900A',
+    warmth: 35, brightness: 3, contrast: 22, saturation: -15,
+    shadows: 25, liftBlacks: 15, vignette: 15, grain: 10,
+    shadowTint: 5, highlightRecovery: 10
+  },
+  'bergman': {
+    label: 'Bergman', color: '#3A3A3A',
+    warmth: 0, brightness: -8, contrast: 62, saturation: -100,
+    shadows: -8, liftBlacks: 3, vignette: 30, grain: 18,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'villeneuve': {
+    label: 'Villeneuve', color: '#5A7080',
+    warmth: -22, brightness: -5, contrast: 38, saturation: -40,
+    shadows: 5, liftBlacks: 5, vignette: 35, grain: 5,
+    shadowTint: -10, highlightRecovery: 12
+  },
+  'akira': {
+    label: 'Akira', color: '#8B1A1A',
+    warmth: 12, brightness: -5, contrast: 55, saturation: 20,
+    shadows: -12, liftBlacks: 0, vignette: 28, grain: 10,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'tarkovsky': {
+    label: 'Tarkovsky', color: '#5A6A3A',
+    warmth: 18, brightness: -12, contrast: 25, saturation: -45,
+    shadows: 15, liftBlacks: 8, vignette: 40, grain: 22,
+    shadowTint: 5, highlightRecovery: 5
+  },
+
+  // — Pintores (nuevos) —
+  'vermeer': {
+    label: 'Vermeer', color: '#4A80A0',
+    warmth: 15, brightness: 5, contrast: 18, saturation: 12,
+    shadows: 35, liftBlacks: 8, vignette: 20, grain: 2,
+    shadowTint: -5, highlightRecovery: 12
+  },
+  'hopper': {
+    label: 'Hopper', color: '#D4A020',
+    warmth: 28, brightness: 8, contrast: 45, saturation: 15,
+    shadows: -18, liftBlacks: 0, vignette: 12, grain: 3,
+    shadowTint: 0, highlightRecovery: 8
+  },
+  'rembrandt': {
+    label: 'Rembrandt', color: '#8B5A1A',
+    warmth: 48, brightness: -12, contrast: 58, saturation: -20,
+    shadows: -15, liftBlacks: 0, vignette: 55, grain: 5,
+    shadowTint: 8, highlightRecovery: 0
+  },
+  'goya': {
+    label: 'Goya', color: '#2A1A0A',
+    warmth: 5, brightness: -28, contrast: 75, saturation: -35,
+    shadows: -25, liftBlacks: 0, vignette: 65, grain: 12,
+    shadowTint: 3, highlightRecovery: 0
+  },
+  'turner': {
+    label: 'Turner', color: '#D4B870',
+    warmth: 35, brightness: 18, contrast: -12, saturation: -30,
+    shadows: 42, liftBlacks: 35, vignette: 8, grain: 3,
+    shadowTint: 5, highlightRecovery: 28
+  },
+  'hockney': {
+    label: 'Hockney', color: '#1A8AB0',
+    warmth: 8, brightness: 12, contrast: 15, saturation: 55,
+    shadows: 22, liftBlacks: 12, vignette: 0, grain: 1,
+    shadowTint: 0, highlightRecovery: 10
+  },
+  'klimt': {
+    label: 'Klimt', color: '#C8940A',
+    warmth: 55, brightness: -5, contrast: 32, saturation: 35,
+    shadows: 8, liftBlacks: 5, vignette: 38, grain: 5,
+    shadowTint: 10, highlightRecovery: 0
+  },
+
+  // — Cámaras / sistemas (nuevos) —
+  'summilux': {
+    label: 'Summilux', color: '#A87840',
+    warmth: 18, brightness: 3, contrast: 15, saturation: 5,
+    shadows: 20, liftBlacks: 0, vignette: 18, grain: 2,
+    shadowTint: 2, highlightRecovery: 8
+  },
+  'nikkor': {
+    label: 'Nikkor', color: '#F0A000',
+    warmth: 8, brightness: 2, contrast: 22, saturation: 12,
+    shadows: 10, liftBlacks: 0, vignette: 10, grain: 2,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'otus': {
+    label: 'Otus', color: '#1A3A5A',
+    warmth: -5, brightness: 3, contrast: 28, saturation: 8,
+    shadows: 12, liftBlacks: 0, vignette: 8, grain: 1,
+    shadowTint: -3, highlightRecovery: 8
+  },
+  'v-system': {
+    label: 'V-System', color: '#3A3A3A',
+    warmth: 5, brightness: 5, contrast: 12, saturation: 8,
+    shadows: 25, liftBlacks: 5, vignette: 12, grain: 2,
+    shadowTint: 0, highlightRecovery: 18
+  },
+  'polaroid': {
+    label: 'Polaroid', color: '#E05020',
+    warmth: 38, brightness: 8, contrast: -18, saturation: -28,
+    shadows: 35, liftBlacks: 45, vignette: 12, grain: 8,
+    shadowTint: 5, highlightRecovery: 15
+  },
+
+  // — Materiales / procesos (nuevos) —
+  'cianotype': {
+    label: 'Cianotype', color: '#1A4A7A',
+    warmth: -55, brightness: 0, contrast: 35, saturation: 60,
+    shadows: 8, liftBlacks: 5, vignette: 18, grain: 8,
+    shadowTint: -20, highlightRecovery: 5
+  },
+  'sepia': {
+    label: 'Sépia', color: '#8B6040',
+    warmth: 50, brightness: -5, contrast: 20, saturation: -80,
+    shadows: 10, liftBlacks: 8, vignette: 25, grain: 10,
+    shadowTint: 15, highlightRecovery: 0
+  },
+  'cross-process': {
+    label: 'Cross Process', color: '#20A850',
+    warmth: -18, brightness: 5, contrast: 55, saturation: 65,
+    shadows: -15, liftBlacks: 8, vignette: 18, grain: 8,
+    shadowTint: -15, highlightRecovery: 0
+  },
+  'albumen': {
+    label: 'Albumen', color: '#C8A860',
+    warmth: 42, brightness: -8, contrast: 25, saturation: -70,
+    shadows: 5, liftBlacks: 10, vignette: 30, grain: 12,
+    shadowTint: 12, highlightRecovery: 0
+  },
+  'platinum': {
+    label: 'Platinum', color: '#A0A8B0',
+    warmth: -8, brightness: 3, contrast: 32, saturation: -100,
+    shadows: 15, liftBlacks: 12, vignette: 12, grain: 5,
+    shadowTint: -5, highlightRecovery: 12
+  },
+  'push-2': {
+    label: 'Push +2', color: '#4A4A4A',
+    warmth: 0, brightness: -18, contrast: 80, saturation: -85,
+    shadows: -20, liftBlacks: 0, vignette: 22, grain: 45,
+    shadowTint: 0, highlightRecovery: 0
+  },
+
+  // — Blanco y negro: emulsiones clásicas —
+  'tri-x': {
+    label: 'Tri-X 400', color: '#5A5A5A',
+    warmth: 5, brightness: -3, contrast: 42, saturation: -100,
+    shadows: -5, liftBlacks: 3, vignette: 18, grain: 55,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'hp5': {
+    label: 'HP5 Plus', color: '#606060',
+    warmth: 0, brightness: 0, contrast: 35, saturation: -100,
+    shadows: 0, liftBlacks: 5, vignette: 15, grain: 42,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'delta': {
+    label: 'Delta Pro', color: '#484848',
+    warmth: -5, brightness: 2, contrast: 28, saturation: -100,
+    shadows: 5, liftBlacks: 5, vignette: 12, grain: 35,
+    shadowTint: -3, highlightRecovery: 8
+  },
+  'acros': {
+    label: 'Acros', color: '#3A3A3A',
+    warmth: -3, brightness: -2, contrast: 45, saturation: -100,
+    shadows: 8, liftBlacks: 2, vignette: 10, grain: 28,
+    shadowTint: -2, highlightRecovery: 5
+  },
+  'tmax': {
+    label: 'T-Max', color: '#555555',
+    warmth: 2, brightness: 0, contrast: 38, saturation: -100,
+    shadows: 3, liftBlacks: 5, vignette: 10, grain: 32,
+    shadowTint: 0, highlightRecovery: 8
+  },
+  'ortho': {
+    label: 'Ortho', color: '#4A4A5A',
+    warmth: -18, brightness: -5, contrast: 55, saturation: -100,
+    shadows: -12, liftBlacks: 0, vignette: 15, grain: 22,
+    shadowTint: -8, highlightRecovery: 0
+  },
+  'fomapan': {
+    label: 'Fomapan', color: '#686868',
+    warmth: 8, brightness: -5, contrast: 30, saturation: -100,
+    shadows: -5, liftBlacks: 5, vignette: 20, grain: 48,
+    shadowTint: 2, highlightRecovery: 0
+  },
+  'kentmere': {
+    label: 'Kentmere', color: '#505050',
+    warmth: 3, brightness: -8, contrast: 35, saturation: -100,
+    shadows: -8, liftBlacks: 3, vignette: 22, grain: 58,
+    shadowTint: 0, highlightRecovery: 0
+  },
 };
 
 // ── Formatos de recorte ──
@@ -1238,6 +1490,58 @@ const PRESET_ICONS = {
   'strand':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="3" x2="21" y2="3"/><line x1="3" y1="21" x2="21" y2="21"/><line x1="3" y1="3" x2="3" y2="21"/><line x1="21" y1="3" x2="21" y2="21"/><line x1="8" y1="3" x2="8" y2="21"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
   'japanese-grain': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="7" x2="22" y2="7"/><line x1="4" y1="4" x2="20" y2="4"/><line x1="7" y1="7" x2="7" y2="22"/><line x1="17" y1="7" x2="17" y2="22"/><line x1="7" y1="13" x2="17" y2="13"/></svg>`,
   'silver':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="5" width="18" height="14"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="7" y1="5" x2="7" y2="19"/></svg>`,
+
+  // — Luz nuevos —
+  'blue-hour':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  'midday':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="7" r="3"/><line x1="12" y1="1.5" x2="12" y2="3.5"/><line x1="17.5" y1="3.5" x2="16.2" y2="4.8"/><line x1="19.5" y1="8" x2="17.5" y2="8"/><line x1="6.5" y1="3.5" x2="7.8" y2="4.8"/><line x1="4.5" y1="8" x2="6.5" y2="8"/><line x1="12" y1="11" x2="12" y2="22"/><line x1="4" y1="22" x2="20" y2="22"/></svg>`,
+  'overcast':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>`,
+  'storm-light':    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16H5a7 7 0 0 1 6.3-9.9 7 7 0 0 1 6.7 5"/><polyline points="13 13 10 17 14 17 11 21"/></svg>`,
+  'candlelight':    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3 C11 5 10 6.5 10 8.5 A2 2 0 0 0 14 8.5 C14 6.5 13 5 12 3Z"/><line x1="12" y1="10.5" x2="12" y2="18"/><line x1="9" y1="21" x2="15" y2="21"/><line x1="12" y1="18" x2="12" y2="21"/></svg>`,
+  'neon-night':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="21" x2="22" y2="21"/><rect x="4" y="11" width="4" height="10"/><rect x="10" y="5" width="4" height="16"/><rect x="16" y="8" width="4" height="13"/></svg>`,
+  'platinum-sky':   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="14" x2="22" y2="14"/><circle cx="12" cy="14" r="5"/><line x1="12" y1="5" x2="12" y2="7"/><line x1="18" y1="8" x2="17" y2="9"/><line x1="6" y1="8" x2="7" y2="9"/><line x1="21" y1="12" x2="19" y2="12.5"/><line x1="3" y1="12" x2="5" y2="12.5"/></svg>`,
+
+  // — Cine nuevos —
+  'kubrick':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,3 22,21 2,21"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="5" y1="18" x2="19" y2="18"/></svg>`,
+  'lynch':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 6,10 10,6 14,10 18,6 22,10"/><polyline points="2,13 6,17 10,13 14,17 18,13 22,17"/></svg>`,
+  'fellini':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18 Q4 10 12 8 Q20 10 20 18"/><line x1="2" y1="21" x2="22" y2="21"/><line x1="6" y1="18" x2="4" y2="21"/><line x1="18" y1="18" x2="20" y2="21"/><line x1="12" y1="8" x2="12" y2="5"/><line x1="9" y1="5" x2="15" y2="5"/></svg>`,
+  'bergman':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="8" y="2" width="8" height="5" rx="0.5"/><path d="M10 7 L6 20 M14 7 L18 20"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>`,
+  'villeneuve':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16 Q7 6 12 10 Q17 14 22 4"/><line x1="2" y1="20" x2="22" y2="20"/></svg>`,
+  'akira':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor" stroke="none" opacity="0.7"/></svg>`,
+  'tarkovsky':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="3" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+
+  // — Arte nuevos —
+  'vermeer':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 21 L5 9 Q5 4 12 4 Q19 4 19 9 L19 21"/><line x1="5" y1="14" x2="19" y2="14"/><line x1="3" y1="21" x2="21" y2="21"/></svg>`,
+  'hopper':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="15"/><line x1="3" y1="11" x2="21" y2="11"/><line x1="12" y1="6" x2="12" y2="21"/><path d="M12 6 L12 2 L16 6" fill="currentColor" stroke="none"/></svg>`,
+  'rembrandt':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="4"/><path d="M5 22 L9 12 L15 14 L19 22"/><polygon points="8,22 12,14 16,22" fill="currentColor" stroke="none" opacity="0.3"/></svg>`,
+  'goya':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M8 12 Q6 14 6 17 Q6 21 12 21 Q18 21 18 17 Q18 14 16 12"/><line x1="2" y1="22" x2="22" y2="22"/></svg>`,
+  'turner':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="16" x2="22" y2="16"/><circle cx="12" cy="16" r="6"/><line x1="12" y1="3" x2="12" y2="8"/><line x1="5" y1="5" x2="8" y2="8"/><line x1="19" y1="5" x2="16" y2="8"/><line x1="2" y1="10" x2="5" y2="11"/><line x1="22" y1="10" x2="19" y2="11"/></svg>`,
+  'hockney':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 10 Q6 7 10 10 Q14 13 18 10 Q20 8.5 22 10"/><path d="M2 15 Q6 12 10 15 Q14 18 18 15 Q20 13.5 22 15"/><line x1="2" y1="20" x2="22" y2="20"/></svg>`,
+  'klimt':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 9 Q15 6 18 9 Q21 12 18 15 Q15 18 12 15 Q9 18 6 15 Q3 12 6 9 Q9 6 12 9Z"/><circle cx="7" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="17" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="17" cy="18" r="1" fill="currentColor" stroke="none"/><circle cx="7" cy="18" r="1" fill="currentColor" stroke="none"/></svg>`,
+
+  // — Cámara nuevos —
+  'summilux':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="3" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="21"/><line x1="3" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="21" y2="12"/><line x1="5.6" y1="5.6" x2="9" y2="9"/><line x1="15" y1="15" x2="18.4" y2="18.4"/><line x1="18.4" y1="5.6" x2="15" y2="9"/><line x1="9" y1="15" x2="5.6" y2="18.4"/></svg>`,
+  'nikkor':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><polyline points="9,8 9,16"/><polyline points="9,8 15,16"/><polyline points="15,8 15,16"/></svg>`,
+  'otus':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="12" r="5"/><circle cx="16" cy="12" r="5"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><line x1="13" y1="12" x2="11" y2="12"/></svg>`,
+  'v-system':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="4" width="16" height="16"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/><line x1="8" y1="4" x2="8" y2="20"/><line x1="16" y1="4" x2="16" y2="20"/></svg>`,
+  'polaroid':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="21"/><line x1="3" y1="18" x2="21" y2="18"/><circle cx="12" cy="10" r="3"/></svg>`,
+
+  // — Revelado nuevos —
+  'cianotype':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 L12 21"/><path d="M12 6 Q16 8 16 12 Q16 16 12 18"/><path d="M12 6 Q8 8 8 12 Q8 16 12 18"/><path d="M12 8 Q14 10 14 12 Q14 14 12 16"/></svg>`,
+  'sepia':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 L9 8 Q9 14 12 16 Q15 18 15 21"/><path d="M9 3 L15 3 L15 8 Q15 14 12 16 Q9 18 9 21"/><line x1="7" y1="21" x2="17" y2="21"/><line x1="8" y1="11" x2="16" y2="11"/></svg>`,
+  'cross-process':  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3 L17 7 L7 17 L7 21"/><path d="M7 3 L7 7 L17 17 L17 21"/><polyline points="14,3 17,3 17,6"/><polyline points="10,21 7,21 7,18"/></svg>`,
+  'albumen':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><ellipse cx="12" cy="13" rx="7" ry="8.5"/><path d="M9 9 Q12 5 15 9" stroke-width="1"/></svg>`,
+  'platinum':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="8" width="18" height="8"/><line x1="3" y1="10.5" x2="21" y2="10.5"/><line x1="3" y1="13.5" x2="21" y2="13.5"/><line x1="6" y1="8" x2="6" y2="16"/><line x1="18" y1="8" x2="18" y2="16"/></svg>`,
+  'push-2':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14"/><line x1="7" y1="5" x2="7" y2="19"/><line x1="17" y1="5" x2="17" y2="19"/><line x1="12" y1="15" x2="12" y2="9"/><polyline points="9,12 12,9 15,12"/></svg>`,
+
+  // — Grano: emulsiones clásicas —
+  'tri-x':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="6" y="4" width="12" height="16" rx="1"/><line x1="6" y1="7" x2="18" y2="7"/><line x1="6" y1="17" x2="18" y2="17"/><circle cx="12" cy="12" r="2.5"/><rect x="4" y="2" width="2" height="3" rx="0.5"/><rect x="18" y="2" width="2" height="3" rx="0.5"/></svg>`,
+  'hp5':            `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="6" width="20" height="12"/><line x1="6" y1="6" x2="6" y2="18"/><line x1="18" y1="6" x2="18" y2="18"/><rect x="3" y="8" width="2" height="2.5" fill="currentColor" stroke="none"/><rect x="3" y="12.5" width="2" height="2.5" fill="currentColor" stroke="none"/><rect x="19" y="8" width="2" height="2.5" fill="currentColor" stroke="none"/><rect x="19" y="12.5" width="2" height="2.5" fill="currentColor" stroke="none"/></svg>`,
+  'delta':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 L21 20 L3 20 Z"/><line x1="7.5" y1="15" x2="16.5" y2="15"/><line x1="9.5" y1="11.5" x2="14.5" y2="11.5"/></svg>`,
+  'acros':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="8" width="3" height="8" fill="currentColor" stroke="none" opacity="0.9"/><rect x="6.5" y="9.5" width="3" height="6.5" fill="currentColor" stroke="none" opacity="0.7"/><rect x="11" y="11" width="3" height="5" fill="currentColor" stroke="none" opacity="0.5"/><rect x="15.5" y="12.5" width="3" height="3.5" fill="currentColor" stroke="none" opacity="0.3"/><rect x="20" y="14" width="2" height="2" fill="currentColor" stroke="none" opacity="0.15"/><line x1="2" y1="20" x2="22" y2="20"/></svg>`,
+  'tmax':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="18" x2="22" y2="18"/><line x1="2" y1="8" x2="22" y2="8"/><line x1="2" y1="13" x2="22" y2="13" stroke-dasharray="2 2"/><line x1="2" y1="8" x2="22" y2="18"/></svg>`,
+  'ortho':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,3 22,21 2,21"/><line x1="12" y1="3" x2="7" y2="21"/><line x1="12" y1="3" x2="17" y2="21"/><line x1="4" y1="16" x2="20" y2="16"/></svg>`,
+  'fomapan':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="21"/><line x1="3" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="5.6" y1="5.6" x2="9.5" y2="9.5"/></svg>`,
+  'kentmere':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="22" x2="12" y2="8"/><path d="M12 14 Q8 12 6 8 Q10 8 12 14"/><path d="M12 10 Q16 8 18 4 Q14 4 12 10"/><path d="M12 18 Q8 16 7 12 Q10 12 12 18"/></svg>`,
 };
 
 // ── Construir formatos de recorte ──
@@ -1332,13 +1636,13 @@ function updateCropOverlay() {
 
 // ── Grupos de presets ──
 const GROUPS = [
-  { label: 'Luz',      keys: ['golden-hour','first-light','dead-of-night'] },
-  { label: 'Cine',     keys: ['quentin','wes','andy'] },
-  { label: 'Arte',     keys: ['caravaggio','zuloaga','velvet'] },
-  { label: 'Cámara',   keys: ['m-system','f-chrome','h-format','wetzlar','capa'] },
-  { label: 'Revelado', keys: ['tobacco','old-money','matte','eastman'] },
+  { label: 'Luz',      keys: ['golden-hour','first-light','dead-of-night','blue-hour','midday','overcast','storm-light','candlelight','neon-night','platinum-sky'] },
+  { label: 'Cine',     keys: ['quentin','wes','andy','kubrick','lynch','fellini','bergman','villeneuve','akira','tarkovsky'] },
+  { label: 'Arte',     keys: ['caravaggio','zuloaga','velvet','vermeer','hopper','rembrandt','goya','turner','hockney','klimt'] },
+  { label: 'Cámara',   keys: ['m-system','f-chrome','h-format','wetzlar','capa','summilux','nikkor','otus','v-system','polaroid'] },
+  { label: 'Revelado', keys: ['tobacco','old-money','matte','eastman','cianotype','sepia','cross-process','albumen','platinum','push-2'] },
   { label: 'Visor',    keys: ['cartier','brassai','doisneau','avedon','newton','eggleston','shore','frank','nadar','strand'] },
-  { label: 'Grano',    keys: ['japanese-grain','silver'] },
+  { label: 'Grano',    keys: ['japanese-grain','silver','tri-x','hp5','delta','acros','tmax','ortho','fomapan','kentmere'] },
 ];
 
 // ── Iconos de grupos ──
