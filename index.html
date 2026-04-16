@@ -116,6 +116,24 @@
     }
     .tab-bar::-webkit-scrollbar { display: none; }
 
+    .presets-wordmark {
+      font-family: var(--font-serif);
+      font-size: 0.72rem;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      padding-right: 18px;
+      margin-right: 4px;
+      border-right: 1px solid var(--border);
+    }
+    @media (max-width: 640px) { .presets-wordmark { display: none; } }
+
     .tab-btn {
       display: flex;
       align-items: center;
@@ -740,7 +758,7 @@
 
 <!-- La Curaduría: grupos de presets -->
 <div class="presets-bar-wrapper">
-  <div class="tab-bar" id="tab-bar"></div>
+  <div class="tab-bar" id="tab-bar"><span class="presets-wordmark">Presets</span></div>
   <div class="tab-drawer" id="tab-drawer">
     <!-- grupos de presets generados por JS -->
   </div>
@@ -1023,7 +1041,7 @@ const PRESETS = {
     shadowTint: 0, highlightRecovery: 0
   },
   'zuloaga': {
-    label: 'Zuloaga', color: '#333333',
+    label: 'Ignacio', color: '#333333',
     warmth: 0, brightness: 0, contrast: 55, saturation: -100,
     shadows: 0, liftBlacks: 5, vignette: 25, grain: 35,
     shadowTint: 0, highlightRecovery: 0
@@ -1095,7 +1113,7 @@ const PRESETS = {
 
   // — Fotógrafos —
   'cartier': {
-    label: 'Cartier', color: '#8B7D6B',
+    label: 'Henri', color: '#8B7D6B',
     warmth: 12, brightness: 2, contrast: 28, saturation: -8,
     shadows: 12, liftBlacks: 0, vignette: 18, grain: 8,
     shadowTint: 0, highlightRecovery: 5
@@ -1107,31 +1125,31 @@ const PRESETS = {
     shadowTint: 5, highlightRecovery: 0
   },
   'doisneau': {
-    label: 'Doisneau', color: '#C4906A',
+    label: 'Robert', color: '#C4906A',
     warmth: 22, brightness: 5, contrast: -8, saturation: -18,
     shadows: 28, liftBlacks: 15, vignette: 10, grain: 5,
     shadowTint: 3, highlightRecovery: 10
   },
   'avedon': {
-    label: 'Avedon', color: '#C8C0B8',
+    label: 'Richard', color: '#C8C0B8',
     warmth: 5, brightness: 18, contrast: 12, saturation: -5,
     shadows: 35, liftBlacks: 5, vignette: 0, grain: 1,
     shadowTint: 0, highlightRecovery: 25
   },
   'newton': {
-    label: 'Newton', color: '#2A2A2A',
+    label: 'Helmut', color: '#2A2A2A',
     warmth: 8, brightness: -5, contrast: 55, saturation: 15,
     shadows: -5, liftBlacks: 0, vignette: 35, grain: 4,
     shadowTint: 0, highlightRecovery: 0
   },
   'eggleston': {
-    label: 'Eggleston', color: '#B84020',
+    label: 'William', color: '#B84020',
     warmth: 32, brightness: 5, contrast: 18, saturation: 55,
     shadows: 15, liftBlacks: 5, vignette: 8, grain: 3,
     shadowTint: 0, highlightRecovery: 8
   },
   'shore': {
-    label: 'Shore', color: '#C8A870',
+    label: 'Stephen', color: '#C8A870',
     warmth: 28, brightness: 8, contrast: -5, saturation: -25,
     shadows: 22, liftBlacks: 28, vignette: 5, grain: 5,
     shadowTint: 3, highlightRecovery: 12
@@ -1149,7 +1167,7 @@ const PRESETS = {
     shadowTint: 8, highlightRecovery: 0
   },
   'strand': {
-    label: 'Strand', color: '#606060',
+    label: 'Paul', color: '#606060',
     warmth: -5, brightness: 3, contrast: 48, saturation: -100,
     shadows: 5, liftBlacks: 3, vignette: 15, grain: 12,
     shadowTint: -3, highlightRecovery: 8
@@ -1215,31 +1233,31 @@ const PRESETS = {
 
   // — Directores (nuevos) —
   'kubrick': {
-    label: 'Kubrick', color: '#1A2A4A',
+    label: 'Stanley', color: '#1A2A4A',
     warmth: -28, brightness: 0, contrast: 48, saturation: -25,
     shadows: -8, liftBlacks: 5, vignette: 18, grain: 3,
     shadowTint: -8, highlightRecovery: 0
   },
   'lynch': {
-    label: 'Lynch', color: '#2A1A3A',
+    label: 'David', color: '#2A1A3A',
     warmth: -8, brightness: -25, contrast: 65, saturation: 15,
     shadows: -22, liftBlacks: 0, vignette: 70, grain: 8,
     shadowTint: -5, highlightRecovery: 0
   },
   'fellini': {
-    label: 'Fellini', color: '#C4900A',
+    label: 'Federico', color: '#C4900A',
     warmth: 35, brightness: 3, contrast: 22, saturation: -15,
     shadows: 25, liftBlacks: 15, vignette: 15, grain: 10,
     shadowTint: 5, highlightRecovery: 10
   },
   'bergman': {
-    label: 'Bergman', color: '#3A3A3A',
+    label: 'Ingmar', color: '#3A3A3A',
     warmth: 0, brightness: -8, contrast: 62, saturation: -100,
     shadows: -8, liftBlacks: 3, vignette: 30, grain: 18,
     shadowTint: 0, highlightRecovery: 0
   },
   'villeneuve': {
-    label: 'Villeneuve', color: '#5A7080',
+    label: 'Denis', color: '#5A7080',
     warmth: -22, brightness: -5, contrast: 38, saturation: -40,
     shadows: 5, liftBlacks: 5, vignette: 35, grain: 5,
     shadowTint: -10, highlightRecovery: 12
@@ -1251,21 +1269,27 @@ const PRESETS = {
     shadowTint: 0, highlightRecovery: 0
   },
   'tarkovsky': {
-    label: 'Tarkovsky', color: '#5A6A3A',
+    label: 'Andrei', color: '#5A6A3A',
     warmth: 18, brightness: -12, contrast: 25, saturation: -45,
     shadows: 15, liftBlacks: 8, vignette: 40, grain: 22,
     shadowTint: 5, highlightRecovery: 5
   },
 
   // — Pintores (nuevos) —
+  'mark': {
+    label: 'Mark', color: '#8B2020',
+    warmth: 32, brightness: 5, contrast: -20, saturation: -15,
+    shadows: 45, liftBlacks: 55, vignette: 0, grain: 1,
+    shadowTint: 10, highlightRecovery: 15
+  },
   'vermeer': {
-    label: 'Vermeer', color: '#4A80A0',
+    label: 'Johannes', color: '#4A80A0',
     warmth: 15, brightness: 5, contrast: 18, saturation: 12,
     shadows: 35, liftBlacks: 8, vignette: 20, grain: 2,
     shadowTint: -5, highlightRecovery: 12
   },
   'hopper': {
-    label: 'Hopper', color: '#D4A020',
+    label: 'Edward', color: '#D4A020',
     warmth: 28, brightness: 8, contrast: 45, saturation: 15,
     shadows: -18, liftBlacks: 0, vignette: 12, grain: 3,
     shadowTint: 0, highlightRecovery: 8
@@ -1277,25 +1301,25 @@ const PRESETS = {
     shadowTint: 8, highlightRecovery: 0
   },
   'goya': {
-    label: 'Goya', color: '#2A1A0A',
+    label: 'Francisco', color: '#2A1A0A',
     warmth: 5, brightness: -28, contrast: 75, saturation: -35,
     shadows: -25, liftBlacks: 0, vignette: 65, grain: 12,
     shadowTint: 3, highlightRecovery: 0
   },
   'turner': {
-    label: 'Turner', color: '#D4B870',
+    label: 'Joseph', color: '#D4B870',
     warmth: 35, brightness: 18, contrast: -12, saturation: -30,
     shadows: 42, liftBlacks: 35, vignette: 8, grain: 3,
     shadowTint: 5, highlightRecovery: 28
   },
   'hockney': {
-    label: 'Hockney', color: '#1A8AB0',
+    label: 'David', color: '#1A8AB0',
     warmth: 8, brightness: 12, contrast: 15, saturation: 55,
     shadows: 22, liftBlacks: 12, vignette: 0, grain: 1,
     shadowTint: 0, highlightRecovery: 10
   },
   'klimt': {
-    label: 'Klimt', color: '#C8940A',
+    label: 'Gustav', color: '#C8940A',
     warmth: 55, brightness: -5, contrast: 32, saturation: 35,
     shadows: 8, liftBlacks: 5, vignette: 38, grain: 5,
     shadowTint: 10, highlightRecovery: 0
@@ -1522,6 +1546,7 @@ const PRESET_ICONS = {
   'tarkovsky':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="3" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
 
   // — Arte nuevos —
+  'mark':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="8"/><rect x="3" y="13" width="18" height="8"/></svg>`,
   'vermeer':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 21 L5 9 Q5 4 12 4 Q19 4 19 9 L19 21"/><line x1="5" y1="14" x2="19" y2="14"/><line x1="3" y1="21" x2="21" y2="21"/></svg>`,
   'hopper':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="15"/><line x1="3" y1="11" x2="21" y2="11"/><line x1="12" y1="6" x2="12" y2="21"/><path d="M12 6 L12 2 L16 6" fill="currentColor" stroke="none"/></svg>`,
   'rembrandt':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="4"/><path d="M5 22 L9 12 L15 14 L19 22"/><polygon points="8,22 12,14 16,22" fill="currentColor" stroke="none" opacity="0.3"/></svg>`,
@@ -1650,7 +1675,7 @@ function updateCropOverlay() {
 const GROUPS = [
   { label: 'Luz',      keys: ['golden-hour','first-light','dead-of-night','blue-hour','midday','overcast','storm-light','candlelight','neon-night','platinum-sky'] },
   { label: 'Cine',     keys: ['quentin','wes','andy','kubrick','lynch','fellini','bergman','villeneuve','akira','tarkovsky'] },
-  { label: 'Arte',     keys: ['caravaggio','zuloaga','velvet','vermeer','hopper','rembrandt','goya','turner','hockney','klimt'] },
+  { label: 'Arte',     keys: ['caravaggio','zuloaga','velvet','vermeer','hopper','rembrandt','goya','turner','hockney','klimt','mark'] },
   { label: 'Cámara',   keys: ['m-system','f-chrome','h-format','wetzlar','capa','summilux','nikkor','otus','v-system','polaroid'] },
   { label: 'Revelado', keys: ['tobacco','old-money','matte','eastman','cianotype','sepia','cross-process','albumen','platinum','push-2'] },
   { label: 'Visor',    keys: ['cartier','brassai','doisneau','avedon','newton','eggleston','shore','frank','nadar','strand'] },
