@@ -617,6 +617,43 @@
 
     #file-input { display: none; }
 
+    /* ── Transformaciones (girar / voltear) ── */
+    .transform-header {
+      font-size: 0.52rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin: 14px 0 10px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .transform-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .btn-transform {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 4px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-transform:hover { border-color: #4a4643; color: var(--text); }
+    .btn-transform svg { width: 20px; height: 20px; display: block; }
+    .btn-transform span {
+      font-family: var(--font-sans);
+      font-size: 0.36rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
     /* ── Recorte ── */
     .crop-header {
       font-size: 0.52rem;
@@ -1066,6 +1103,26 @@
         <div class="control">
           <label>Nivelar <span id="val-nivelar">0°</span></label>
           <input type="range" id="nivelar" min="-10" max="10" step="0.5" value="0">
+        </div>
+
+        <p class="transform-header">Transformar</p>
+        <div class="transform-row">
+          <button class="btn-transform" id="btn-rotate-l" title="Girar 90° izquierda">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9"/><polyline points="3,7 3,12 8,12"/></svg>
+            <span>90° Izq</span>
+          </button>
+          <button class="btn-transform" id="btn-rotate-r" title="Girar 90° derecha">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><polyline points="21,7 21,12 16,12"/></svg>
+            <span>90° Der</span>
+          </button>
+          <button class="btn-transform" id="btn-flip-h" title="Espejo horizontal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M16 7 L20 12 L16 17"/><path d="M8 7 L4 12 L8 17"/></svg>
+            <span>Espejo H</span>
+          </button>
+          <button class="btn-transform" id="btn-flip-v" title="Espejo vertical">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><path d="M7 8 L12 4 L17 8"/><path d="M7 16 L12 20 L17 16"/></svg>
+            <span>Espejo V</span>
+          </button>
         </div>
 
         <div class="annotation-row">
@@ -1738,7 +1795,8 @@ const undoStack = [];
 const redoStack = [];
 
 function captureState() {
-  const s = { preset: activePreset, appliedCrop: appliedCrop ? { ...appliedCrop } : null };
+  const s = { preset: activePreset, appliedCrop: appliedCrop ? { ...appliedCrop } : null,
+              rotationDeg, flipH, flipV };
   Object.keys(sliders).forEach(k => { s[k] = +sliders[k].value; });
   s.nivelar   = +nivelarSlider.value;
   s.sharpness = +sharpnessSlider.value;
@@ -1748,6 +1806,9 @@ function captureState() {
 function applyState(s) {
   activePreset = s.preset;
   appliedCrop  = s.appliedCrop ? { ...s.appliedCrop } : null;
+  rotationDeg  = s.rotationDeg ?? 0;
+  flipH        = s.flipH ?? false;
+  flipV        = s.flipV ?? false;
   Object.keys(sliders).forEach(k => {
     sliders[k].value = s[k];
     if (vals[k]) vals[k].textContent = s[k];
@@ -1793,6 +1854,9 @@ function redo() {
 let showBefore       = false;
 let activeCropFormat = 'free';
 let appliedCrop = null; // { sx, sy, sw, sh, exportW, exportH } en coords de originalImage
+let rotationDeg = 0;   // 0 | 90 | 180 | 270
+let flipH = false;
+let flipV = false;
 let cropMode  = false;
 let cropRect  = { x1: 0.1, y1: 0.1, x2: 0.9, y2: 0.9 }; // normalized 0-1 relative to canvas display
 let _cropDrag = null; // { type:'corner'|'move', corner?:str, clientX, clientY, startRect }
@@ -2485,6 +2549,7 @@ function loadImage(file) {
     const img = new Image();
     img.onload = () => {
       // Reset estado antes de cargar la nueva foto
+      rotationDeg = 0; flipH = false; flipV = false;
       cropRect = { x1: 0.1, y1: 0.1, x2: 0.9, y2: 0.9 };
       appliedCrop = null;
       activePreset = null;
@@ -2615,35 +2680,41 @@ function applyFilters() {
 
   const srcW = appliedCrop ? appliedCrop.sw : originalImage.width;
   const srcH = appliedCrop ? appliedCrop.sh : originalImage.height;
-  canvas.width  = srcW + border * 2;
-  canvas.height = srcH + border * 2;
+
+  // Rotation swaps canvas dimensions for 90°/270°
+  const rotated90 = rotationDeg === 90 || rotationDeg === 270;
+  const imgW = rotated90 ? srcH : srcW;
+  const imgH = rotated90 ? srcW : srcH;
+  canvas.width  = imgW + border * 2;
+  canvas.height = imgH + border * 2;
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.beginPath(); ctx.rect(border, border, imgW, imgH); ctx.clip();
+  ctx.translate(border + imgW / 2, border + imgH / 2);
 
   const deg = parseFloat(nivelarSlider.value);
   if (deg !== 0) {
     const rad = deg * Math.PI / 180;
     const cosA = Math.abs(Math.cos(rad)), sinA = Math.abs(Math.sin(rad));
     const scale = Math.max(
-      (srcW * cosA + srcH * sinA) / srcW,
-      (srcW * sinA + srcH * cosA) / srcH
+      (imgW * cosA + imgH * sinA) / imgW,
+      (imgW * sinA + imgH * cosA) / imgH
     );
-    ctx.save();
-    ctx.beginPath(); ctx.rect(border, border, srcW, srcH); ctx.clip();
-    ctx.translate(border + srcW / 2, border + srcH / 2);
     ctx.rotate(rad);
     ctx.scale(scale, scale);
-    if (appliedCrop) {
-      ctx.drawImage(originalImage, appliedCrop.sx, appliedCrop.sy, srcW, srcH, -srcW / 2, -srcH / 2, srcW, srcH);
-    } else {
-      ctx.drawImage(originalImage, -srcW / 2, -srcH / 2);
-    }
-    ctx.restore();
-  } else if (appliedCrop) {
-    ctx.drawImage(originalImage, appliedCrop.sx, appliedCrop.sy, srcW, srcH, border, border, srcW, srcH);
-  } else {
-    ctx.drawImage(originalImage, border, border);
   }
+  if (rotationDeg) ctx.rotate(rotationDeg * Math.PI / 180);
+  if (flipH) ctx.scale(-1, 1);
+  if (flipV) ctx.scale(1, -1);
+
+  if (appliedCrop) {
+    ctx.drawImage(originalImage, appliedCrop.sx, appliedCrop.sy, srcW, srcH, -srcW / 2, -srcH / 2, srcW, srcH);
+  } else {
+    ctx.drawImage(originalImage, -srcW / 2, -srcH / 2, srcW, srcH);
+  }
+  ctx.restore();
 
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   processPixels(imageData.data, p);
@@ -2783,6 +2854,8 @@ function resetSliders() {
     b.style.borderBottomColor = 'transparent';
   });
   activePreset = null;
+  // Reset transformaciones
+  rotationDeg = 0; flipH = false; flipV = false;
   // Reset recorte
   if (cropMode) exitCropMode(false);
   appliedCrop = null;
@@ -2795,6 +2868,28 @@ function resetSliders() {
 }
 
 document.getElementById('btn-reset').addEventListener('click', resetSliders);
+
+// ── Girar y voltear ──
+document.getElementById('btn-rotate-l').addEventListener('click', () => {
+  saveHistory(captureState());
+  rotationDeg = (rotationDeg + 270) % 360;
+  scheduleApplyFilters();
+});
+document.getElementById('btn-rotate-r').addEventListener('click', () => {
+  saveHistory(captureState());
+  rotationDeg = (rotationDeg + 90) % 360;
+  scheduleApplyFilters();
+});
+document.getElementById('btn-flip-h').addEventListener('click', () => {
+  saveHistory(captureState());
+  flipH = !flipH;
+  scheduleApplyFilters();
+});
+document.getElementById('btn-flip-v').addEventListener('click', () => {
+  saveHistory(captureState());
+  flipV = !flipV;
+  scheduleApplyFilters();
+});
 
 // ── Undo / Redo ──
 document.getElementById('btn-undo').addEventListener('click', undo);
