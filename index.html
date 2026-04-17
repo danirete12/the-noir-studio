@@ -577,8 +577,8 @@
       gap: 6px;
     }
     .footer-info-label {
-      font-size: 0.42rem;
-      letter-spacing: 0.2em;
+      font-size: 0.55rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--muted);
       white-space: nowrap;
@@ -589,11 +589,11 @@
       border-bottom: 1px solid var(--border);
       color: var(--text);
       font-family: var(--font-sans);
-      font-size: 0.62rem;
+      font-size: 0.82rem;
       font-weight: 400;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       padding: 2px 4px;
-      width: 160px;
+      width: 200px;
       outline: none;
       transition: border-color 0.2s;
     }
@@ -1793,9 +1793,9 @@ let showBefore       = false;
 let activeCropFormat = 'free';
 let appliedCrop = null; // { sx, sy, sw, sh, exportW, exportH } en coords de originalImage
 let cropMode  = false;
-let cropNormX = 0.5;
-let cropNormY = 0.5;
-let _cropDrag = null;
+let cropRect  = { x1: 0.1, y1: 0.1, x2: 0.9, y2: 0.9 }; // normalized 0-1 relative to canvas display
+let _cropDrag = null; // { type:'corner'|'move', corner?:str, clientX, clientY, startRect }
+const CROP_HANDLE_R = 13; // px hit radius for corner handles
 
 // ── DOM ──
 const dropZone    = document.getElementById('drop-zone');
@@ -1950,7 +1950,6 @@ CROP_FORMATS.forEach(fmt => {
 function setCropFormat(id, btn) {
   if (cropMode) exitCropMode(false);
   activeCropFormat = id;
-  cropNormX = 0.5; cropNormY = 0.5;
   cropFormatsEl.querySelectorAll('.btn-crop').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('crop-custom-inputs').classList.toggle('visible', id === 'free');
@@ -2023,9 +2022,8 @@ cropRatioH.addEventListener('input', () => {
 
 function onPixelInputChange() {
   if (activeCropFormat === 'free') {
-    cropNormX = 0.5; cropNormY = 0.5;
     if (originalImage && !cropMode) enterCropMode();
-    else updateCropOverlay();
+    else if (cropMode) { initCropRect(); updateCropOverlay(); }
   }
 }
 
@@ -2034,91 +2032,165 @@ const overlayCanvas = document.getElementById('crop-overlay-canvas');
 const overlayCtx    = overlayCanvas.getContext('2d');
 
 // ── Modo recorte interactivo ──
+function getActiveRatio() {
+  if (activeCropFormat === 'free' || activeCropFormat === 'custom') {
+    const cw = parseFloat(document.getElementById('crop-custom-w').value) || 1080;
+    const ch = parseFloat(document.getElementById('crop-custom-h').value) || 1350;
+    return cw / ch;
+  }
+  const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
+  return fmt ? fmt.ratio : null;
+}
+
+function initCropRect() {
+  const ratio = getActiveRatio();
+  const r = canvas.getBoundingClientRect();
+  const dw = r.width || 1, dh = r.height || 1;
+  const margin = 0.06;
+  const avail  = 1 - 2 * margin;
+
+  if (!ratio) { cropRect = { x1: 0, y1: 0, x2: 1, y2: 1 }; return; }
+
+  const canvasRatio = dw / dh;
+  let fw, fh;
+  if (canvasRatio > ratio) { fh = avail; fw = fh * ratio * dh / dw; }
+  else                     { fw = avail; fh = fw * dw / (ratio * dh); }
+
+  cropRect = { x1: (1-fw)/2, y1: (1-fh)/2, x2: (1+fw)/2, y2: (1+fh)/2 };
+}
+
 function enterCropMode() {
   if (!originalImage) return;
   cropMode = true;
+  initCropRect();
   overlayCanvas.classList.add('crop-active');
   document.getElementById('crop-mode-bar').classList.add('visible');
   updateCropOverlay();
 }
+
 function exitCropMode(apply) {
   cropMode = false;
   overlayCanvas.classList.remove('crop-active');
+  overlayCanvas.style.cursor = '';
   document.getElementById('crop-mode-bar').classList.remove('visible');
 
   if (apply && originalImage) {
     saveHistory(captureState());
-    const border = parseInt(sliders.borderSize.value);
-    const cW = canvas.width, cH = canvas.height;
     const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
-    let ratio, exportW, exportH;
+    let exportW, exportH;
     if (activeCropFormat === 'free' || activeCropFormat === 'custom') {
-      const pw = parseFloat(document.getElementById('crop-custom-w').value) || 1080;
-      const ph = parseFloat(document.getElementById('crop-custom-h').value) || 1350;
-      ratio = pw / ph; exportW = Math.round(pw); exportH = Math.round(ph);
-    } else if (fmt && fmt.ratio) {
-      ratio = fmt.ratio; exportW = fmt.exportW; exportH = fmt.exportH;
+      exportW = parseFloat(document.getElementById('crop-custom-w').value) || Math.round((cropRect.x2 - cropRect.x1) * canvas.width);
+      exportH = parseFloat(document.getElementById('crop-custom-h').value) || Math.round((cropRect.y2 - cropRect.y1) * canvas.height);
+    } else if (fmt) {
+      exportW = fmt.exportW; exportH = fmt.exportH;
     }
-    if (ratio) {
-      const canvasRatio = cW / cH;
-      let cropW, cropH;
-      if (canvasRatio > ratio) { cropH = cH; cropW = cropH * ratio; }
-      else                     { cropW = cW; cropH = cropW / ratio; }
-      const minNX = (cropW/2)/cW, maxNX = 1-minNX;
-      const minNY = (cropH/2)/cH, maxNY = 1-minNY;
-      const nx = Math.max(minNX, Math.min(maxNX, cropNormX));
-      const ny = Math.max(minNY, Math.min(maxNY, cropNormY));
-      const cx = nx * cW - cropW / 2;
-      const cy = ny * cH - cropH / 2;
-      const sx = Math.round(Math.max(0, cx - border));
-      const sy = Math.round(Math.max(0, cy - border));
-      const sw = Math.round(Math.min(cropW, originalImage.width  - sx));
-      const sh = Math.round(Math.min(cropH, originalImage.height - sy));
+    if (exportW && exportH) {
+      const sx = Math.round(Math.max(0, cropRect.x1 * canvas.width));
+      const sy = Math.round(Math.max(0, cropRect.y1 * canvas.height));
+      const sw = Math.round(Math.min(canvas.width  - sx, (cropRect.x2 - cropRect.x1) * canvas.width));
+      const sh = Math.round(Math.min(canvas.height - sy, (cropRect.y2 - cropRect.y1) * canvas.height));
       appliedCrop = { sx, sy, sw: Math.max(1, sw), sh: Math.max(1, sh), exportW, exportH };
     }
-    cropNormX = 0.5; cropNormY = 0.5;
     overlayCanvas.style.display = 'none';
-    // Volver a 'free' sin overlay activo
     activeCropFormat = 'free';
     cropFormatsEl.querySelectorAll('.btn-crop').forEach(b => b.classList.toggle('active', b.dataset.id === 'free'));
     document.getElementById('crop-custom-inputs').classList.add('visible');
     applyFilters();
   } else {
-    cropNormX = 0.5; cropNormY = 0.5;
+    initCropRect();
     updateCropOverlay();
   }
 }
 document.getElementById('btn-crop-apply').addEventListener('click', () => exitCropMode(true));
 document.getElementById('btn-crop-cancel').addEventListener('click', () => exitCropMode(false));
 
-// Arrastre del marco de recorte
+// ── Interacción con esquinas del marco ──
+function getCropHit(clientX, clientY) {
+  const r = overlayCanvas.getBoundingClientRect();
+  const px = clientX - r.left, py = clientY - r.top;
+  const w = r.width, h = r.height;
+  const handles = {
+    tl: [cropRect.x1 * w, cropRect.y1 * h],
+    tr: [cropRect.x2 * w, cropRect.y1 * h],
+    bl: [cropRect.x1 * w, cropRect.y2 * h],
+    br: [cropRect.x2 * w, cropRect.y2 * h],
+  };
+  for (const [name, [hx, hy]] of Object.entries(handles)) {
+    if (Math.hypot(px - hx, py - hy) <= CROP_HANDLE_R) return { type: 'corner', corner: name };
+  }
+  const x1 = cropRect.x1 * w, y1 = cropRect.y1 * h;
+  const x2 = cropRect.x2 * w, y2 = cropRect.y2 * h;
+  if (px >= x1 && px <= x2 && py >= y1 && py <= y2) return { type: 'move' };
+  return null;
+}
+
+const CORNER_CURSORS = { tl: 'nwse-resize', tr: 'nesw-resize', bl: 'nesw-resize', br: 'nwse-resize' };
+
+function applyCropDrag(clientX, clientY) {
+  const r = overlayCanvas.getBoundingClientRect();
+  const dx = (clientX - _cropDrag.clientX) / r.width;
+  const dy = (clientY - _cropDrag.clientY) / r.height;
+  const sr = _cropDrag.startRect;
+  const MIN = 0.04;
+
+  if (_cropDrag.type === 'move') {
+    const rw = sr.x2 - sr.x1, rh = sr.y2 - sr.y1;
+    const nx1 = Math.max(0, Math.min(1 - rw, sr.x1 + dx));
+    const ny1 = Math.max(0, Math.min(1 - rh, sr.y1 + dy));
+    cropRect = { x1: nx1, y1: ny1, x2: nx1 + rw, y2: ny1 + rh };
+  } else {
+    const { corner } = _cropDrag;
+    let nx1 = sr.x1, ny1 = sr.y1, nx2 = sr.x2, ny2 = sr.y2;
+    if (corner === 'tl') { nx1 = Math.min(sr.x2 - MIN, sr.x1 + dx); ny1 = Math.min(sr.y2 - MIN, sr.y1 + dy); }
+    else if (corner === 'tr') { nx2 = Math.max(sr.x1 + MIN, sr.x2 + dx); ny1 = Math.min(sr.y2 - MIN, sr.y1 + dy); }
+    else if (corner === 'bl') { nx1 = Math.min(sr.x2 - MIN, sr.x1 + dx); ny2 = Math.max(sr.y1 + MIN, sr.y2 + dy); }
+    else if (corner === 'br') { nx2 = Math.max(sr.x1 + MIN, sr.x2 + dx); ny2 = Math.max(sr.y1 + MIN, sr.y2 + dy); }
+
+    // Maintain ratio for non-free formats
+    const ratio = getActiveRatio();
+    if (ratio) {
+      const dw = r.width, dh = r.height;
+      const nw = (nx2 - nx1) * dw;
+      const nh = nw / ratio;
+      const nhN = nh / dh;
+      if (corner === 'tl' || corner === 'bl') {
+        if (corner === 'tl') ny1 = ny2 - nhN; else ny2 = ny1 + nhN;
+      } else {
+        if (corner === 'tr') ny1 = ny2 - nhN; else ny2 = ny1 + nhN;
+      }
+    }
+
+    cropRect = {
+      x1: Math.max(0, Math.min(1, nx1)), y1: Math.max(0, Math.min(1, ny1)),
+      x2: Math.max(0, Math.min(1, nx2)), y2: Math.max(0, Math.min(1, ny2)),
+    };
+  }
+  updateCropOverlay();
+}
+
 overlayCanvas.addEventListener('mousedown', e => {
   if (!cropMode) return;
-  _cropDrag = { x: e.clientX, y: e.clientY, nx: cropNormX, ny: cropNormY };
-  e.preventDefault();
+  const hit = getCropHit(e.clientX, e.clientY);
+  if (hit) { _cropDrag = { ...hit, clientX: e.clientX, clientY: e.clientY, startRect: { ...cropRect } }; e.preventDefault(); }
 });
 window.addEventListener('mousemove', e => {
-  if (!cropMode || !_cropDrag) return;
-  const r = canvas.getBoundingClientRect();
-  cropNormX = _cropDrag.nx + (e.clientX - _cropDrag.x) / r.width;
-  cropNormY = _cropDrag.ny + (e.clientY - _cropDrag.y) / r.height;
-  updateCropOverlay();
+  if (!cropMode) return;
+  if (_cropDrag) { applyCropDrag(e.clientX, e.clientY); return; }
+  const hit = getCropHit(e.clientX, e.clientY);
+  overlayCanvas.style.cursor = hit ? (hit.type === 'corner' ? CORNER_CURSORS[hit.corner] : 'move') : 'default';
 });
 window.addEventListener('mouseup', () => { _cropDrag = null; });
 
 overlayCanvas.addEventListener('touchstart', e => {
   if (!cropMode) return;
   const t = e.touches[0];
-  _cropDrag = { x: t.clientX, y: t.clientY, nx: cropNormX, ny: cropNormY };
-  e.preventDefault();
+  const hit = getCropHit(t.clientX, t.clientY);
+  if (hit) { _cropDrag = { ...hit, clientX: t.clientX, clientY: t.clientY, startRect: { ...cropRect } }; e.preventDefault(); }
 }, { passive: false });
 window.addEventListener('touchmove', e => {
   if (!cropMode || !_cropDrag) return;
   const t = e.touches[0];
-  const r = canvas.getBoundingClientRect();
-  cropNormX = _cropDrag.nx + (t.clientX - _cropDrag.x) / r.width;
-  cropNormY = _cropDrag.ny + (t.clientY - _cropDrag.y) / r.height;
-  updateCropOverlay();
+  applyCropDrag(t.clientX, t.clientY);
   e.preventDefault();
 }, { passive: false });
 window.addEventListener('touchend', () => { _cropDrag = null; });
@@ -2126,89 +2198,62 @@ window.addEventListener('touchend', () => { _cropDrag = null; });
 function updateCropOverlay() {
   if (!originalImage) { overlayCanvas.style.display = 'none'; return; }
 
-  const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
-  let ratio = fmt ? fmt.ratio : null;
-  if (activeCropFormat === 'free' || activeCropFormat === 'custom') {
-    const cw = parseFloat(document.getElementById('crop-custom-w').value) || 1080;
-    const ch = parseFloat(document.getElementById('crop-custom-h').value) || 1350;
-    ratio = cw / ch;
-  }
-  if (!ratio) { overlayCanvas.style.display = 'none'; return; }
-
   const canvasRect = canvas.getBoundingClientRect();
   const areaRect   = document.getElementById('canvas-area').getBoundingClientRect();
+  const w = canvasRect.width, h = canvasRect.height;
 
-  overlayCanvas.width  = canvasRect.width;
-  overlayCanvas.height = canvasRect.height;
-  overlayCanvas.style.width  = canvasRect.width  + 'px';
-  overlayCanvas.style.height = canvasRect.height + 'px';
+  overlayCanvas.width  = w; overlayCanvas.height = h;
+  overlayCanvas.style.width  = w + 'px'; overlayCanvas.style.height = h + 'px';
   overlayCanvas.style.left   = (canvasRect.left - areaRect.left) + 'px';
   overlayCanvas.style.top    = (canvasRect.top  - areaRect.top)  + 'px';
   overlayCanvas.style.display = 'block';
 
-  const w = canvasRect.width, h = canvasRect.height;
-  const canvasRatio = w / h;
-  let cropW, cropH;
-  if (canvasRatio > ratio) { cropH = h; cropW = h * ratio; }
-  else                     { cropW = w; cropH = w / ratio; }
-
-  // Clamp normalized center so frame stays within canvas
-  const minNX = (cropW / 2) / w, maxNX = 1 - minNX;
-  const minNY = (cropH / 2) / h, maxNY = 1 - minNY;
-  cropNormX = Math.max(minNX, Math.min(maxNX, cropNormX));
-  cropNormY = Math.max(minNY, Math.min(maxNY, cropNormY));
-
-  const cropX = cropNormX * w - cropW / 2;
-  const cropY = cropNormY * h - cropH / 2;
+  const x  = cropRect.x1 * w, y  = cropRect.y1 * h;
+  const cw = (cropRect.x2 - cropRect.x1) * w, ch = (cropRect.y2 - cropRect.y1) * h;
 
   overlayCtx.clearRect(0, 0, w, h);
 
-  // Oscurecer fuera del recorte
+  // Sombra fuera del recorte
   overlayCtx.fillStyle = 'rgba(0,0,0,0.58)';
   overlayCtx.fillRect(0, 0, w, h);
-  overlayCtx.clearRect(cropX, cropY, cropW, cropH);
+  overlayCtx.clearRect(x, y, cw, ch);
 
-  // Tercios (líneas guía sutiles)
+  // Tercios
   overlayCtx.strokeStyle = 'rgba(255,255,255,0.18)';
   overlayCtx.lineWidth = 0.5;
   overlayCtx.beginPath();
   for (let i = 1; i < 3; i++) {
-    overlayCtx.moveTo(cropX + cropW * i/3, cropY);
-    overlayCtx.lineTo(cropX + cropW * i/3, cropY + cropH);
-    overlayCtx.moveTo(cropX, cropY + cropH * i/3);
-    overlayCtx.lineTo(cropX + cropW, cropY + cropH * i/3);
+    overlayCtx.moveTo(x + cw * i/3, y); overlayCtx.lineTo(x + cw * i/3, y + ch);
+    overlayCtx.moveTo(x, y + ch * i/3); overlayCtx.lineTo(x + cw, y + ch * i/3);
   }
   overlayCtx.stroke();
 
-  // Borde exterior fino
-  overlayCtx.strokeStyle = 'rgba(255,255,255,0.35)';
+  // Borde
+  overlayCtx.strokeStyle = 'rgba(255,255,255,0.4)';
   overlayCtx.lineWidth = 1;
-  overlayCtx.strokeRect(cropX, cropY, cropW, cropH);
+  overlayCtx.strokeRect(x, y, cw, ch);
 
-  // Asas de esquina en L (diseño de cámara)
-  const arm = Math.min(cropW, cropH) * 0.11;
+  // Asas L en esquinas
+  const arm = Math.min(cw, ch) * 0.12;
   overlayCtx.strokeStyle = 'rgba(255,255,255,0.95)';
   overlayCtx.lineWidth = 2;
   overlayCtx.lineCap = 'square';
   overlayCtx.beginPath();
-  const corners = [
-    [cropX, cropY, 1, 1],
-    [cropX + cropW, cropY, -1, 1],
-    [cropX, cropY + cropH, 1, -1],
-    [cropX + cropW, cropY + cropH, -1, -1],
-  ];
-  corners.forEach(([cx, cy, sx, sy]) => {
-    overlayCtx.moveTo(cx + sx * arm, cy);
-    overlayCtx.lineTo(cx, cy);
-    overlayCtx.lineTo(cx, cy + sy * arm);
+  [[x, y, 1, 1], [x+cw, y, -1, 1], [x, y+ch, 1, -1], [x+cw, y+ch, -1, -1]].forEach(([cx, cy, sx, sy]) => {
+    overlayCtx.moveTo(cx + sx * arm, cy); overlayCtx.lineTo(cx, cy); overlayCtx.lineTo(cx, cy + sy * arm);
   });
   overlayCtx.stroke();
   overlayCtx.lineCap = 'butt';
 
-  // Indicador de arrastre cuando está en modo recorte
+  // Indicadores de esquina arrastrables
   if (cropMode) {
-    overlayCtx.fillStyle = 'rgba(255,255,255,0.07)';
-    overlayCtx.fillRect(cropX, cropY, cropW, cropH);
+    overlayCtx.fillStyle = 'rgba(255,255,255,0.06)';
+    overlayCtx.fillRect(x, y, cw, ch);
+    const hs = 5;
+    overlayCtx.fillStyle = 'rgba(255,255,255,0.92)';
+    [[x, y], [x+cw, y], [x, y+ch], [x+cw, y+ch]].forEach(([hx, hy]) => {
+      overlayCtx.fillRect(hx - hs, hy - hs, hs*2, hs*2);
+    });
   }
 }
 
@@ -2385,7 +2430,7 @@ function loadImage(file) {
     const img = new Image();
     img.onload = () => {
       // Reset estado antes de cargar la nueva foto
-      cropNormX = 0.5; cropNormY = 0.5;
+      cropRect = { x1: 0.1, y1: 0.1, x2: 0.9, y2: 0.9 };
       appliedCrop = null;
       activePreset = null;
       resetSliders();
@@ -2603,21 +2648,18 @@ document.getElementById('btn-export').addEventListener('click', () => {
     } else if (activeCropFormat !== 'free') {
       const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
       if (activeCropFormat === 'custom') {
-        const pw = parseFloat(document.getElementById('crop-custom-w').value) || canvas.width;
-        const ph = parseFloat(document.getElementById('crop-custom-h').value) || canvas.height;
-        const ratio = pw / ph; expW = Math.round(pw); expH = Math.round(ph);
-        const canvasRatio = canvas.width / canvas.height;
-        if (canvasRatio > ratio) { srcH = canvas.height; srcW = srcH * ratio; }
-        else                     { srcW = canvas.width;  srcH = srcW / ratio; }
-        srcX = Math.max(0, Math.min(canvas.width  - srcW, cropNormX * canvas.width  - srcW / 2));
-        srcY = Math.max(0, Math.min(canvas.height - srcH, cropNormY * canvas.height - srcH / 2));
+        expW = parseFloat(document.getElementById('crop-custom-w').value) || canvas.width;
+        expH = parseFloat(document.getElementById('crop-custom-h').value) || canvas.height;
+        srcX = Math.round(cropRect.x1 * canvas.width);
+        srcY = Math.round(cropRect.y1 * canvas.height);
+        srcW = Math.round((cropRect.x2 - cropRect.x1) * canvas.width);
+        srcH = Math.round((cropRect.y2 - cropRect.y1) * canvas.height);
       } else if (fmt && fmt.ratio) {
-        const ratio = fmt.ratio; expW = fmt.exportW; expH = fmt.exportH;
-        const canvasRatio = canvas.width / canvas.height;
-        if (canvasRatio > ratio) { srcH = canvas.height; srcW = srcH * ratio; }
-        else                     { srcW = canvas.width;  srcH = srcW / ratio; }
-        srcX = Math.max(0, Math.min(canvas.width  - srcW, cropNormX * canvas.width  - srcW / 2));
-        srcY = Math.max(0, Math.min(canvas.height - srcH, cropNormY * canvas.height - srcH / 2));
+        expW = fmt.exportW; expH = fmt.exportH;
+        srcX = Math.round(cropRect.x1 * canvas.width);
+        srcY = Math.round(cropRect.y1 * canvas.height);
+        srcW = Math.round((cropRect.x2 - cropRect.x1) * canvas.width);
+        srcH = Math.round((cropRect.y2 - cropRect.y1) * canvas.height);
       } else {
         expW = canvas.width; expH = canvas.height;
       }
