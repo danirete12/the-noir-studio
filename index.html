@@ -152,11 +152,11 @@
       align-items: center;
       gap: 7px;
       font-family: var(--font-sans);
-      font-size: 0.6rem;
+      font-size: 0.65rem;
       font-weight: 500;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--text);
       white-space: nowrap;
       background: none;
       border: none;
@@ -233,12 +233,12 @@
       transition: color 0.22s, border-color 0.22s;
       flex-shrink: 0;
     }
-    .btn-preset:hover .preset-icon { color: #666; }
-    .btn-preset:hover .preset-label { color: #666; }
+    .btn-preset:hover .preset-icon { color: var(--text); }
+    .btn-preset:hover .preset-label { color: var(--text); }
 
     .preset-icon {
-      width: 20px; height: 20px;
-      color: #bbb;
+      width: 22px; height: 22px;
+      color: #a09890;
       flex-shrink: 0;
       transition: color 0.22s;
     }
@@ -246,11 +246,11 @@
 
     .preset-label {
       font-family: var(--font-serif);
-      font-size: 0.62rem;
-      font-weight: 300;
+      font-size: 0.7rem;
+      font-weight: 400;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--text);
       white-space: nowrap;
       transition: color 0.22s;
       line-height: 1.3;
@@ -326,8 +326,9 @@
     .drop-zone:hover, .drop-zone.drag-over { border-color: #5a5652; }
 
     .drop-zone p {
-      color: #3e3b37;
-      font-size: 0.55rem;
+      color: #6a6560;
+      font-size: 0.6rem;
+      font-weight: 500;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       text-align: center;
@@ -336,7 +337,7 @@
 
     .drop-zone .icon {
       font-size: 0.9rem;
-      color: #2e2b27;
+      color: #4a4643;
       letter-spacing: 0.6em;
     }
 
