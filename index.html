@@ -862,6 +862,11 @@
         display: block !important;
       }
 
+      /* Todos los pilares ocultos por defecto; solo se muestra el activo */
+      .pillar { display: none; }
+      .pillar.mobile-open { display: block; }
+      .panel-footer { display: none; }
+
       /* Tab bar en móvil */
       .tab-bar { padding: 0 10px; }
       .tab-btn { padding: 8px 10px; font-size: 0.55rem; }
@@ -3036,6 +3041,7 @@ function toggleMobileSheet(pillarId, btn) {
   const isSame = activeMobileSheet === pillarId;
 
   document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.pillar').forEach(p => p.classList.remove('mobile-open'));
 
   if (isSame) {
     activeMobileSheet = null;
@@ -3045,16 +3051,9 @@ function toggleMobileSheet(pillarId, btn) {
   activeMobileSheet = pillarId;
   btn.classList.add('active');
 
-  // Expandir el pillar correcto, colapsar el resto
-  document.querySelectorAll('.pillar').forEach(p => {
-    p.classList.toggle('collapsed', p.id !== pillarId);
-  });
-
-  // Scroll al pillar dentro del panel
-  setTimeout(() => {
-    const el = document.getElementById(pillarId);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 50);
+  const pillar = document.getElementById(pillarId);
+  pillar.classList.add('mobile-open');
+  pillar.classList.remove('collapsed');
 }
 
 // Exportar desde móvil
