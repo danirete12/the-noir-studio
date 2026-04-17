@@ -14,8 +14,9 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="The Noir Studio — Editor de Fotografía Gratis">
   <meta name="twitter:image" content="https://raw.githubusercontent.com/danirete12/the-noir-studio/master/og-image.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230d0d0d'/><g stroke='white' stroke-width='1.2' stroke-linecap='round'><line x1='50' y1='50' x2='50' y2='9' transform='rotate(0 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(15 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(30 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(45 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(60 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(75 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(90 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(105 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(120 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(135 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(150 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(165 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(180 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(195 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(210 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(225 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(240 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(255 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(270 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(285 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(300 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(315 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(330 50 50)'/><line x1='50' y1='50' x2='50' y2='9' transform='rotate(345 50 50)'/></g><circle cx='50' cy='50' r='5.5' fill='%23C8201A'/><path d='M87 82 L89 85 L92 87 L89 89 L87 92 L85 89 L82 87 L85 85 Z' fill='white'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg:         #ffffff;
@@ -51,15 +52,21 @@
       border-bottom: 1px solid var(--border);
       padding: 14px 28px;
       display: flex;
-      align-items: baseline;
-      gap: desktop16px;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .logo-mark {
+      width: 30px;
+      height: 30px;
       flex-shrink: 0;
     }
 
     header h1 {
       font-family: var(--font-serif);
       font-size: 1.25rem;
-      font-weight: 300;
+      font-weight: 700;
       letter-spacing: 0.35em;
       text-transform: uppercase;
       color: var(--text);
@@ -439,6 +446,16 @@
       outline: none;
       cursor: pointer;
     }
+    #warmth {
+      background: linear-gradient(to right, #7ab3cc 0%, #d8d5d0 50%, #c89040 100%);
+    }
+    .warmth-ends {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+    .warmth-cold { font-size: 0.38rem; letter-spacing: 0.1em; color: #7ab3cc; }
+    .warmth-warm { font-size: 0.38rem; letter-spacing: 0.1em; color: #c89040; }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       width: 9px; height: 9px;
@@ -806,6 +823,35 @@
 <body>
 
 <header>
+  <svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g stroke="#1a1a1a" stroke-width="1.2" stroke-linecap="round">
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(0 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(15 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(30 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(45 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(60 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(75 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(90 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(105 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(120 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(135 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(150 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(165 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(180 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(195 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(210 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(225 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(240 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(255 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(270 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(285 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(300 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(315 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(330 50 50)"/>
+      <line x1="50" y1="50" x2="50" y2="9" transform="rotate(345 50 50)"/>
+    </g>
+    <circle cx="50" cy="50" r="5.5" fill="#C8201A"/>
+  </svg>
   <h1>The Noir Studio</h1>
   <span class="tagline">Editor de Fotografía</span>
   <div class="header-actions">
@@ -867,8 +913,12 @@
       <div class="pillar-body">
 
         <div class="control">
-          <label>Temperatura <span id="val-warmth">0</span></label>
+          <label>Temperatura <span id="val-warmth">0°</span></label>
           <input type="range" id="warmth" min="-100" max="100" value="0">
+          <div class="warmth-ends">
+            <span class="warmth-cold">−100°</span>
+            <span class="warmth-warm">+100°</span>
+          </div>
         </div>
 
         <div class="control">
@@ -2377,7 +2427,7 @@ Object.entries(sliders).forEach(([key, slider]) => {
   slider.addEventListener('touchstart', () => { _pre = captureState(); }, { passive: true });
   slider.addEventListener('change',     () => { if (_pre) { saveHistory(_pre); _pre = null; } });
   slider.addEventListener('input', () => {
-    if (vals[key]) vals[key].textContent = slider.value;
+    if (vals[key]) vals[key].textContent = slider.value + (key === 'warmth' ? '°' : '');
     activePreset = null;
     document.querySelectorAll('.btn-preset').forEach(b => {
       b.classList.remove('active');
@@ -2440,7 +2490,7 @@ document.getElementById('btn-export').addEventListener('click', () => {
     if (annotToggle.checked && border > 0) {
       const text = annotInput.value || annotInput.placeholder;
       const scaledBorder = border * (1080 / (originalImage.width + border * 2));
-      expCtx.font = `300 ${Math.max(18, scaledBorder * 0.28)}px 'Cormorant Garamond', Georgia, serif`;
+      expCtx.font = `700 ${Math.max(18, scaledBorder * 0.28)}px 'Cormorant Garamond', Georgia, serif`;
       expCtx.fillStyle = '#999';
       expCtx.letterSpacing = '3px';
       expCtx.textAlign = 'center';
