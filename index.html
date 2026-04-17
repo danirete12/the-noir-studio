@@ -2330,6 +2330,20 @@ function loadImage(file) {
   reader.onload = e => {
     const img = new Image();
     img.onload = () => {
+      // Reset estado antes de cargar la nueva foto
+      cropNormX = 0.5; cropNormY = 0.5;
+      appliedCrop = null;
+      activePreset = null;
+      resetSliders();
+      undoStack.length = 0;
+      redoStack.length = 0;
+      updateHistoryBtns();
+      document.querySelectorAll('.btn-preset').forEach(b => {
+        b.classList.remove('active');
+        b.style.borderBottomColor = 'transparent';
+      });
+      document.getElementById('before-badge').style.display = 'none';
+
       originalImage = img;
       dropZone.style.display = 'none';
       canvas.style.display = 'block';
@@ -2349,23 +2363,8 @@ function loadImage(file) {
 // ── Cambiar foto ──
 document.getElementById('btn-change-photo').addEventListener('click', () => {
   if (cropMode) exitCropMode(false);
-  cropNormX = 0.5; cropNormY = 0.5;
-  appliedCrop = null;
-  originalImage = null;
-  activePreset = null;
-  resetSliders();
-  undoStack.length = 0;
-  redoStack.length = 0;
-  updateHistoryBtns();
-  document.getElementById('btn-change-photo').disabled = true;
-  canvas.style.display = 'none';
-  document.getElementById('before-badge').style.display = 'none';
-  dropZone.style.display = '';
-  document.querySelectorAll('.btn-preset').forEach(b => {
-    b.classList.remove('active');
-    b.style.borderBottomColor = 'transparent';
-  });
   fileInput.value = '';
+  fileInput.click();
 });
 
 // ── Nivelar: rota y escala dentro del canvas (sin CSS transform) ──
