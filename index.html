@@ -1965,6 +1965,15 @@ const cropRatioW  = document.getElementById('crop-ratio-w');
 const cropRatioH  = document.getElementById('crop-ratio-h');
 
 // Actualiza los inputs de proporción a partir de los valores de píxeles
+function syncInputsFromCropRect() {
+  if (!canvas.width || !canvas.height) return;
+  const sw = Math.round((cropRect.x2 - cropRect.x1) * canvas.width);
+  const sh = Math.round((cropRect.y2 - cropRect.y1) * canvas.height);
+  cropWInput.value = sw;
+  cropHInput.value = sh;
+  syncRatioFromPixels();
+}
+
 function syncRatioFromPixels() {
   const w = parseInt(cropWInput.value);
   const h = parseInt(cropHInput.value);
@@ -2063,6 +2072,7 @@ function enterCropMode() {
   if (!originalImage) return;
   cropMode = true;
   initCropRect();
+  syncInputsFromCropRect();
   overlayCanvas.classList.add('crop-active');
   document.getElementById('crop-mode-bar').classList.add('visible');
   updateCropOverlay();
@@ -2213,6 +2223,7 @@ function applyCropDrag(clientX, clientY) {
       x2: Math.max(0, Math.min(1, nx2)), y2: Math.max(0, Math.min(1, ny2)),
     };
   }
+  syncInputsFromCropRect();
   updateCropOverlay();
 }
 
