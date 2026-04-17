@@ -608,14 +608,13 @@
     }
 
     .crop-custom-inputs {
-      display: none;
+      display: flex;
       flex-direction: column;
       gap: 4px;
       margin-top: 10px;
       padding-top: 10px;
       border-top: 1px solid var(--border);
     }
-    .crop-custom-inputs.visible { display: flex; }
     .crop-custom-row {
       display: flex;
       align-items: flex-end;
@@ -1805,6 +1804,7 @@ const PRESET_ICONS = {
 // ── Construir formatos de recorte ──
 const cropFormatsEl = document.getElementById('crop-formats');
 CROP_FORMATS.forEach(fmt => {
+  if (fmt.id === 'custom') return; // inputs siempre visibles, no necesita botón
   const [rx, ry, rw, rh] = fmt.svgRect;
   const btn = document.createElement('button');
   btn.className = 'btn-crop' + (fmt.id === 'free' ? ' active' : '');
@@ -1825,14 +1825,24 @@ function setCropFormat(id, btn) {
   cropNormX = 0.5; cropNormY = 0.5;
   cropFormatsEl.querySelectorAll('.btn-crop').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const isCustom = id === 'custom';
-  document.getElementById('crop-custom-inputs').classList.toggle('visible', isCustom);
   if (id !== 'free' && originalImage) enterCropMode();
   else updateCropOverlay();
 }
 
-document.getElementById('crop-custom-w').addEventListener('input', updateCropOverlay);
-document.getElementById('crop-custom-h').addEventListener('input', updateCropOverlay);
+function activateCustomCrop() {
+  if (activeCropFormat !== 'custom') {
+    if (cropMode) exitCropMode(false);
+    activeCropFormat = 'custom';
+    cropNormX = 0.5; cropNormY = 0.5;
+    cropFormatsEl.querySelectorAll('.btn-crop').forEach(b => b.classList.remove('active'));
+    if (originalImage) enterCropMode();
+    else updateCropOverlay();
+  } else {
+    updateCropOverlay();
+  }
+}
+document.getElementById('crop-custom-w').addEventListener('input', activateCustomCrop);
+document.getElementById('crop-custom-h').addEventListener('input', activateCustomCrop);
 
 // ── Overlay de recorte ──
 const overlayCanvas = document.getElementById('crop-overlay-canvas');
