@@ -572,11 +572,33 @@
     }
 
     .footer-info {
-      font-size: 0.45rem;
-      letter-spacing: 0.22em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .footer-info-label {
+      font-size: 0.42rem;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--muted);
+      white-space: nowrap;
     }
+    #filename-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 0.62rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      padding: 2px 4px;
+      width: 160px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #filename-input:focus { border-bottom-color: var(--accent); }
+    #filename-input::placeholder { color: var(--muted); }
 
     #btn-export {
       background: var(--accent);
@@ -1109,7 +1131,11 @@
 
 <!-- La Salida -->
 <footer>
-  <span class="footer-info">JPG · 1080×1350 · sRGB</span>
+  <div class="footer-info">
+    <span class="footer-info-label">Nombre:</span>
+    <input type="text" id="filename-input" placeholder="noir-studio" maxlength="80" spellcheck="false" autocomplete="off">
+    <span class="footer-info-label">.jpg</span>
+  </div>
   <button id="btn-export">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:7px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     Descargar
@@ -2614,7 +2640,9 @@ document.getElementById('btn-export').addEventListener('click', () => {
     }
 
     const link    = document.createElement('a');
-    link.download = 'noir-studio.jpg';
+    const rawName = document.getElementById('filename-input').value.trim();
+    const safeName = rawName.replace(/[^\w\-. ]/g, '').replace(/\s+/g, '-') || 'noir-studio';
+    link.download = safeName + '.jpg';
     link.href     = exp.toDataURL('image/jpeg', 0.93);
     link.click();
 
