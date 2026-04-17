@@ -699,6 +699,27 @@
       text-align: center;
       margin-top: 2px;
     }
+    .crop-ratio-display {
+      text-align: center;
+      font-family: var(--font-sans);
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      color: var(--text);
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      font-variant-numeric: tabular-nums;
+    }
+    .crop-ratio-label {
+      display: block;
+      font-size: 0.42rem;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
 
     /* Overlay de recorte sobre el canvas */
     #crop-overlay-canvas {
@@ -1076,6 +1097,10 @@
             </div>
           </div>
           <p class="crop-custom-px">píxeles</p>
+          <div class="crop-ratio-display" id="crop-ratio-display">
+            <span class="crop-ratio-label">Proporción</span>
+            <span id="crop-ratio-value">— : —</span>
+          </div>
         </div>
 
       </div>
@@ -1900,6 +1925,48 @@ function setCropFormat(id, btn) {
   else updateCropOverlay();
 }
 
+function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+
+function updateRatioDisplay() {
+  const w = parseInt(document.getElementById('crop-custom-w').value);
+  const h = parseInt(document.getElementById('crop-custom-h').value);
+  const el = document.getElementById('crop-ratio-value');
+  if (!el) return;
+  if (w > 0 && h > 0) {
+    const g = gcd(w, h);
+    el.textContent = `${w / g} : ${h / g}`;
+  } else {
+    el.textContent = '— : —';
+  }
+}
+
+function getImageRatio() {
+  if (appliedCrop) return appliedCrop.sw / appliedCrop.sh;
+  if (originalImage) return originalImage.width / originalImage.height;
+  return null;
+}
+
+const cropWInput = document.getElementById('crop-custom-w');
+const cropHInput = document.getElementById('crop-custom-h');
+
+cropWInput.addEventListener('input', () => {
+  const ratio = getImageRatio();
+  if (ratio && cropWInput.value) {
+    cropHInput.value = Math.round(parseInt(cropWInput.value) / ratio) || '';
+  }
+  updateRatioDisplay();
+  onPixelInputChange();
+});
+
+cropHInput.addEventListener('input', () => {
+  const ratio = getImageRatio();
+  if (ratio && cropHInput.value) {
+    cropWInput.value = Math.round(parseInt(cropHInput.value) * ratio) || '';
+  }
+  updateRatioDisplay();
+  onPixelInputChange();
+});
+
 function onPixelInputChange() {
   if (activeCropFormat === 'free') {
     cropNormX = 0.5; cropNormY = 0.5;
@@ -1907,8 +1974,6 @@ function onPixelInputChange() {
     else updateCropOverlay();
   }
 }
-document.getElementById('crop-custom-w').addEventListener('input', onPixelInputChange);
-document.getElementById('crop-custom-h').addEventListener('input', onPixelInputChange);
 
 // ── Overlay de recorte ──
 const overlayCanvas = document.getElementById('crop-overlay-canvas');
@@ -2270,6 +2335,10 @@ function loadImage(file) {
       canvas.style.display = 'block';
       document.getElementById('btn-change-photo').disabled = false;
       updateAnnotationState();
+      // Inicializar inputs de recorte con las dimensiones reales de la imagen
+      cropWInput.value = img.width;
+      cropHInput.value = img.height;
+      updateRatioDisplay();
       applyFilters();
     };
     img.src = e.target.result;
