@@ -7,21 +7,21 @@
 ## Para el lanzamiento (must-have)
 
 ### Producto
-- [ ] UI completamente en español
-- [ ] Histograma en tiempo real (feedback tonal básico)
-- [ ] Indicador visual de overflow en barra de presets (fade en bordes)
+- [x] UI completamente en español
+- [x] Indicador visual de overflow en barra de presets (fade en bordes)
+- [x] Open Graph completo con og:image
 - [ ] Dominio propio o URL limpia publicada
-- [ ] Open Graph completo (ya hecho)
 - [ ] Mobile testeado en iOS Safari y Android Chrome
 
 ### Marketing
-- [ ] Landing page o al menos meta tags completos (ya hecho)
-- [ ] 5 preset pages con URL params (?tool=golden-hour etc.) — ya hay infraestructura
+- [x] Landing page y meta tags completos
 - [ ] Publicación en al menos 2 comunidades de fotografía
 
 ## Post-lanzamiento (próximo sprint)
 
 ### Producto (semana 1-2)
+- Histograma en tiempo real
+- Edición multi-foto (batch)
 - Curvas tonales con LUT
 - HSL por canal
 - Toggle antes/después también con botón visible (ya existe con tecla A)

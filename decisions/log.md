@@ -26,3 +26,7 @@ Formato:
 [2026-04-13] DECISION: 9 agentes especializados en .claude/agents/ | REASONING: Cada agente tiene contexto específico del proyecto para tomar decisiones desde su perspectiva sin necesidad de briefing en cada sesión | CONTEXT: El usuario quiere un ecosistema de subagentes para el proyecto
 
 [2026-04-13] DECISION: Lanzamiento objetivo domingo 2026-04-20 | REASONING: El producto tiene suficiente funcionalidad para un MVP público; el usuario quiere validar con usuarios reales lo antes posible | CONTEXT: Planificación post-sesión multi-agente
+
+[2026-04-14] DECISION: Edición multi-foto → post-lanzamiento | REASONING: Requiere refactorizar el modelo de datos central (originalImage → array de fotos con estado por foto); el MVP de una foto es suficiente para validar con usuarios reales | CONTEXT: Análisis de la feature confirmó que es trabajo significativo, no un tweak; el lanzamiento del domingo no lo necesita
+
+[2026-04-14] DECISION: Histograma → post-lanzamiento | REASONING: El usuario considera que el producto lanza bien sin él; prioridad es dominio propio + testeo mobile antes del domingo | CONTEXT: Pregunta abierta del informe multi-agente resuelta
