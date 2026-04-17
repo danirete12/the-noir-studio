@@ -1595,7 +1595,7 @@ const PRESETS = {
 
 // ── Formatos de recorte ──
 const CROP_FORMATS = [
-  { id: 'free',     label: 'Libre',      sub: 'Sin recorte', ratio: null,    exportW: 1080, exportH: 1350, svgRect: [4,2,16,20] },
+  { id: 'free',     label: 'Libre',      sub: '',            ratio: null,    exportW: 1080, exportH: 1350, svgRect: [4,2,16,20] },
   { id: 'story',    label: 'Story',      sub: '9:16',        ratio: 9/16,    exportW: 1080, exportH: 1920, svgRect: [8,1,8,22] },
   { id: 'post45',   label: 'Post 4:5',   sub: '4:5',         ratio: 4/5,     exportW: 1080, exportH: 1350, svgRect: [5,2,14,18] },
   { id: 'square',   label: 'Cuadrado',   sub: '1:1',         ratio: 1,       exportW: 1080, exportH: 1080, svgRect: [3,3,18,18] },
@@ -1666,6 +1666,7 @@ function redo() {
 }
 let showBefore       = false;
 let activeCropFormat = 'free';
+let appliedCrop = null; // { sx, sy, sw, sh, exportW, exportH } en coords de originalImage
 let cropMode  = false;
 let cropNormX = 0.5;
 let cropNormY = 0.5;
@@ -1825,24 +1826,20 @@ function setCropFormat(id, btn) {
   cropNormX = 0.5; cropNormY = 0.5;
   cropFormatsEl.querySelectorAll('.btn-crop').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  if (id !== 'free' && originalImage) enterCropMode();
+  document.getElementById('crop-custom-inputs').classList.toggle('visible', id === 'free');
+  if (originalImage) enterCropMode();
   else updateCropOverlay();
 }
 
-function activateCustomCrop() {
-  if (activeCropFormat !== 'custom') {
-    if (cropMode) exitCropMode(false);
-    activeCropFormat = 'custom';
+function onPixelInputChange() {
+  if (activeCropFormat === 'free') {
     cropNormX = 0.5; cropNormY = 0.5;
-    cropFormatsEl.querySelectorAll('.btn-crop').forEach(b => b.classList.remove('active'));
-    if (originalImage) enterCropMode();
+    if (originalImage && !cropMode) enterCropMode();
     else updateCropOverlay();
-  } else {
-    updateCropOverlay();
   }
 }
-document.getElementById('crop-custom-w').addEventListener('input', activateCustomCrop);
-document.getElementById('crop-custom-h').addEventListener('input', activateCustomCrop);
+document.getElementById('crop-custom-w').addEventListener('input', onPixelInputChange);
+document.getElementById('crop-custom-h').addEventListener('input', onPixelInputChange);
 
 // ── Overlay de recorte ──
 const overlayCanvas = document.getElementById('crop-overlay-canvas');
@@ -1850,7 +1847,7 @@ const overlayCtx    = overlayCanvas.getContext('2d');
 
 // ── Modo recorte interactivo ──
 function enterCropMode() {
-  if (!originalImage || activeCropFormat === 'free') return;
+  if (!originalImage) return;
   cropMode = true;
   overlayCanvas.classList.add('crop-active');
   document.getElementById('crop-mode-bar').classList.add('visible');
@@ -1858,10 +1855,49 @@ function enterCropMode() {
 }
 function exitCropMode(apply) {
   cropMode = false;
-  if (!apply) { cropNormX = 0.5; cropNormY = 0.5; }
   overlayCanvas.classList.remove('crop-active');
   document.getElementById('crop-mode-bar').classList.remove('visible');
-  updateCropOverlay();
+
+  if (apply && originalImage) {
+    const border = parseInt(sliders.borderSize.value);
+    const cW = canvas.width, cH = canvas.height;
+    const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
+    let ratio, exportW, exportH;
+    if (activeCropFormat === 'free' || activeCropFormat === 'custom') {
+      const pw = parseFloat(document.getElementById('crop-custom-w').value) || 1080;
+      const ph = parseFloat(document.getElementById('crop-custom-h').value) || 1350;
+      ratio = pw / ph; exportW = Math.round(pw); exportH = Math.round(ph);
+    } else if (fmt && fmt.ratio) {
+      ratio = fmt.ratio; exportW = fmt.exportW; exportH = fmt.exportH;
+    }
+    if (ratio) {
+      const canvasRatio = cW / cH;
+      let cropW, cropH;
+      if (canvasRatio > ratio) { cropH = cH; cropW = cropH * ratio; }
+      else                     { cropW = cW; cropH = cropW / ratio; }
+      const minNX = (cropW/2)/cW, maxNX = 1-minNX;
+      const minNY = (cropH/2)/cH, maxNY = 1-minNY;
+      const nx = Math.max(minNX, Math.min(maxNX, cropNormX));
+      const ny = Math.max(minNY, Math.min(maxNY, cropNormY));
+      const cx = nx * cW - cropW / 2;
+      const cy = ny * cH - cropH / 2;
+      const sx = Math.round(Math.max(0, cx - border));
+      const sy = Math.round(Math.max(0, cy - border));
+      const sw = Math.round(Math.min(cropW, originalImage.width  - sx));
+      const sh = Math.round(Math.min(cropH, originalImage.height - sy));
+      appliedCrop = { sx, sy, sw: Math.max(1, sw), sh: Math.max(1, sh), exportW, exportH };
+    }
+    cropNormX = 0.5; cropNormY = 0.5;
+    overlayCanvas.style.display = 'none';
+    // Volver a 'free' sin overlay activo
+    activeCropFormat = 'free';
+    cropFormatsEl.querySelectorAll('.btn-crop').forEach(b => b.classList.toggle('active', b.dataset.id === 'free'));
+    document.getElementById('crop-custom-inputs').classList.add('visible');
+    applyFilters();
+  } else {
+    cropNormX = 0.5; cropNormY = 0.5;
+    updateCropOverlay();
+  }
 }
 document.getElementById('btn-crop-apply').addEventListener('click', () => exitCropMode(true));
 document.getElementById('btn-crop-cancel').addEventListener('click', () => exitCropMode(false));
@@ -1902,16 +1938,13 @@ function updateCropOverlay() {
   if (!originalImage) { overlayCanvas.style.display = 'none'; return; }
 
   const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
-  if (!fmt || (!fmt.ratio && fmt.id !== 'custom')) {
-    overlayCanvas.style.display = 'none'; return;
-  }
-
-  let ratio = fmt.ratio;
-  if (fmt.id === 'custom') {
+  let ratio = fmt ? fmt.ratio : null;
+  if (activeCropFormat === 'free' || activeCropFormat === 'custom') {
     const cw = parseFloat(document.getElementById('crop-custom-w').value) || 1080;
     const ch = parseFloat(document.getElementById('crop-custom-h').value) || 1350;
     ratio = cw / ch;
   }
+  if (!ratio) { overlayCanvas.style.display = 'none'; return; }
 
   const canvasRect = canvas.getBoundingClientRect();
   const areaRect   = document.getElementById('canvas-area').getBoundingClientRect();
@@ -2180,6 +2213,7 @@ function loadImage(file) {
 document.getElementById('btn-change-photo').addEventListener('click', () => {
   if (cropMode) exitCropMode(false);
   cropNormX = 0.5; cropNormY = 0.5;
+  appliedCrop = null;
   originalImage = null;
   activePreset = null;
   resetSliders();
@@ -2292,11 +2326,19 @@ function applyFilters() {
   const p = {};
   Object.keys(sliders).forEach(k => { p[k] = parseInt(sliders[k].value); });
 
-  canvas.width  = originalImage.width  + border * 2;
-  canvas.height = originalImage.height + border * 2;
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(originalImage, border, border);
+  if (appliedCrop) {
+    canvas.width  = appliedCrop.sw + border * 2;
+    canvas.height = appliedCrop.sh + border * 2;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(originalImage, appliedCrop.sx, appliedCrop.sy, appliedCrop.sw, appliedCrop.sh, border, border, appliedCrop.sw, appliedCrop.sh);
+  } else {
+    canvas.width  = originalImage.width  + border * 2;
+    canvas.height = originalImage.height + border * 2;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(originalImage, border, border);
+  }
 
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   processPixels(imageData.data, p);
@@ -2335,34 +2377,35 @@ document.getElementById('btn-export').addEventListener('click', () => {
     const expCtx = exp.getContext('2d');
 
     // Calcular tamaño y recorte
-    const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
-    let ratio = fmt ? fmt.ratio : null;
-    let customW = 1080, customH = 1350;
-    if (activeCropFormat === 'custom') {
-      customW = Math.round(parseFloat(document.getElementById('crop-custom-w').value)) || 1080;
-      customH = Math.round(parseFloat(document.getElementById('crop-custom-h').value)) || 1350;
-      ratio = customW / customH;
-    }
-
     let srcX = 0, srcY = 0, srcW = canvas.width, srcH = canvas.height;
-    let expW = fmt?.exportW || 1080;
-    let expH = fmt?.exportH || 1350;
+    let expW, expH;
 
-    if (ratio && ratio !== 'custom') {
-      const canvasRatio = canvas.width / canvas.height;
-      if (canvasRatio > ratio) { srcH = canvas.height; srcW = srcH * ratio; }
-      else                     { srcW = canvas.width;  srcH = srcW / ratio; }
-      srcX = cropNormX * canvas.width  - srcW / 2;
-      srcY = cropNormY * canvas.height - srcH / 2;
-      srcX = Math.max(0, Math.min(canvas.width  - srcW, srcX));
-      srcY = Math.max(0, Math.min(canvas.height - srcH, srcY));
-      if (activeCropFormat === 'custom') {
-        expW = customW; expH = customH;
+    if (appliedCrop) {
+      // Canvas ya muestra sólo el área recortada
+      expW = appliedCrop.exportW; expH = appliedCrop.exportH;
+    } else {
+      const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
+      let ratio = fmt ? fmt.ratio : null;
+      if (activeCropFormat === 'free') {
+        const pw = parseFloat(document.getElementById('crop-custom-w').value) || 1080;
+        const ph = parseFloat(document.getElementById('crop-custom-h').value) || 1350;
+        ratio = pw / ph; expW = Math.round(pw); expH = Math.round(ph);
+      } else {
+        expW = fmt?.exportW || 1080; expH = fmt?.exportH || 1350;
+      }
+      if (ratio) {
+        const canvasRatio = canvas.width / canvas.height;
+        if (canvasRatio > ratio) { srcH = canvas.height; srcW = srcH * ratio; }
+        else                     { srcW = canvas.width;  srcH = srcW / ratio; }
+        srcX = cropNormX * canvas.width  - srcW / 2;
+        srcY = cropNormY * canvas.height - srcH / 2;
+        srcX = Math.max(0, Math.min(canvas.width  - srcW, srcX));
+        srcY = Math.max(0, Math.min(canvas.height - srcH, srcY));
       }
     }
 
-    exp.width  = expW;
-    exp.height = expH;
+    exp.width  = expW || 1080;
+    exp.height = expH || 1350;
 
     // Aplicar rotación (nivelar) al exportar
     const deg = parseFloat(nivelarSlider.value);
