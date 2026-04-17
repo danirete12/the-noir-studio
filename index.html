@@ -233,8 +233,10 @@
       transition: color 0.22s, border-color 0.22s;
       flex-shrink: 0;
     }
-    .btn-preset:hover .preset-icon { color: var(--preset-color, var(--text)); }
-    .btn-preset:hover .preset-label { color: var(--preset-color, var(--text)); }
+    .btn-preset:hover .preset-icon,
+    .btn-preset.active .preset-icon  { color: var(--preset-color, var(--text)); }
+    .btn-preset:hover .preset-label,
+    .btn-preset.active .preset-label { color: var(--preset-color, var(--text)); }
 
     .preset-icon {
       width: 22px; height: 22px;
