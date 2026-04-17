@@ -1611,18 +1611,18 @@ function saveHistory(preSnap) {
 }
 
 function updateHistoryBtns() {
-  document.getElementById('btn-undo').disabled = undoStack.length === 0;
-  document.getElementById('btn-redo').disabled = redoStack.length === 0;
+  document.getElementById('btn-undo').disabled = !originalImage || undoStack.length === 0;
+  document.getElementById('btn-redo').disabled = !originalImage || redoStack.length === 0;
 }
 
 function undo() {
-  if (!undoStack.length) return;
+  if (!originalImage || !undoStack.length) return;
   redoStack.push(captureState());
   applyState(undoStack.pop());
 }
 
 function redo() {
-  if (!redoStack.length) return;
+  if (!originalImage || !redoStack.length) return;
   undoStack.push(captureState());
   applyState(redoStack.pop());
 }
