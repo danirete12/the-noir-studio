@@ -2463,31 +2463,35 @@ document.getElementById('btn-export').addEventListener('click', () => {
     let expW, expH;
 
     if (appliedCrop) {
-      // Canvas ya muestra sólo el área recortada
       expW = appliedCrop.exportW; expH = appliedCrop.exportH;
-    } else {
+    } else if (activeCropFormat !== 'free') {
       const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
-      let ratio = fmt ? fmt.ratio : null;
-      if (activeCropFormat === 'free') {
-        const pw = parseFloat(document.getElementById('crop-custom-w').value) || 1080;
-        const ph = parseFloat(document.getElementById('crop-custom-h').value) || 1350;
-        ratio = pw / ph; expW = Math.round(pw); expH = Math.round(ph);
-      } else {
-        expW = fmt?.exportW || 1080; expH = fmt?.exportH || 1350;
-      }
-      if (ratio) {
+      if (activeCropFormat === 'custom') {
+        const pw = parseFloat(document.getElementById('crop-custom-w').value) || canvas.width;
+        const ph = parseFloat(document.getElementById('crop-custom-h').value) || canvas.height;
+        const ratio = pw / ph; expW = Math.round(pw); expH = Math.round(ph);
         const canvasRatio = canvas.width / canvas.height;
         if (canvasRatio > ratio) { srcH = canvas.height; srcW = srcH * ratio; }
         else                     { srcW = canvas.width;  srcH = srcW / ratio; }
-        srcX = cropNormX * canvas.width  - srcW / 2;
-        srcY = cropNormY * canvas.height - srcH / 2;
-        srcX = Math.max(0, Math.min(canvas.width  - srcW, srcX));
-        srcY = Math.max(0, Math.min(canvas.height - srcH, srcY));
+        srcX = Math.max(0, Math.min(canvas.width  - srcW, cropNormX * canvas.width  - srcW / 2));
+        srcY = Math.max(0, Math.min(canvas.height - srcH, cropNormY * canvas.height - srcH / 2));
+      } else if (fmt && fmt.ratio) {
+        const ratio = fmt.ratio; expW = fmt.exportW; expH = fmt.exportH;
+        const canvasRatio = canvas.width / canvas.height;
+        if (canvasRatio > ratio) { srcH = canvas.height; srcW = srcH * ratio; }
+        else                     { srcW = canvas.width;  srcH = srcW / ratio; }
+        srcX = Math.max(0, Math.min(canvas.width  - srcW, cropNormX * canvas.width  - srcW / 2));
+        srcY = Math.max(0, Math.min(canvas.height - srcH, cropNormY * canvas.height - srcH / 2));
+      } else {
+        expW = canvas.width; expH = canvas.height;
       }
+    } else {
+      // Sin recorte activo: exportar el canvas en sus dimensiones reales
+      expW = canvas.width; expH = canvas.height;
     }
 
-    exp.width  = expW || 1080;
-    exp.height = expH || 1350;
+    exp.width  = expW;
+    exp.height = expH;
 
     expCtx.drawImage(canvas, srcX, srcY, srcW, srcH, 0, 0, expW, expH);
 
@@ -2497,18 +2501,18 @@ document.getElementById('btn-export').addEventListener('click', () => {
     const border = parseInt(sliders.borderSize.value);
     if (annotToggle.checked && border > 0) {
       const text = annotInput.value || annotInput.placeholder;
-      const scaledBorder = border * (1080 / (originalImage.width + border * 2));
+      const scaledBorder = border * (expW / canvas.width);
       expCtx.font = `700 ${Math.max(18, scaledBorder * 0.28)}px 'Cormorant Garamond', Georgia, serif`;
       expCtx.fillStyle = '#999';
       expCtx.letterSpacing = '3px';
       expCtx.textAlign = 'center';
-      expCtx.fillText(text.toUpperCase(), 540, 1350 - scaledBorder * 0.32);
+      expCtx.fillText(text.toUpperCase(), expW / 2, expH - scaledBorder * 0.32);
     }
 
     // Nitidez al exportar
     const sharpAmount = parseInt(sharpnessSlider.value) / 100;
     if (sharpAmount > 0) {
-      const imgData = expCtx.getImageData(0, 0, 1080, 1350);
+      const imgData = expCtx.getImageData(0, 0, expW, expH);
       sharpenImageData(imgData, sharpAmount * 0.8);
       expCtx.putImageData(imgData, 0, 0);
     }
