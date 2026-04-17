@@ -2179,21 +2179,6 @@ function applyCropDrag(clientX, clientY) {
     else if (edge === 'left')   nx1 = Math.min(sr.x2 - MIN, sr.x1 + dx);
     else if (edge === 'right')  nx2 = Math.max(sr.x1 + MIN, sr.x2 + dx);
 
-    if (ratio) {
-      // Adjust perpendicular axis symmetrically from center to maintain ratio
-      if (edge === 'top' || edge === 'bottom') {
-        const nh = (ny2 - ny1) * dh;
-        const nw = nh * ratio;
-        const nwN = nw / dw;
-        nx1 = Math.max(0, cx - nwN / 2); nx2 = Math.min(1, cx + nwN / 2);
-      } else {
-        const nw = (nx2 - nx1) * dw;
-        const nh = nw / ratio;
-        const nhN = nh / dh;
-        ny1 = Math.max(0, cy - nhN / 2); ny2 = Math.min(1, cy + nhN / 2);
-      }
-    }
-
     cropRect = {
       x1: Math.max(0, Math.min(1, nx1)), y1: Math.max(0, Math.min(1, ny1)),
       x2: Math.max(0, Math.min(1, nx2)), y2: Math.max(0, Math.min(1, ny2)),
