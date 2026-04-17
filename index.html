@@ -2780,6 +2780,14 @@ function resetSliders() {
     b.style.borderBottomColor = 'transparent';
   });
   activePreset = null;
+  // Reset recorte
+  if (cropMode) exitCropMode(false);
+  appliedCrop = null;
+  activeCropFormat = 'free';
+  cropRect = { x1: 0.1, y1: 0.1, x2: 0.9, y2: 0.9 };
+  cropFormatsEl.querySelectorAll('.btn-crop').forEach(b => b.classList.toggle('active', b.dataset.id === 'free'));
+  document.getElementById('crop-custom-inputs').classList.add('visible');
+  if (originalImage) syncInputsFromCropRect();
   applyFilters();
 }
 
