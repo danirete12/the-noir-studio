@@ -1622,6 +1622,18 @@ const PRESETS = {
     shadows: -8, liftBlacks: 5, vignette: 32, grain: 8,
     shadowTint: 12, highlightRecovery: 0
   },
+  'monte-fuji': {
+    label: 'Monte Fuji', color: '#7090B8',
+    warmth: -28, brightness: 5, contrast: 22, saturation: -38,
+    shadows: 15, liftBlacks: 12, vignette: 22, grain: 4,
+    shadowTint: -22, highlightRecovery: 18
+  },
+  'copenhague': {
+    label: 'Copenhague', color: '#7AB898',
+    warmth: -12, brightness: 7, contrast: 14, saturation: -22,
+    shadows: 22, liftBlacks: 18, vignette: 8, grain: 5,
+    shadowTint: -6, highlightRecovery: 8
+  },
 
   // — Blanco y negro: emulsiones clásicas —
   'tri-x': {
@@ -1877,6 +1889,8 @@ const PRESET_ICONS = {
   'oslo':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20 L6 10 L9 14 L14 5 L18 12 L22 20"/><line x1="2" y1="20" x2="22" y2="20"/></svg>`,
   'lisboa':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="10" width="18" height="8"/><line x1="3" y1="14" x2="21" y2="14"/><rect x="5" y="11" width="3" height="2.5"/><rect x="10" y="11" width="3" height="2.5"/><rect x="15" y="11" width="3" height="2.5"/><circle cx="7" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/><line x1="12" y1="10" x2="12" y2="7"/><line x1="7" y1="7" x2="17" y2="7"/></svg>`,
   'marrakech':  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 21 L7 13 Q7 6 12 6 Q17 6 17 13 L17 21"/><line x1="5" y1="21" x2="19" y2="21"/><line x1="7" y1="17" x2="17" y2="17"/><path d="M9 13 Q12 10 15 13"/></svg>`,
+  'monte-fuji': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20 L8 9 L11 12 L12 10 L13 12 L16 9 L22 20"/><line x1="2" y1="20" x2="22" y2="20"/><path d="M10 9 L12 5 L14 9"/></svg>`,
+  'copenhague': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="7"/><rect x="9" y="7" width="6" height="11"/><rect x="4" y="12" width="5" height="6"/><rect x="15" y="12" width="5" height="6"/><line x1="2" y1="18" x2="22" y2="18"/></svg>`,
 
   // — Grano: emulsiones clásicas —
   'tri-x':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="6" y="4" width="12" height="16" rx="1"/><line x1="6" y1="7" x2="18" y2="7"/><line x1="6" y1="17" x2="18" y2="17"/><circle cx="12" cy="12" r="2.5"/><rect x="4" y="2" width="2" height="3" rx="0.5"/><rect x="18" y="2" width="2" height="3" rx="0.5"/></svg>`,
@@ -2181,7 +2195,7 @@ const GROUPS = [
   { label: 'Revelado', keys: ['tobacco','old-money','matte','eastman','cianotype','sepia','cross-process','albumen','platinum','push-2'] },
   { label: 'Visor',    keys: ['cartier','brassai','doisneau','avedon','newton','eggleston','shore','frank','nadar','strand'] },
   { label: 'Grano',    keys: ['japanese-grain','silver','tri-x','hp5','delta','acros','tmax','ortho','fomapan','kentmere'] },
-  { label: 'Ciudades', keys: ['tokyo','madrid','paris','new-york','london','havana','mumbai','oslo','lisboa','marrakech'] },
+  { label: 'Ciudades', keys: ['tokyo','madrid','paris','new-york','london','havana','mumbai','oslo','lisboa','marrakech','monte-fuji','copenhague'] },
 ];
 
 // ── Iconos de grupos ──
