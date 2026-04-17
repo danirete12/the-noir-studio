@@ -1853,6 +1853,10 @@ function setCropFormat(id, btn) {
 document.getElementById('crop-custom-w').addEventListener('input', updateCropOverlay);
 document.getElementById('crop-custom-h').addEventListener('input', updateCropOverlay);
 
+// ── Overlay de recorte ──
+const overlayCanvas = document.getElementById('crop-overlay-canvas');
+const overlayCtx    = overlayCanvas.getContext('2d');
+
 // ── Modo recorte interactivo ──
 function enterCropMode() {
   if (!originalImage || activeCropFormat === 'free') return;
@@ -1903,10 +1907,6 @@ window.addEventListener('touchmove', e => {
   e.preventDefault();
 }, { passive: false });
 window.addEventListener('touchend', () => { _cropDrag = null; });
-
-// ── Overlay de recorte ──
-const overlayCanvas = document.getElementById('crop-overlay-canvas');
-const overlayCtx    = overlayCanvas.getContext('2d');
 
 function updateCropOverlay() {
   if (!originalImage) { overlayCanvas.style.display = 'none'; return; }
