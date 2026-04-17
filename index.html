@@ -1455,6 +1455,18 @@ const PRESETS = {
     shadows: -5, liftBlacks: 0, vignette: 20, grain: 1,
     shadowTint: -8, highlightRecovery: 5
   },
+  'sofia': {
+    label: 'Sofía', color: '#D4A0B0',
+    warmth: 10, brightness: 8, contrast: -14, saturation: -16,
+    shadows: 32, liftBlacks: 26, vignette: 8, grain: 3,
+    shadowTint: 6, highlightRecovery: 10
+  },
+  'zhao': {
+    label: 'Chloé', color: '#D49038',
+    warmth: 38, brightness: 5, contrast: 10, saturation: -14,
+    shadows: 16, liftBlacks: 8, vignette: 15, grain: 6,
+    shadowTint: 10, highlightRecovery: 20
+  },
 
   // — Pintores (nuevos) —
   'mark': {
@@ -1867,6 +1879,8 @@ const PRESET_ICONS = {
   'tarkovsky':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="3" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
   'sorrentino':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M8 8 Q10 5 12 8 Q14 5 16 8"/><path d="M6 14 Q9 10 12 14 Q15 10 18 14"/><line x1="5" y1="21" x2="19" y2="21"/><line x1="8" y1="18" x2="16" y2="18"/></svg>`,
   'nolan':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3 L18 3 L12 12 L18 21 L6 21 L12 12 Z"/><line x1="6" y1="3" x2="18" y2="3"/><line x1="6" y1="21" x2="18" y2="21"/></svg>`,
+  'sofia':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 3 Q9 10 12 13 Q15 10 15 3"/><line x1="9" y1="3" x2="15" y2="3"/><line x1="12" y1="13" x2="12" y2="20"/><line x1="8" y1="20" x2="16" y2="20"/></svg>`,
+  'zhao':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="9" r="4"/><line x1="2" y1="16" x2="22" y2="16"/><path d="M2 20 Q8 16 12 18 Q16 16 22 20"/></svg>`,
 
   // — Arte nuevos —
   'mark':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="8"/><rect x="3" y="13" width="18" height="8"/></svg>`,
@@ -2301,7 +2315,7 @@ function updateCropOverlay() {
 // ── Grupos de presets ──
 const GROUPS = [
   { label: 'Luz',      keys: ['golden-hour','first-light','dead-of-night','blue-hour','midday','overcast','storm-light','candlelight','neon-night','platinum-sky'] },
-  { label: 'Cine',     keys: ['quentin','wes','andy','kubrick','lynch','fellini','bergman','villeneuve','akira','tarkovsky','sorrentino','nolan'] },
+  { label: 'Cine',     keys: ['quentin','wes','andy','kubrick','lynch','fellini','bergman','villeneuve','akira','tarkovsky','sorrentino','nolan','sofia','zhao'] },
   { label: 'Arte',     keys: ['caravaggio','zuloaga','velvet','vermeer','hopper','rembrandt','goya','turner','hockney','klimt','mark'] },
   { label: 'Cámara',   keys: ['m-system','f-chrome','h-format','wetzlar','capa','summilux','nikkor','otus','v-system','polaroid'] },
   { label: 'Revelado', keys: ['tobacco','old-money','matte','eastman','cianotype','sepia','cross-process','albumen','platinum','push-2'] },
