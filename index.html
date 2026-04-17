@@ -583,11 +583,11 @@
       color: #fff;
       border: none;
       font-family: var(--font-sans);
-      font-size: 0.5rem;
-      font-weight: 400;
+      font-size: 0.6rem;
+      font-weight: 500;
       letter-spacing: 0.25em;
       text-transform: uppercase;
-      padding: 10px 20px;
+      padding: 14px 28px;
       cursor: pointer;
       transition: opacity 0.2s;
     }
@@ -2465,8 +2465,8 @@ document.getElementById('btn-export').addEventListener('click', () => {
   if (!originalImage) return;
 
   const btn = document.getElementById('btn-export');
-  btn.textContent = 'Procesando...';
   btn.style.opacity = '0.6';
+  btn.style.pointerEvents = 'none';
 
   document.fonts.load('48px "Pinyon Script"').finally(() => {
     const exp    = document.createElement('canvas');
@@ -2522,8 +2522,8 @@ document.getElementById('btn-export').addEventListener('click', () => {
     link.href     = exp.toDataURL('image/jpeg', 0.93);
     link.click();
 
-    btn.textContent = 'Generar 1080×1350';
     btn.style.opacity = '';
+    btn.style.pointerEvents = '';
   }, 16);
 });
 
