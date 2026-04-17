@@ -1613,7 +1613,7 @@ const undoStack = [];
 const redoStack = [];
 
 function captureState() {
-  const s = { preset: activePreset };
+  const s = { preset: activePreset, appliedCrop: appliedCrop ? { ...appliedCrop } : null };
   Object.keys(sliders).forEach(k => { s[k] = +sliders[k].value; });
   s.nivelar   = +nivelarSlider.value;
   s.sharpness = +sharpnessSlider.value;
@@ -1622,6 +1622,7 @@ function captureState() {
 
 function applyState(s) {
   activePreset = s.preset;
+  appliedCrop  = s.appliedCrop ? { ...s.appliedCrop } : null;
   Object.keys(sliders).forEach(k => {
     sliders[k].value = s[k];
     if (vals[k]) vals[k].textContent = s[k];
@@ -1861,6 +1862,7 @@ function exitCropMode(apply) {
   document.getElementById('crop-mode-bar').classList.remove('visible');
 
   if (apply && originalImage) {
+    saveHistory(captureState());
     const border = parseInt(sliders.borderSize.value);
     const cW = canvas.width, cH = canvas.height;
     const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
