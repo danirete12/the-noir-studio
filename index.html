@@ -2431,6 +2431,20 @@ function applyFilters() {
   processPixels(imageData.data, p);
   ctx.putImageData(imageData, 0, 0);
   applyVignette(ctx, canvas.width, canvas.height, p.vignette);
+
+  // Anotación manuscrita sobre el borde blanco
+  const annotToggle = document.getElementById('annotation-toggle');
+  const annotInput  = document.getElementById('annotation-text');
+  if (annotToggle?.checked && border > 0) {
+    const text = annotInput.value || annotInput.placeholder;
+    const fontSize = Math.max(22, border * 0.38);
+    ctx.save();
+    ctx.font = `${fontSize}px 'Pinyon Script', cursive`;
+    ctx.fillStyle = '#1a1a1a';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, canvas.width / 2, canvas.height - border * 0.32);
+    ctx.restore();
+  }
 }
 
 // ── Sliders: escuchar cambios ──
@@ -2499,20 +2513,6 @@ document.getElementById('btn-export').addEventListener('click', () => {
     exp.height = expH;
 
     expCtx.drawImage(canvas, srcX, srcY, srcW, srcH, 0, 0, expW, expH);
-
-    // Anotación en el borde blanco
-    const annotToggle = document.getElementById('annotation-toggle');
-    const annotInput  = document.getElementById('annotation-text');
-    const border = parseInt(sliders.borderSize.value);
-    if (annotToggle.checked && border > 0) {
-      const text = annotInput.value || annotInput.placeholder;
-      const scaledBorder = border * (expW / canvas.width);
-      expCtx.font = `${Math.max(28, scaledBorder * 0.45)}px 'Pinyon Script', cursive`;
-      expCtx.fillStyle = '#1a1a1a';
-      expCtx.letterSpacing = '0px';
-      expCtx.textAlign = 'center';
-      expCtx.fillText(text, expW / 2, expH - scaledBorder * 0.28);
-    }
 
     // Nitidez al exportar
     const sharpAmount = parseInt(sharpnessSlider.value) / 100;
@@ -2592,7 +2592,9 @@ function updateAnnotationState() {
 
 document.getElementById('annotation-toggle').addEventListener('change', (e) => {
   document.getElementById('annotation-text').classList.toggle('visible', e.target.checked);
+  applyFilters();
 });
+document.getElementById('annotation-text').addEventListener('input', scheduleApplyFilters);
 
 sliders.borderSize.addEventListener('input', updateAnnotationState);
 
