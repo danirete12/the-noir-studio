@@ -1631,7 +1631,6 @@ function applyState(s) {
   sharpnessSlider.value = s.sharpness;
   document.getElementById('val-nivelar').textContent   = s.nivelar + '°';
   document.getElementById('val-sharpness').textContent = s.sharpness;
-  canvas.style.transform = s.nivelar != 0 ? `rotate(${s.nivelar}deg)` : '';
   document.querySelectorAll('.btn-preset').forEach(b => {
     const active = b.dataset.key === s.preset;
     b.classList.toggle('active', active);
@@ -2227,7 +2226,6 @@ document.getElementById('btn-change-photo').addEventListener('click', () => {
   document.getElementById('btn-change-photo').disabled = true;
   canvas.style.display = 'none';
   document.getElementById('before-badge').style.display = 'none';
-  canvas.style.transform = '';
   dropZone.style.display = '';
   document.querySelectorAll('.btn-preset').forEach(b => {
     b.classList.remove('active');
@@ -2237,11 +2235,10 @@ document.getElementById('btn-change-photo').addEventListener('click', () => {
   fileInput.value = '';
 });
 
-// ── Nivelar: CSS transform en preview ──
+// ── Nivelar: rota y escala dentro del canvas (sin CSS transform) ──
 nivelarSlider.addEventListener('input', () => {
-  const deg = parseFloat(nivelarSlider.value);
-  document.getElementById('val-nivelar').textContent = deg + '°';
-  canvas.style.transform = deg !== 0 ? `rotate(${deg}deg)` : '';
+  document.getElementById('val-nivelar').textContent = parseFloat(nivelarSlider.value) + '°';
+  applyFilters();
 });
 
 // ── Sharpness: solo afecta al export (muestra valor en UI) ──
@@ -2330,17 +2327,35 @@ function applyFilters() {
   const p = {};
   Object.keys(sliders).forEach(k => { p[k] = parseInt(sliders[k].value); });
 
-  if (appliedCrop) {
-    canvas.width  = appliedCrop.sw + border * 2;
-    canvas.height = appliedCrop.sh + border * 2;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(originalImage, appliedCrop.sx, appliedCrop.sy, appliedCrop.sw, appliedCrop.sh, border, border, appliedCrop.sw, appliedCrop.sh);
+  const srcW = appliedCrop ? appliedCrop.sw : originalImage.width;
+  const srcH = appliedCrop ? appliedCrop.sh : originalImage.height;
+  canvas.width  = srcW + border * 2;
+  canvas.height = srcH + border * 2;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const deg = parseFloat(nivelarSlider.value);
+  if (deg !== 0) {
+    const rad = deg * Math.PI / 180;
+    const cosA = Math.abs(Math.cos(rad)), sinA = Math.abs(Math.sin(rad));
+    const scale = Math.max(
+      (srcW * cosA + srcH * sinA) / srcW,
+      (srcW * sinA + srcH * cosA) / srcH
+    );
+    ctx.save();
+    ctx.beginPath(); ctx.rect(border, border, srcW, srcH); ctx.clip();
+    ctx.translate(border + srcW / 2, border + srcH / 2);
+    ctx.rotate(rad);
+    ctx.scale(scale, scale);
+    if (appliedCrop) {
+      ctx.drawImage(originalImage, appliedCrop.sx, appliedCrop.sy, srcW, srcH, -srcW / 2, -srcH / 2, srcW, srcH);
+    } else {
+      ctx.drawImage(originalImage, -srcW / 2, -srcH / 2);
+    }
+    ctx.restore();
+  } else if (appliedCrop) {
+    ctx.drawImage(originalImage, appliedCrop.sx, appliedCrop.sy, srcW, srcH, border, border, srcW, srcH);
   } else {
-    canvas.width  = originalImage.width  + border * 2;
-    canvas.height = originalImage.height + border * 2;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(originalImage, border, border);
   }
 
@@ -2411,17 +2426,7 @@ document.getElementById('btn-export').addEventListener('click', () => {
     exp.width  = expW || 1080;
     exp.height = expH || 1350;
 
-    // Aplicar rotación (nivelar) al exportar
-    const deg = parseFloat(nivelarSlider.value);
-    if (deg !== 0) {
-      expCtx.save();
-      expCtx.translate(expW / 2, expH / 2);
-      expCtx.rotate(deg * Math.PI / 180);
-      expCtx.drawImage(canvas, srcX, srcY, srcW, srcH, -expW / 2, -expH / 2, expW, expH);
-      expCtx.restore();
-    } else {
-      expCtx.drawImage(canvas, srcX, srcY, srcW, srcH, 0, 0, expW, expH);
-    }
+    expCtx.drawImage(canvas, srcX, srcY, srcW, srcH, 0, 0, expW, expH);
 
     // Anotación en el borde blanco
     const annotToggle = document.getElementById('annotation-toggle');
@@ -2485,7 +2490,6 @@ function resetSliders() {
   Object.keys(vals).forEach(k => { if (vals[k]) vals[k].textContent = sliders[k].defaultValue; });
   nivelarSlider.value = 0;
   document.getElementById('val-nivelar').textContent = '0°';
-  canvas.style.transform = '';
   document.querySelectorAll('.btn-preset').forEach(b => {
     b.classList.remove('active');
     b.style.borderBottomColor = 'transparent';
