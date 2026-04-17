@@ -2041,6 +2041,7 @@ CROP_FORMATS.forEach(fmt => {
 });
 
 function setCropFormat(id, btn) {
+  if (cropMode && activeCropFormat === id) return;
   if (cropMode) exitCropMode(false);
   activeCropFormat = id;
   cropFormatsEl.querySelectorAll('.btn-crop').forEach(b => b.classList.remove('active'));
