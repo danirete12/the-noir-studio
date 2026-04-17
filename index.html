@@ -1655,12 +1655,14 @@ function updateHistoryBtns() {
 
 function undo() {
   if (!originalImage || !undoStack.length) return;
+  if (cropMode) exitCropMode(false);
   redoStack.push(captureState());
   applyState(undoStack.pop());
 }
 
 function redo() {
   if (!originalImage || !redoStack.length) return;
+  if (cropMode) exitCropMode(false);
   undoStack.push(captureState());
   applyState(redoStack.pop());
 }
