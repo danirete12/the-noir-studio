@@ -343,7 +343,7 @@
     #canvas {
       display: none;
       max-width: 100%;
-      max-height: calc(100vh - 140px);
+      max-height: calc(100% - 80px);
       box-shadow: 0 16px 64px rgba(0,0,0,0.6);
       transition: transform 0.2s ease;
     }
@@ -474,6 +474,11 @@
       margin-top: 14px;
       padding-top: 14px;
       border-top: 1px solid var(--border);
+      transition: opacity 0.2s;
+    }
+    .annotation-row.disabled {
+      opacity: 0.35;
+      pointer-events: none;
     }
 
     .annotation-label {
@@ -2260,6 +2265,7 @@ function loadImage(file) {
       dropZone.style.display = 'none';
       canvas.style.display = 'block';
       document.getElementById('btn-change-photo').disabled = false;
+      updateAnnotationState();
       applyFilters();
     };
     img.src = e.target.result;
@@ -2562,9 +2568,22 @@ document.getElementById('btn-undo').addEventListener('click', undo);
 document.getElementById('btn-redo').addEventListener('click', redo);
 
 // ── Anotación toggle ──
+function updateAnnotationState() {
+  const hasBorder = parseInt(sliders.borderSize.value) > 0;
+  const row = document.querySelector('.annotation-row');
+  const toggle = document.getElementById('annotation-toggle');
+  row.classList.toggle('disabled', !hasBorder);
+  if (!hasBorder && toggle.checked) {
+    toggle.checked = false;
+    document.getElementById('annotation-text').classList.remove('visible');
+  }
+}
+
 document.getElementById('annotation-toggle').addEventListener('change', (e) => {
   document.getElementById('annotation-text').classList.toggle('visible', e.target.checked);
 });
+
+sliders.borderSize.addEventListener('input', updateAnnotationState);
 
 // ── Pilares: colapsar/expandir ──
 function togglePillar(id) {
