@@ -19,13 +19,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:         #ffffff;
-      --panel:      #f8f8f6;
-      --border:     #e0ddd8;
-      --text:       #1a1a1a;
-      --muted:      #aaa;
-      --canvas-bg:  #141414;
-      --accent:     #C8201A;
+      --bg:         #0f0f0d;
+      --panel:      #161613;
+      --border:     #2a2723;
+      --text:       #e8e2d8;
+      --muted:      #56524e;
+      --canvas-bg:  #0a0a09;
+      --accent:     #C07828;
       --font-serif: 'Cormorant Garamond', Georgia, serif;
       --font-sans:  'Inter', system-ui, sans-serif;
     }
@@ -103,7 +103,7 @@
       transition: color 0.2s, border-color 0.2s;
       white-space: nowrap;
     }
-    .btn-header:hover { color: var(--text); border-color: #aaa; }
+    .btn-header:hover { color: var(--text); border-color: #4a4643; }
     .btn-header:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
     .btn-header svg { width: 13px; height: 13px; display: block; flex-shrink: 0; }
 
@@ -311,7 +311,7 @@
     }
 
     .drop-zone {
-      border: 1px solid #3a3a3a;
+      border: 1px solid #2a2723;
       width: 100%;
       max-width: 420px;
       aspect-ratio: 4/5;
@@ -323,10 +323,10 @@
       cursor: pointer;
       transition: border-color 0.3s;
     }
-    .drop-zone:hover, .drop-zone.drag-over { border-color: #666; }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: #5a5652; }
 
     .drop-zone p {
-      color: #555;
+      color: #3e3b37;
       font-size: 0.55rem;
       letter-spacing: 0.22em;
       text-transform: uppercase;
@@ -336,7 +336,7 @@
 
     .drop-zone .icon {
       font-size: 0.9rem;
-      color: #333;
+      color: #2e2b27;
       letter-spacing: 0.6em;
     }
 
@@ -374,7 +374,7 @@
       background: var(--panel);
     }
     .panel::-webkit-scrollbar { width: 2px; }
-    .panel::-webkit-scrollbar-thumb { background: #ccc; }
+    .panel::-webkit-scrollbar-thumb { background: #3a3835; }
 
     /* ── Pilares (Los 4 Laboratorios) ── */
     .pillar { border-bottom: 1px solid var(--border); }
@@ -387,7 +387,7 @@
       cursor: pointer;
       user-select: none;
     }
-    .pillar-header:hover { background: rgba(0,0,0,0.02); }
+    .pillar-header:hover { background: rgba(255,255,255,0.03); }
 
     .pillar-icon {
       width: 22px;
@@ -442,20 +442,20 @@
       -webkit-appearance: none;
       width: 100%;
       height: 1px;
-      background: #d8d5d0;
+      background: #2e2b27;
       outline: none;
       cursor: pointer;
     }
     #warmth {
-      background: linear-gradient(to right, #7ab3cc 0%, #d8d5d0 50%, #c89040 100%);
+      background: linear-gradient(to right, #3a6a8a 0%, #2a2723 50%, #a06828 100%);
     }
     .warmth-ends {
       display: flex;
       justify-content: space-between;
       margin-top: 4px;
     }
-    .warmth-cold { font-size: 0.38rem; letter-spacing: 0.1em; color: #7ab3cc; }
-    .warmth-warm { font-size: 0.38rem; letter-spacing: 0.1em; color: #c89040; }
+    .warmth-cold { font-size: 0.38rem; letter-spacing: 0.1em; color: #5a8aaa; }
+    .warmth-warm { font-size: 0.38rem; letter-spacing: 0.1em; color: #a06828; }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       width: 9px; height: 9px;
@@ -499,7 +499,7 @@
     .toggle-track {
       position: absolute;
       inset: 0;
-      background: #d0cdc8;
+      background: #3a3735;
       border-radius: 8px;
       cursor: pointer;
       transition: background 0.2s;
@@ -614,12 +614,12 @@
       align-items: center;
       gap: 6px;
       padding: 10px 6px;
-      background: #fff;
+      background: #1e1c19;
       border: 1px solid var(--border);
       cursor: pointer;
       transition: border-color 0.2s;
     }
-    .btn-crop:hover { border-color: #aaa; }
+    .btn-crop:hover { border-color: #4a4643; }
     .btn-crop.active { border-color: var(--accent); }
     .btn-crop.active .crop-shape { stroke: var(--accent); }
     .btn-crop.active .crop-name { color: var(--accent); }
@@ -736,7 +736,7 @@
     }
     .btn-crop-action:hover { color: #fff; background: rgba(255,255,255,0.06); }
     .btn-crop-apply { color: var(--accent); border-left: 1px solid rgba(255,255,255,0.12); }
-    .btn-crop-apply:hover { color: #e03530; background: rgba(200,32,26,0.08); }
+    .btn-crop-apply:hover { color: #d48830; background: rgba(192,120,40,0.1); }
 
     /* ── Mobile nav (oculto en desktop) ── */
     .mobile-nav { display: none; }
@@ -829,7 +829,7 @@
 
 <header>
   <svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <g stroke="#1a1a1a" stroke-width="1.2" stroke-linecap="round">
+    <g stroke="#e8e2d8" stroke-width="1.2" stroke-linecap="round">
       <line x1="50" y1="50" x2="50"   y2="0"/>
       <line x1="50" y1="50" x2="63.4" y2="0"/>
       <line x1="50" y1="50" x2="78.9" y2="0"/>
