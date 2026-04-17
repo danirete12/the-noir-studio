@@ -233,8 +233,8 @@
       transition: color 0.22s, border-color 0.22s;
       flex-shrink: 0;
     }
-    .btn-preset:hover .preset-icon { color: var(--text); }
-    .btn-preset:hover .preset-label { color: var(--text); }
+    .btn-preset:hover .preset-icon { color: var(--preset-color, var(--text)); }
+    .btn-preset:hover .preset-label { color: var(--preset-color, var(--text)); }
 
     .preset-icon {
       width: 22px; height: 22px;
@@ -1701,7 +1701,6 @@ function applyState(s) {
   document.querySelectorAll('.btn-preset').forEach(b => {
     const active = b.dataset.key === s.preset;
     b.classList.toggle('active', active);
-    b.style.color = active ? (PRESETS[s.preset]?.color || '') : '';
     b.style.borderBottomColor = active ? (PRESETS[s.preset]?.color || '') : 'transparent';
   });
   applyFilters();
@@ -2143,6 +2142,7 @@ GROUPS.forEach((group, gi) => {
     const btn = document.createElement('button');
     btn.className = 'btn-preset';
     btn.dataset.key = key;
+    if (preset.color) btn.style.setProperty('--preset-color', preset.color);
     btn.innerHTML = `
       <span class="preset-icon">${PRESET_ICONS[key] || ''}</span>
       <span class="preset-label">${preset.label}</span>
@@ -2219,16 +2219,12 @@ function applyPreset(key, btn) {
   document.querySelectorAll('.btn-preset').forEach(b => {
     b.classList.remove('active');
     b.style.borderBottomColor = 'transparent';
-    b.querySelector('.preset-icon').style.color  = '';
-    b.querySelector('.preset-label').style.color = '';
   });
 
   // Activa este con su color
   btn.classList.add('active');
   const color = PRESETS[key].color;
   btn.style.borderBottomColor = color;
-  btn.querySelector('.preset-icon').style.color  = color;
-  btn.querySelector('.preset-label').style.color = color;
 
   // Aplica valores
   const p = PRESETS[key];
@@ -2297,7 +2293,6 @@ document.getElementById('btn-change-photo').addEventListener('click', () => {
   dropZone.style.display = '';
   document.querySelectorAll('.btn-preset').forEach(b => {
     b.classList.remove('active');
-    b.style.color = '';
     b.style.borderBottomColor = 'transparent';
   });
   fileInput.value = '';
@@ -2458,7 +2453,6 @@ Object.entries(sliders).forEach(([key, slider]) => {
     activePreset = null;
     document.querySelectorAll('.btn-preset').forEach(b => {
       b.classList.remove('active');
-      b.style.color = '';
       b.style.borderBottomColor = 'transparent';
     });
     scheduleApplyFilters();
@@ -2565,8 +2559,6 @@ function resetSliders() {
   document.querySelectorAll('.btn-preset').forEach(b => {
     b.classList.remove('active');
     b.style.borderBottomColor = 'transparent';
-    b.querySelector('.preset-icon').style.color  = '';
-    b.querySelector('.preset-label').style.color = '';
   });
   activePreset = null;
   applyFilters();
@@ -2656,7 +2648,6 @@ document.addEventListener('keydown', e => {
       activePreset = null;
       document.querySelectorAll('.btn-preset').forEach(b => {
         b.classList.remove('active');
-        b.style.color = '';
         b.style.borderBottomColor = 'transparent';
       });
       applyFilters();
