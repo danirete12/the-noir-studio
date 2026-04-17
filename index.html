@@ -2459,7 +2459,7 @@ document.getElementById('btn-export').addEventListener('click', () => {
   btn.textContent = 'Procesando...';
   btn.style.opacity = '0.6';
 
-  setTimeout(() => {
+  document.fonts.load('48px "Pinyon Script"').finally(() => {
     const exp    = document.createElement('canvas');
     const expCtx = exp.getContext('2d');
 
