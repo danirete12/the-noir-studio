@@ -1670,6 +1670,11 @@ const CROP_FORMATS = [
 // ── Estado ──
 let originalImage    = null;
 let activePreset     = null;
+let _filterRaf = null;
+function scheduleApplyFilters() {
+  if (_filterRaf) cancelAnimationFrame(_filterRaf);
+  _filterRaf = requestAnimationFrame(() => { _filterRaf = null; applyFilters(); });
+}
 // ── Historia undo/redo ──
 const undoStack = [];
 const redoStack = [];
@@ -2301,7 +2306,7 @@ document.getElementById('btn-change-photo').addEventListener('click', () => {
 // ── Nivelar: rota y escala dentro del canvas (sin CSS transform) ──
 nivelarSlider.addEventListener('input', () => {
   document.getElementById('val-nivelar').textContent = parseFloat(nivelarSlider.value) + '°';
-  applyFilters();
+  scheduleApplyFilters();
 });
 
 // ── Sharpness: solo afecta al export (muestra valor en UI) ──
@@ -2442,7 +2447,7 @@ Object.entries(sliders).forEach(([key, slider]) => {
       b.style.color = '';
       b.style.borderBottomColor = 'transparent';
     });
-    applyFilters();
+    scheduleApplyFilters();
   });
 });
 
