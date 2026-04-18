@@ -850,6 +850,10 @@
     /* ── Presets pillar: solo en móvil ── */
     .pillar-mobile-only { display: none !important; }
 
+    /* ── Geometría: sub-tabs (solo móvil) ── */
+    .mobile-geo-tabs { display: none; }
+    .geo-section { display: contents; }
+
     /* ── Mobile ── */
     @media (max-width: 700px) {
 
@@ -900,6 +904,34 @@
         padding: 4px 10px 8px;
       }
       .mobile-preset-strip::-webkit-scrollbar { display: none; }
+
+      /* Geometría sub-tabs */
+      .mobile-geo-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border);
+        margin: 0 -18px 12px;
+        padding: 0 10px;
+      }
+      .mobile-geo-tab {
+        flex: 1;
+        background: none;
+        border: none;
+        border-bottom: 1.5px solid transparent;
+        padding: 10px 6px 9px;
+        font-family: var(--font-sans);
+        font-size: 0.52rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+        cursor: pointer;
+        margin-bottom: -1px;
+        white-space: nowrap;
+        transition: color 0.2s, border-color 0.2s;
+      }
+      .mobile-geo-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+      .geo-section { display: none; }
+      .geo-section.active { display: block; }
 
       /* Header compacto */
       header { padding: 8px 12px; }
@@ -1202,74 +1234,89 @@
       </div>
       <div class="pillar-body">
 
-        <div class="control">
-          <span class="ctrl-label">Marco</span>
-          <input type="range" id="borderSize" min="0" max="120" value="0">
-          <span class="ctrl-value" id="val-borderSize">0</span>
+        <!-- Sub-tabs: solo visibles en móvil -->
+        <div class="mobile-geo-tabs">
+          <button class="mobile-geo-tab active" onclick="showGeoTab('marco', this)">Marco</button>
+          <button class="mobile-geo-tab" onclick="showGeoTab('recorte', this)">Recorte</button>
+          <button class="mobile-geo-tab" onclick="showGeoTab('transformar', this)">Transformar</button>
         </div>
 
-        <div class="control">
-          <span class="ctrl-label">Nivelar</span>
-          <input type="range" id="nivelar" min="-10" max="10" step="0.5" value="0">
-          <span class="ctrl-value" id="val-nivelar">0°</span>
-        </div>
-
-        <p class="transform-header">Transformar</p>
-        <div class="transform-row">
-          <button class="btn-transform" id="btn-rotate-l" title="Girar 90° izquierda">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9"/><polyline points="3,7 3,12 8,12"/></svg>
-            <span>90° Izq</span>
-          </button>
-          <button class="btn-transform" id="btn-rotate-r" title="Girar 90° derecha">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><polyline points="21,7 21,12 16,12"/></svg>
-            <span>90° Der</span>
-          </button>
-          <button class="btn-transform" id="btn-flip-h" title="Espejo horizontal">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M16 7 L20 12 L16 17"/><path d="M8 7 L4 12 L8 17"/></svg>
-            <span>Espejo H</span>
-          </button>
-          <button class="btn-transform" id="btn-flip-v" title="Espejo vertical">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><path d="M7 8 L12 4 L17 8"/><path d="M7 16 L12 20 L17 16"/></svg>
-            <span>Espejo V</span>
-          </button>
-        </div>
-
-        <div class="annotation-row">
-          <span class="annotation-label">Anotación</span>
-          <label class="toggle">
-            <input type="checkbox" id="annotation-toggle">
-            <span class="toggle-track"></span>
-          </label>
-        </div>
-        <input type="text" class="annotation-input" id="annotation-text" placeholder="Caravaggio / Sevilla 2026" maxlength="40">
-
-        <p class="crop-header">Recorte</p>
-        <div class="crop-formats" id="crop-formats"></div>
-        <div class="crop-custom-inputs" id="crop-custom-inputs">
-          <div class="crop-custom-row">
-            <div class="crop-custom-field">
-              <span class="crop-custom-lbl">Ancho</span>
-              <input type="number" id="crop-custom-w" placeholder="1080" min="1" max="9999" value="1080">
-            </div>
-            <span class="crop-custom-sep">×</span>
-            <div class="crop-custom-field">
-              <span class="crop-custom-lbl">Alto</span>
-              <input type="number" id="crop-custom-h" placeholder="1350" min="1" max="9999" value="1350">
-            </div>
+        <!-- Sección Marco + Anotación -->
+        <div class="geo-section active" id="geo-marco">
+          <div class="control">
+            <span class="ctrl-label">Marco</span>
+            <input type="range" id="borderSize" min="0" max="120" value="0">
+            <span class="ctrl-value" id="val-borderSize">0</span>
           </div>
-          <p class="crop-custom-px">píxeles</p>
-          <div class="crop-ratio-row">
+
+          <div class="annotation-row">
+            <span class="annotation-label">Anotación</span>
+            <label class="toggle">
+              <input type="checkbox" id="annotation-toggle">
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+          <input type="text" class="annotation-input" id="annotation-text" placeholder="Caravaggio / Sevilla 2026" maxlength="40">
+        </div>
+
+        <!-- Sección Recorte -->
+        <div class="geo-section" id="geo-recorte">
+          <div class="crop-formats" id="crop-formats"></div>
+          <div class="crop-custom-inputs" id="crop-custom-inputs">
             <div class="crop-custom-row">
               <div class="crop-custom-field">
-                <span class="crop-custom-lbl">Proporción</span>
-                <input type="number" id="crop-ratio-w" min="1" max="9999" value="4">
+                <span class="crop-custom-lbl">Ancho</span>
+                <input type="number" id="crop-custom-w" placeholder="1080" min="1" max="9999" value="1080">
               </div>
-              <span class="crop-custom-sep">:</span>
+              <span class="crop-custom-sep">×</span>
               <div class="crop-custom-field">
-                <span class="crop-custom-lbl">&nbsp;</span>
-                <input type="number" id="crop-ratio-h" min="1" max="9999" value="5">
+                <span class="crop-custom-lbl">Alto</span>
+                <input type="number" id="crop-custom-h" placeholder="1350" min="1" max="9999" value="1350">
               </div>
             </div>
+            <p class="crop-custom-px">píxeles</p>
+            <div class="crop-ratio-row">
+              <div class="crop-custom-row">
+                <div class="crop-custom-field">
+                  <span class="crop-custom-lbl">Proporción</span>
+                  <input type="number" id="crop-ratio-w" min="1" max="9999" value="4">
+                </div>
+                <span class="crop-custom-sep">:</span>
+                <div class="crop-custom-field">
+                  <span class="crop-custom-lbl">&nbsp;</span>
+                  <input type="number" id="crop-ratio-h" min="1" max="9999" value="5">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección Transformar: Nivelar + botones -->
+        <div class="geo-section" id="geo-transformar">
+          <div class="control">
+            <span class="ctrl-label">Nivelar</span>
+            <input type="range" id="nivelar" min="-10" max="10" step="0.5" value="0">
+            <span class="ctrl-value" id="val-nivelar">0°</span>
+          </div>
+
+          <p class="transform-header">Transformar</p>
+          <div class="transform-row">
+            <button class="btn-transform" id="btn-rotate-l" title="Girar 90° izquierda">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9"/><polyline points="3,7 3,12 8,12"/></svg>
+              <span>90° Izq</span>
+            </button>
+            <button class="btn-transform" id="btn-rotate-r" title="Girar 90° derecha">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><polyline points="21,7 21,12 16,12"/></svg>
+              <span>90° Der</span>
+            </button>
+            <button class="btn-transform" id="btn-flip-h" title="Espejo horizontal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M16 7 L20 12 L16 17"/><path d="M8 7 L4 12 L8 17"/></svg>
+              <span>Espejo H</span>
+            </button>
+            <button class="btn-transform" id="btn-flip-v" title="Espejo vertical">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><path d="M7 8 L12 4 L17 8"/><path d="M7 16 L12 20 L17 16"/></svg>
+              <span>Espejo V</span>
+            </button>
           </div>
         </div>
 
@@ -3265,6 +3312,13 @@ canvas.addEventListener('touchcancel', () => {
 
 // ── Nav móvil ──
 let activeMobileSheet = null;
+
+function showGeoTab(name, btn) {
+  document.querySelectorAll('.mobile-geo-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.geo-section').forEach(s => s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('geo-' + name).classList.add('active');
+}
 
 function toggleMobileSheet(pillarId, btn) {
   const isSame = activeMobileSheet === pillarId;
