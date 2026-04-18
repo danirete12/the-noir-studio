@@ -4,16 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Noir Studio — Editor de Fotografía Gratis</title>
+  <title>The Noir. Studio — Editor de Fotografía Gratis</title>
   <meta name="description" content="Editor de fotografía online con presets cinematográficos inspirados en el cine y la pintura. Gratis, sin registro. Exporta a Instagram 1080×1350.">
-  <meta property="og:title" content="Noir Studio — Editor de Fotografía Gratis">
+  <meta property="og:title" content="The Noir. Studio — Editor de Fotografía Gratis">
   <meta property="og:description" content="Presets de fotografía con estética editorial. Gratis, sin instalar nada, sin cuenta.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://raw.githubusercontent.com/danirete12/the-noir-studio/master/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Noir Studio — Editor de Fotografía Gratis">
+  <meta name="twitter:title" content="The Noir. Studio — Editor de Fotografía Gratis">
   <meta name="twitter:image" content="https://raw.githubusercontent.com/danirete12/the-noir-studio/master/og-image.png">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230f0f0d'/><g stroke='%23e8e2d8' fill='none' stroke-linecap='round'><path d='M 45,12 Q 50,7 55,12 L 84,45 Q 89,50 84,55 L 55,88 Q 50,93 45,88 L 16,55 Q 11,50 16,45 Z' stroke-width='4' stroke-linejoin='round'/><line x1='11' y1='50' x2='89' y2='50' stroke-width='1.5'/><line x1='16' y1='98' x2='84' y2='98' stroke-width='1.2'/></g></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -71,6 +71,23 @@
       letter-spacing: 0.35em;
       text-transform: uppercase;
       color: var(--text);
+      display: flex;
+      align-items: baseline;
+      gap: 0.18em;
+    }
+
+    header h1 .h1-noir {
+      font-weight: 700;
+      font-style: normal;
+      letter-spacing: 0.35em;
+    }
+
+    header h1 .h1-studio {
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-transform: none;
     }
 
     header .tagline {
@@ -1039,7 +1056,7 @@
       <line x1="16" y1="98" x2="84" y2="98" stroke-width="1.2"/>
     </g>
   </svg>
-  <h1>Noir Studio</h1>
+  <h1><span class="h1-noir">The Noir.</span><span class="h1-studio">Studio</span></h1>
   <span class="tagline">Editor de Fotografía</span>
   <div class="header-actions">
     <button id="btn-change-photo" class="btn-header" title="Cambiar foto" disabled>
