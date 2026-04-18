@@ -1,0 +1,33 @@
+{
+  "packageId": "com.thenoirstudio.app",
+  "host": "PLACEHOLDER_DOMAIN",
+  "name": "The Noir Studio",
+  "launcherName": "Noir Studio",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#1a1a1a",
+  "navigationColor": "#1a1a1a",
+  "navigationColorDark": "#1a1a1a",
+  "navigationDividerColor": "#1a1a1a",
+  "navigationDividerColorDark": "#1a1a1a",
+  "backgroundColor": "#ffffff",
+  "enableNotifications": false,
+  "startUrl": "/",
+  "iconUrl": "https://PLACEHOLDER_DOMAIN/icons/icon-512.png",
+  "maskableIconUrl": "https://PLACEHOLDER_DOMAIN/icons/icon-512-maskable.png",
+  "monochromeIconUrl": "https://PLACEHOLDER_DOMAIN/icons/icon-512.png",
+  "appVersion": "1",
+  "appVersionCode": 1,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "noir-studio"
+  },
+  "features": [],
+  "alphaDependencies": { "enabled": false },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://PLACEHOLDER_DOMAIN/",
+  "minSdkVersion": 19,
+  "fingerprints": []
+}
