@@ -661,8 +661,8 @@
       letter-spacing: 0.15em;
       text-transform: uppercase;
       color: var(--text);
-      margin: 14px 0 10px;
-      padding-top: 14px;
+      margin: 28px 0 10px;
+      padding-top: 20px;
       border-top: 1px solid var(--border);
     }
     .transform-row {
@@ -964,6 +964,7 @@
       /* Panel: solo tan alto como su contenido, máximo 55dvh */
       .panel {
         flex: 0 0 auto;
+        height: auto !important;
         max-height: 55dvh;
         position: static !important;
         transform: none !important;
@@ -1293,7 +1294,7 @@
 
         <!-- Sección Transformar: Nivelar + botones -->
         <div class="geo-section" id="geo-transformar">
-          <div class="control">
+          <div class="control" style="padding-top: 14px;">
             <span class="ctrl-label">Nivelar</span>
             <input type="range" id="nivelar" min="-10" max="10" step="0.5" value="0">
             <span class="ctrl-value" id="val-nivelar">0°</span>
