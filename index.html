@@ -1,1 +1,3076 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noir Studio — Editor de Fotografía Gratis</title>
+  <meta name="description" content="Editor de fotografía online con presets cinematográficos inspirados en el cine y la pintura. Gratis, sin registro. Exporta a Instagram 1080×1350.">
+  <meta property="og:title" content="Noir Studio — Editor de Fotografía Gratis">
+  <meta property="og:description" content="Presets de fotografía con estética editorial. Gratis, sin instalar nada, sin cuenta.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://raw.githubusercontent.com/danirete12/the-noir-studio/master/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Noir Studio — Editor de Fotografía Gratis">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/danirete12/the-noir-studio/master/og-image.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230f0f0d'/><g stroke='%23e8e2d8' fill='none'><line x1='27' y1='19' x2='27' y2='79' stroke-width='2.8' stroke-linecap='square'/><line x1='73' y1='19' x2='73' y2='79' stroke-width='2.8' stroke-linecap='square'/><line x1='27' y1='19' x2='73' y2='79' stroke-width='2.8' stroke-linecap='square'/><line x1='19' y1='19' x2='35' y2='19' stroke-width='1.2' stroke-linecap='round'/><line x1='65' y1='19' x2='81' y2='19' stroke-width='1.2' stroke-linecap='round'/><line x1='19' y1='79' x2='35' y2='79' stroke-width='1.2' stroke-linecap='round'/><line x1='65' y1='79' x2='81' y2='79' stroke-width='1.2' stroke-linecap='round'/><line x1='13' y1='91' x2='87' y2='91' stroke-width='0.85' stroke-linecap='round'/></g></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;700&family=Inter:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:         #0f0f0d;
+      --panel:      #161613;
+      --border:     #2a2723;
+      --text:       #e8e2d8;
+      --muted:      #7a7570;
+      --canvas-bg:  #0a0a09;
+      --accent:     #C07828;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans:  'Inter', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { height: 100%; overflow: hidden; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .logo-mark {
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    header .tagline {
+      font-size: 0.55rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Botones de cabecera */
+    .btn-header {
+      background: none;
+      border: 1px solid var(--border);
+      padding: 5px 8px;
+      cursor: pointer;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-sans);
+      font-size: 0.48rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .btn-header:hover { color: var(--text); border-color: #4a4643; }
+    .btn-header:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+    .btn-header svg { width: 13px; height: 13px; display: block; flex-shrink: 0; }
+
+    /* ── Tab bar de grupos ── */
+    .presets-bar-wrapper {
+      flex-shrink: 0;
+      background: var(--bg);
+    }
+
+    .tab-bar {
+      display: flex;
+      align-items: center;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+      -webkit-mask-image: linear-gradient(to right, black 0%, black calc(100% - 40px), transparent 100%);
+      mask-image: linear-gradient(to right, black 0%, black calc(100% - 40px), transparent 100%);
+    }
+    .tab-bar.scrolled-end {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+
+    .presets-wordmark {
+      font-family: var(--font-serif);
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      padding-right: 18px;
+      margin-right: 4px;
+      border-right: 1px solid var(--border);
+    }
+    @media (max-width: 640px) { .presets-wordmark { display: none; } }
+
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--font-sans);
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text);
+      white-space: nowrap;
+      background: none;
+      border: none;
+      border-bottom: 1.5px solid transparent;
+      padding: 11px 16px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      flex-shrink: 0;
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .tab-icon {
+      width: 14px; height: 14px;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+    .tab-icon svg { width: 100%; height: 100%; display: block; }
+    .tab-btn.active .tab-icon { opacity: 1; }
+
+    .tab-separator {
+      width: 1px;
+      height: 12px;
+      background: var(--border);
+      flex-shrink: 0;
+      margin: 0 4px;
+    }
+
+    /* ── Drawer desplegable ── */
+    .tab-drawer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.28s cubic-bezier(0.4,0,0.2,1);
+      background: var(--bg);
+    }
+    .tab-drawer.open {
+      max-height: 160px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-drawer.open-tall {
+      max-height: 260px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .drawer-presets {
+      display: none;
+      align-items: stretch;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 0 16px;
+      -webkit-mask-image: linear-gradient(to right, black 0%, black calc(100% - 52px), transparent 100%);
+      mask-image: linear-gradient(to right, black 0%, black calc(100% - 52px), transparent 100%);
+    }
+    .drawer-presets.visible { display: flex; }
+    .drawer-presets.scrolled-end {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+    .drawer-presets::-webkit-scrollbar { display: none; }
+
+    .btn-preset {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      min-width: 72px;
+      background: none;
+      border: none;
+      border-bottom: 1.5px solid transparent;
+      padding: 11px 7px 10px;
+      cursor: pointer;
+      transition: color 0.22s, border-color 0.22s;
+      flex-shrink: 0;
+    }
+    .btn-preset:hover .preset-icon,
+    .btn-preset.active .preset-icon  { color: var(--preset-color, var(--text)); }
+    .btn-preset:hover .preset-label,
+    .btn-preset.active .preset-label { color: var(--preset-color, var(--text)); }
+
+    .preset-icon {
+      width: 22px; height: 22px;
+      color: #a09890;
+      flex-shrink: 0;
+      transition: color 0.22s;
+    }
+    .preset-icon svg { width: 100%; height: 100%; display: block; }
+
+    .preset-label {
+      font-family: var(--font-serif);
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+      white-space: nowrap;
+      transition: color 0.22s;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    /* Drawer Geometría */
+    .drawer-geo {
+      display: none;
+      padding: 12px 20px 14px;
+      gap: 12px;
+      flex-direction: column;
+    }
+    .drawer-geo.visible { display: flex; }
+    .drawer-geo .control { margin-bottom: 0; }
+    .drawer-geo .annotation-row { margin-top: 0; padding-top: 0; border-top: none; }
+
+    /* Drawer Recorte */
+    .drawer-crop {
+      display: none;
+      padding: 10px 16px 12px;
+    }
+    .drawer-crop.visible { display: block; }
+    .drawer-crop .crop-formats {
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+      gap: 6px;
+    }
+    .drawer-crop .crop-formats::-webkit-scrollbar { display: none; }
+    .drawer-crop .btn-crop { flex: 0 0 auto; min-width: 52px; }
+    .drawer-crop .crop-custom-inputs { margin-top: 8px; }
+
+    /* ── Layout principal ── */
+    .workspace {
+      flex: 1;
+      height: 0;
+      display: grid;
+      grid-template-columns: 1fr 256px;
+      overflow: hidden;
+    }
+
+    /* ── Canvas area – negativo ── */
+    .canvas-area {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: var(--canvas-bg);
+      overflow: hidden;
+      position: relative;
+    }
+    #canvas {
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+    }
+
+    .drop-zone {
+      border: 1px solid #2a2723;
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 4/5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: #5a5652; }
+
+    .drop-zone p {
+      color: #6a6560;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-align: center;
+      line-height: 2.4;
+    }
+
+    .drop-zone .icon {
+      font-size: 0.9rem;
+      color: #4a4643;
+      letter-spacing: 0.6em;
+    }
+
+    #canvas {
+      display: none;
+      max-width: 100%;
+      max-height: calc(100% - 40px);
+      box-shadow: 0 16px 64px rgba(0,0,0,0.6);
+      transition: transform 0.2s ease;
+    }
+
+
+    #before-badge {
+      display: none;
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      font-size: 0.42rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      pointer-events: none;
+    }
+
+    /* ── Panel derecho ── */
+    .panel {
+      height: 100%;
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: scroll;
+      background: var(--panel);
+    }
+    .panel::-webkit-scrollbar { width: 2px; }
+    .panel::-webkit-scrollbar-thumb { background: #3a3835; }
+
+    /* ── Pilares (Los 4 Laboratorios) ── */
+    .pillar { border-bottom: 1px solid var(--border); }
+
+    .pillar-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .pillar-header:hover { background: rgba(255,255,255,0.03); }
+
+    .pillar-icon {
+      width: 22px;
+      height: 22px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .pillar-icon svg { width: 100%; height: 100%; }
+
+    .pillar-title {
+      font-size: 0.52rem;
+      font-weight: 500;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .pillar-toggle {
+      font-size: 0.5rem;
+      color: var(--muted);
+      transition: transform 0.2s;
+    }
+    .pillar.collapsed .pillar-toggle { transform: rotate(-90deg); }
+
+    .pillar-body {
+      padding: 4px 18px 18px;
+      overflow: hidden;
+    }
+    .pillar.collapsed .pillar-body { display: none; }
+
+    /* ── Controles ── */
+    .control { margin-bottom: 14px; }
+    .control:last-child { margin-bottom: 0; }
+
+    .control label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.52rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .control label span {
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      font-weight: 400;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 1px;
+      background: #2e2b27;
+      outline: none;
+      cursor: pointer;
+    }
+    #warmth {
+      background: linear-gradient(to right, #3a6a8a 0%, #2a2723 50%, #a06828 100%);
+    }
+    .warmth-ends {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+    .warmth-cold { font-size: 0.38rem; letter-spacing: 0.1em; color: #5a8aaa; }
+    .warmth-warm { font-size: 0.38rem; letter-spacing: 0.1em; color: #a06828; }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+    /* ── Anotación ── */
+    .annotation-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      transition: opacity 0.2s;
+    }
+    .annotation-row.disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .annotation-label {
+      font-size: 0.52rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text);
+      flex: 1;
+    }
+
+    /* Toggle switch */
+    .toggle {
+      position: relative;
+      width: 28px; height: 15px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: #3a3735;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle input:checked + .toggle-track { background: var(--accent); }
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 11px; height: 11px;
+      top: 2px; left: 2px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    .toggle input:checked + .toggle-track::after { transform: translateX(13px); }
+
+    .annotation-input {
+      display: none;
+      width: 100%;
+      margin-top: 8px;
+      font-family: 'Pinyon Script', cursive;
+      font-size: 1.1rem;
+      letter-spacing: 0;
+      text-transform: none;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      padding: 4px 0;
+      outline: none;
+    }
+    .annotation-input:focus { border-bottom-color: var(--accent); }
+    .annotation-input.visible { display: block; }
+
+    /* ── Reset ── */
+    .panel-footer {
+      padding: 16px 18px;
+      margin-top: auto;
+    }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 9px;
+      font-family: var(--font-sans);
+      font-size: 0.5rem;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      transition: opacity 0.2s;
+    }
+    .btn-secondary:hover { opacity: 0.6; }
+
+    /* ── Footer / Export bar ── */
+    footer {
+      flex-shrink: 0;
+      border-top: 1px solid var(--border);
+      padding: 9px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+    }
+
+    .footer-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .footer-info-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    #filename-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      padding: 2px 4px;
+      width: 200px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #filename-input:focus { border-bottom-color: var(--accent); }
+    #filename-input::placeholder { color: var(--muted); }
+
+    #btn-export {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    #btn-export:hover { opacity: 0.82; }
+
+    #file-input { display: none; }
+
+    /* ── Transformaciones (girar / voltear) ── */
+    .transform-header {
+      font-size: 0.52rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin: 14px 0 10px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .transform-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .btn-transform {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 4px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-transform:hover { border-color: #4a4643; color: var(--text); }
+    .btn-transform svg { width: 20px; height: 20px; display: block; }
+    .btn-transform span {
+      font-family: var(--font-sans);
+      font-size: 0.36rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ── Recorte ── */
+    .crop-header {
+      font-size: 0.52rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin: 14px 0 10px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .crop-formats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .btn-crop {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 6px;
+      background: #1e1c19;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .btn-crop:hover { border-color: #4a4643; }
+    .btn-crop.active { border-color: var(--accent); }
+    .btn-crop.active .crop-shape { stroke: var(--accent); }
+    .btn-crop.active .crop-name { color: var(--accent); }
+
+    .crop-shape { width: 32px; height: 32px; display: block; }
+    .crop-name {
+      font-size: 0.48rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .crop-custom-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .crop-custom-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .crop-custom-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+    .crop-custom-lbl {
+      font-family: var(--font-sans);
+      font-size: 0.44rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+    }
+    .crop-custom-inputs input[type="number"] {
+      width: 100%;
+      border: none;
+      border-bottom: 1.5px solid var(--border);
+      background: transparent;
+      font-family: var(--font-sans);
+      font-size: 1.1rem;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+      text-align: center;
+      color: var(--text);
+      outline: none;
+      padding: 4px 0 3px;
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+    .crop-custom-inputs input[type="number"]::-webkit-inner-spin-button,
+    .crop-custom-inputs input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .crop-custom-sep {
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      color: var(--muted);
+      padding-bottom: 6px;
+      flex-shrink: 0;
+    }
+    .crop-custom-px {
+      font-family: var(--font-sans);
+      font-size: 0.44rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 2px;
+    }
+    .crop-ratio-row {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Overlay de recorte sobre el canvas */
+    #crop-overlay-canvas {
+      position: absolute;
+      pointer-events: none;
+      display: none;
+    }
+    #crop-overlay-canvas.crop-active {
+      cursor: move;
+      pointer-events: auto;
+    }
+    .crop-mode-bar {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      align-items: center;
+      gap: 0;
+      z-index: 20;
+      background: rgba(10,10,10,0.82);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .crop-mode-bar.visible { display: flex; }
+    .btn-crop-action {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.75);
+      font-family: var(--font-sans);
+      font-size: 0.58rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+    .btn-crop-action:hover { color: #fff; background: rgba(255,255,255,0.06); }
+    .btn-crop-apply { color: var(--accent); border-left: 1px solid rgba(255,255,255,0.12); }
+    .btn-crop-apply:hover { color: #d48830; background: rgba(192,120,40,0.1); }
+
+    /* ── Mobile nav (oculto en desktop) ── */
+    .mobile-nav { display: none; }
+
+    /* ── Mobile ── */
+    @media (max-width: 700px) {
+
+      /* Footer oculto en móvil */
+      footer { display: none; }
+
+      /* Header compacto */
+      header { padding: 8px 12px; }
+      header .tagline { display: none; }
+
+      /* Workspace: columna — canvas arriba, panel abajo */
+      .workspace {
+        display: flex;
+        flex-direction: column;
+        grid-template-columns: unset;
+        grid-template-rows: unset;
+        overflow: hidden;
+        flex: 1;
+        height: 0;
+      }
+
+      /* Canvas: altura fija en la parte superior */
+      .canvas-area {
+        flex: 0 0 auto;
+        height: 38dvh;
+        min-height: 150px;
+        padding: 8px;
+        overflow: hidden;
+        touch-action: none;
+      }
+      #canvas {
+        max-height: 100%;
+        max-width: 100%;
+      }
+
+      /* Panel: ocupa el resto, siempre visible, scrollable */
+      .panel {
+        flex: 1;
+        height: 0;
+        position: static !important;
+        transform: none !important;
+        transition: none !important;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        border-radius: 0;
+        box-shadow: none;
+        max-height: none;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 64px;
+        display: block !important;
+      }
+
+      /* Todos los pilares ocultos por defecto; solo se muestra el activo */
+      .pillar { display: none; }
+      .pillar.mobile-open { display: block; }
+      .panel-footer { display: none; }
+
+      /* Tab bar en móvil */
+      .tab-bar { padding: 0 10px; }
+      .tab-btn { padding: 8px 10px; font-size: 0.55rem; }
+
+      /* Nav inferior */
+      .mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        height: 58px;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+        z-index: 200;
+      }
+
+      .mobile-nav-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: var(--font-sans);
+        font-size: 0.38rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--muted);
+        padding: 8px 2px 6px;
+        transition: color 0.2s;
+      }
+      .mobile-nav-btn svg { width: 20px; height: 20px; }
+      .mobile-nav-btn.active { color: var(--accent); }
+
+      .mobile-nav-export {
+        background: var(--accent);
+        color: #fff !important;
+      }
+      .mobile-nav-export:active { opacity: 0.8; }
+
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g stroke="#e8e2d8" fill="none">
+      <line x1="27" y1="19" x2="27" y2="79" stroke-width="2.8" stroke-linecap="square"/>
+      <line x1="73" y1="19" x2="73" y2="79" stroke-width="2.8" stroke-linecap="square"/>
+      <line x1="27" y1="19" x2="73" y2="79" stroke-width="2.8" stroke-linecap="square"/>
+      <line x1="19" y1="19" x2="35" y2="19" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="65" y1="19" x2="81" y2="19" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="19" y1="79" x2="35" y2="79" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="65" y1="79" x2="81" y2="79" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="13" y1="91" x2="87" y2="91" stroke-width="0.85" stroke-linecap="round"/>
+    </g>
+  </svg>
+  <h1>Noir Studio</h1>
+  <span class="tagline">Editor de Fotografía</span>
+  <div class="header-actions">
+    <button id="btn-change-photo" class="btn-header" title="Cambiar foto" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="12" cy="12" r="4"/><path d="M9 5 L10.5 3 L13.5 3 L15 5"/></svg>
+      Cambiar foto
+    </button>
+    <button id="btn-undo" class="btn-header" title="Deshacer (Ctrl+Z)" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11a6 6 0 0 1 0 12H8"/><polyline points="7,3 3,7 7,11"/></svg>
+    </button>
+    <button id="btn-redo" class="btn-header" title="Rehacer (Ctrl+Y)" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7H10a6 6 0 0 0 0 12h6"/><polyline points="17,3 21,7 17,11"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- La Curaduría: grupos de presets -->
+<div class="presets-bar-wrapper">
+  <div class="tab-bar" id="tab-bar"><span class="presets-wordmark">Presets</span></div>
+  <div class="tab-drawer" id="tab-drawer">
+    <!-- grupos de presets generados por JS -->
+  </div>
+</div>
+
+<div class="workspace">
+
+  <!-- La Obra -->
+  <div class="canvas-area" id="canvas-area">
+    <div class="drop-zone" id="drop-zone">
+      <div class="icon">◇ ◇ ◇</div>
+      <p>Arrastra tu foto aquí<br>o haz clic para seleccionar<br>JPG · PNG · WEBP</p>
+    </div>
+    <canvas id="canvas"></canvas>
+    <canvas id="crop-overlay-canvas"></canvas>
+    <div class="crop-mode-bar" id="crop-mode-bar">
+      <button class="btn-crop-action btn-crop-cancel" id="btn-crop-cancel">Cancelar</button>
+      <button class="btn-crop-action btn-crop-apply" id="btn-crop-apply">Aplicar recorte</button>
+    </div>
+    <div id="before-badge">Antes</div>
+  </div>
+
+  <!-- El Laboratorio -->
+  <div class="panel">
+
+    <!-- A. Color HSL -->
+    <div class="pillar collapsed" id="pillar-color">
+      <div class="pillar-header" onclick="togglePillar('pillar-color')">
+        <span class="pillar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c3.1 0 5.6-2.5 5.6-5.6C22 6 17.5 2 12 2z"/>
+            <circle cx="7" cy="10" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="11" cy="7" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="16" cy="9" r="1.2" fill="currentColor" stroke="none"/>
+          </svg>
+        </span>
+        <span class="pillar-title">Color</span>
+        <span class="pillar-toggle">▾</span>
+      </div>
+      <div class="pillar-body">
+
+        <div class="control">
+          <label>Temperatura <span id="val-warmth">0°</span></label>
+          <input type="range" id="warmth" min="-100" max="100" value="0">
+          <div class="warmth-ends">
+            <span class="warmth-cold">−100°</span>
+            <span class="warmth-warm">+100°</span>
+          </div>
+        </div>
+
+        <div class="control">
+          <label>Saturación <span id="val-saturation">0</span></label>
+          <input type="range" id="saturation" min="-100" max="100" value="0">
+        </div>
+
+        <div class="control">
+          <label>Negros lavados <span id="val-liftBlacks">0</span></label>
+          <input type="range" id="liftBlacks" min="0" max="100" value="0">
+        </div>
+
+        <div class="control">
+          <label>Tinte sombras <span id="val-shadowTint">0</span></label>
+          <input type="range" id="shadowTint" min="-100" max="100" value="0">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- B. Textura -->
+    <div class="pillar collapsed" id="pillar-tex">
+      <div class="pillar-header" onclick="togglePillar('pillar-tex')">
+        <span class="pillar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+            <circle cx="5" cy="6" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="10" cy="4" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="15" cy="7" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="20" cy="5" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="7" cy="11" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="13" cy="12" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="18" cy="10" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="4" cy="16" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="9" cy="18" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="16" cy="17" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="21" cy="15" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+        </span>
+        <span class="pillar-title">Textura</span>
+        <span class="pillar-toggle">▾</span>
+      </div>
+      <div class="pillar-body">
+
+        <div class="control">
+          <label>Grano <span id="val-grain">0</span></label>
+          <input type="range" id="grain" min="0" max="100" value="0">
+        </div>
+
+        <div class="control">
+          <label>Nitidez <span id="val-sharpness">45</span></label>
+          <input type="range" id="sharpness" min="0" max="100" value="45">
+        </div>
+
+        <div class="control">
+          <label>Viñeta <span id="val-vignette">0</span></label>
+          <input type="range" id="vignette" min="0" max="100" value="0">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- C. Revelado -->
+    <div class="pillar collapsed" id="pillar-rev">
+      <div class="pillar-header" onclick="togglePillar('pillar-rev')">
+        <span class="pillar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="8"/>
+            <line x1="12" y1="4" x2="12" y2="7"/>
+            <line x1="12" y1="17" x2="12" y2="20"/>
+            <line x1="4" y1="12" x2="7" y2="12"/>
+            <line x1="17" y1="12" x2="20" y2="12"/>
+            <line x1="12" y1="12" x2="16" y2="9"/>
+          </svg>
+        </span>
+        <span class="pillar-title">Revelado</span>
+        <span class="pillar-toggle">▾</span>
+      </div>
+      <div class="pillar-body">
+
+        <div class="control">
+          <label>Luminancia <span id="val-brightness">0</span></label>
+          <input type="range" id="brightness" min="-100" max="100" value="0">
+        </div>
+
+        <div class="control">
+          <label>Contraste <span id="val-contrast">0</span></label>
+          <input type="range" id="contrast" min="-100" max="100" value="0">
+        </div>
+
+        <div class="control">
+          <label>Sombras <span id="val-shadows">0</span></label>
+          <input type="range" id="shadows" min="-100" max="100" value="0">
+        </div>
+
+        <div class="control">
+          <label>Luces <span id="val-highlightRecovery">0</span></label>
+          <input type="range" id="highlightRecovery" min="0" max="100" value="0">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- D. Geometría y Recorte -->
+    <div class="pillar collapsed" id="pillar-geo">
+      <div class="pillar-header" onclick="togglePillar('pillar-geo')">
+        <span class="pillar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21 L3 3 L21 3"/><path d="M3 3 L21 21"/>
+          </svg>
+        </span>
+        <span class="pillar-title">Geometría y Recorte</span>
+        <span class="pillar-toggle">▾</span>
+      </div>
+      <div class="pillar-body">
+
+        <div class="control">
+          <label>Marco blanco <span id="val-borderSize">0</span></label>
+          <input type="range" id="borderSize" min="0" max="120" value="0">
+        </div>
+
+        <div class="control">
+          <label>Nivelar <span id="val-nivelar">0°</span></label>
+          <input type="range" id="nivelar" min="-10" max="10" step="0.5" value="0">
+        </div>
+
+        <p class="transform-header">Transformar</p>
+        <div class="transform-row">
+          <button class="btn-transform" id="btn-rotate-l" title="Girar 90° izquierda">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9"/><polyline points="3,7 3,12 8,12"/></svg>
+            <span>90° Izq</span>
+          </button>
+          <button class="btn-transform" id="btn-rotate-r" title="Girar 90° derecha">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><polyline points="21,7 21,12 16,12"/></svg>
+            <span>90° Der</span>
+          </button>
+          <button class="btn-transform" id="btn-flip-h" title="Espejo horizontal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M16 7 L20 12 L16 17"/><path d="M8 7 L4 12 L8 17"/></svg>
+            <span>Espejo H</span>
+          </button>
+          <button class="btn-transform" id="btn-flip-v" title="Espejo vertical">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><path d="M7 8 L12 4 L17 8"/><path d="M7 16 L12 20 L17 16"/></svg>
+            <span>Espejo V</span>
+          </button>
+        </div>
+
+        <div class="annotation-row">
+          <span class="annotation-label">Anotación</span>
+          <label class="toggle">
+            <input type="checkbox" id="annotation-toggle">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <input type="text" class="annotation-input" id="annotation-text" placeholder="Caravaggio / Sevilla 2026" maxlength="40">
+
+        <p class="crop-header">Recorte</p>
+        <div class="crop-formats" id="crop-formats"></div>
+        <div class="crop-custom-inputs" id="crop-custom-inputs">
+          <div class="crop-custom-row">
+            <div class="crop-custom-field">
+              <span class="crop-custom-lbl">Ancho</span>
+              <input type="number" id="crop-custom-w" placeholder="1080" min="1" max="9999" value="1080">
+            </div>
+            <span class="crop-custom-sep">×</span>
+            <div class="crop-custom-field">
+              <span class="crop-custom-lbl">Alto</span>
+              <input type="number" id="crop-custom-h" placeholder="1350" min="1" max="9999" value="1350">
+            </div>
+          </div>
+          <p class="crop-custom-px">píxeles</p>
+          <div class="crop-ratio-row">
+            <div class="crop-custom-row">
+              <div class="crop-custom-field">
+                <span class="crop-custom-lbl">Proporción</span>
+                <input type="number" id="crop-ratio-w" min="1" max="9999" value="4">
+              </div>
+              <span class="crop-custom-sep">:</span>
+              <div class="crop-custom-field">
+                <span class="crop-custom-lbl">&nbsp;</span>
+                <input type="number" id="crop-ratio-h" min="1" max="9999" value="5">
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Reset -->
+    <div class="panel-footer">
+      <button class="btn-secondary" id="btn-reset">Resetear todo</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- La Salida -->
+<footer>
+  <div class="footer-info">
+    <span class="footer-info-label">Nombre:</span>
+    <input type="text" id="filename-input" placeholder="noir-studio" maxlength="80" spellcheck="false" autocomplete="off">
+    <span class="footer-info-label">.jpg</span>
+  </div>
+  <button id="btn-export">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:7px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Descargar
+  </button>
+</footer>
+
+<input type="file" id="file-input" accept="image/*">
+
+<!-- Barra de navegación inferior (solo móvil) -->
+<nav class="mobile-nav" id="mobile-nav">
+  <button class="mobile-nav-btn" data-pillar="pillar-geo" onclick="toggleMobileSheet('pillar-geo', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21 L3 3 L21 3"/><path d="M3 3 L21 21"/></svg>
+    <span>Geometría</span>
+  </button>
+  <button class="mobile-nav-btn" data-pillar="pillar-rev" onclick="toggleMobileSheet('pillar-rev', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="12" y1="12" x2="16" y2="9"/></svg>
+    <span>Revelado</span>
+  </button>
+  <button class="mobile-nav-btn" data-pillar="pillar-tex" onclick="toggleMobileSheet('pillar-tex', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="5" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="4" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="7" r="1.2" fill="currentColor" stroke="none"/><circle cx="20" cy="5" r="1.2" fill="currentColor" stroke="none"/><circle cx="7" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="13" cy="13" r="1.2" fill="currentColor" stroke="none"/><circle cx="18" cy="11" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="19" r="1.2" fill="currentColor" stroke="none"/><circle cx="17" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
+    <span>Textura</span>
+  </button>
+  <button class="mobile-nav-btn" data-pillar="pillar-color" onclick="toggleMobileSheet('pillar-color', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c3.1 0 5.6-2.5 5.6-5.6C22 6 17.5 2 12 2z"/><circle cx="7" cy="10" r="1.2" fill="currentColor" stroke="none"/><circle cx="11" cy="7" r="1.2" fill="currentColor" stroke="none"/></svg>
+    <span>Color</span>
+  </button>
+  <button class="mobile-nav-btn mobile-nav-export" id="btn-export-mobile">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span>Guardar</span>
+  </button>
+</nav>
+
+<script>
+// ── Los 20 presets ──
+// Cada preset: label, color (iluminación al seleccionar), y valores de sliders.
+const PRESETS = {
+
+  // — Luz y tiempo —
+  'golden-hour': {
+    label: 'Golden Hour', color: '#C8A84B',
+    warmth: 55, brightness: 8, contrast: 22, saturation: 18,
+    shadows: 28, liftBlacks: 0, vignette: 18, grain: 5,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'first-light': {
+    label: 'First Light', color: '#7BAFC4',
+    warmth: -35, brightness: 6, contrast: 15, saturation: -12,
+    shadows: 22, liftBlacks: 10, vignette: 14, grain: 8,
+    shadowTint: -5, highlightRecovery: 8
+  },
+  'dead-of-night': {
+    label: 'Dead of Night', color: '#4A3570',
+    warmth: -12, brightness: -22, contrast: 75, saturation: -22,
+    shadows: -18, liftBlacks: 0, vignette: 62, grain: 12,
+    shadowTint: 0, highlightRecovery: 0
+  },
+
+  // — Directores —
+  'quentin': {
+    label: 'Quentin', color: '#B03030',
+    warmth: 42, brightness: 5, contrast: 32, saturation: 48,
+    shadows: 10, liftBlacks: 0, vignette: 22, grain: 48,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'wes': {
+    label: 'Wes', color: '#C49080',
+    warmth: 14, brightness: 10, contrast: -22, saturation: -35,
+    shadows: 32, liftBlacks: 38, vignette: 0, grain: 6,
+    shadowTint: 5, highlightRecovery: 18
+  },
+  'andy': {
+    label: 'Andy', color: '#D91E8C',
+    warmth: 10, brightness: 15, contrast: 28, saturation: 85,
+    shadows: 20, liftBlacks: 12, vignette: 0, grain: 2,
+    shadowTint: 0, highlightRecovery: 0
+  },
+
+  // — Pintores —
+  'caravaggio': {
+    label: 'Caravaggio', color: '#8B6A1A',
+    warmth: -8, brightness: -5, contrast: 65, saturation: -15,
+    shadows: 55, liftBlacks: 0, vignette: 45, grain: 6,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'zuloaga': {
+    label: 'Ignacio', color: '#333333',
+    warmth: 0, brightness: 0, contrast: 55, saturation: -100,
+    shadows: 0, liftBlacks: 5, vignette: 25, grain: 35,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'velvet': {
+    label: 'Velvet', color: '#6B3FA0',
+    warmth: -6, brightness: -22, contrast: 42, saturation: 22,
+    shadows: -8, liftBlacks: 0, vignette: 78, grain: 10,
+    shadowTint: 0, highlightRecovery: 0
+  },
+
+  // — Cámaras / sistemas —
+  'm-system': {
+    label: 'M-System', color: '#C8201A',
+    warmth: 5, brightness: 2, contrast: 18, saturation: 8,
+    shadows: 16, liftBlacks: 0, vignette: 12, grain: 2,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'f-chrome': {
+    label: 'F-Chrome', color: '#1A5276',
+    warmth: -25, brightness: 5, contrast: 28, saturation: 32,
+    shadows: 10, liftBlacks: 0, vignette: 20, grain: 5,
+    shadowTint: -5, highlightRecovery: 0
+  },
+  'h-format': {
+    label: 'H-Format', color: '#4A5D23',
+    warmth: 8, brightness: 8, contrast: -8, saturation: 12,
+    shadows: 32, liftBlacks: 5, vignette: 8, grain: 3,
+    shadowTint: 0, highlightRecovery: 22
+  },
+  'wetzlar': {
+    label: 'Wetzlar', color: '#B8860B',
+    warmth: 28, brightness: 3, contrast: 20, saturation: 5,
+    shadows: 18, liftBlacks: 0, vignette: 15, grain: 3,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'capa': {
+    label: 'Capa', color: '#555555',
+    warmth: 0, brightness: -8, contrast: 72, saturation: -100,
+    shadows: -5, liftBlacks: 0, vignette: 35, grain: 45,
+    shadowTint: 0, highlightRecovery: 0
+  },
+
+  // — Materiales / procesos —
+  'tobacco': {
+    label: 'Tobacco', color: '#7B4B2A',
+    warmth: 55, brightness: -6, contrast: 25, saturation: -45,
+    shadows: -12, liftBlacks: 5, vignette: 42, grain: 22,
+    shadowTint: -8, highlightRecovery: 0
+  },
+  'old-money': {
+    label: 'Old Money', color: '#2C5F4A',
+    warmth: -16, brightness: 0, contrast: 22, saturation: -58,
+    shadows: 12, liftBlacks: 12, vignette: 22, grain: 5,
+    shadowTint: 18, highlightRecovery: 8
+  },
+  'matte': {
+    label: 'Matte 180g', color: '#888888',
+    warmth: 5, brightness: 5, contrast: -25, saturation: -20,
+    shadows: 16, liftBlacks: 48, vignette: 5, grain: 3,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'eastman': {
+    label: 'Eastman', color: '#D4880A',
+    warmth: 38, brightness: 5, contrast: 8, saturation: -15,
+    shadows: 28, liftBlacks: 18, vignette: 8, grain: 8,
+    shadowTint: 0, highlightRecovery: 12
+  },
+
+  // — Fotógrafos —
+  'cartier': {
+    label: 'Henri', color: '#8B7D6B',
+    warmth: 12, brightness: 2, contrast: 28, saturation: -8,
+    shadows: 12, liftBlacks: 0, vignette: 18, grain: 8,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'brassai': {
+    label: 'Brassaï', color: '#4A3828',
+    warmth: 15, brightness: -18, contrast: 65, saturation: -20,
+    shadows: -10, liftBlacks: 0, vignette: 55, grain: 18,
+    shadowTint: 5, highlightRecovery: 0
+  },
+  'doisneau': {
+    label: 'Robert', color: '#C4906A',
+    warmth: 22, brightness: 5, contrast: -8, saturation: -18,
+    shadows: 28, liftBlacks: 15, vignette: 10, grain: 5,
+    shadowTint: 3, highlightRecovery: 10
+  },
+  'avedon': {
+    label: 'Richard', color: '#C8C0B8',
+    warmth: 5, brightness: 18, contrast: 12, saturation: -5,
+    shadows: 35, liftBlacks: 5, vignette: 0, grain: 1,
+    shadowTint: 0, highlightRecovery: 25
+  },
+  'newton': {
+    label: 'Helmut', color: '#2A2A2A',
+    warmth: 8, brightness: -5, contrast: 55, saturation: 15,
+    shadows: -5, liftBlacks: 0, vignette: 35, grain: 4,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'eggleston': {
+    label: 'William', color: '#B84020',
+    warmth: 32, brightness: 5, contrast: 18, saturation: 55,
+    shadows: 15, liftBlacks: 5, vignette: 8, grain: 3,
+    shadowTint: 0, highlightRecovery: 8
+  },
+  'shore': {
+    label: 'Stephen', color: '#C8A870',
+    warmth: 28, brightness: 8, contrast: -5, saturation: -25,
+    shadows: 22, liftBlacks: 28, vignette: 5, grain: 5,
+    shadowTint: 3, highlightRecovery: 12
+  },
+  'frank': {
+    label: 'Frank', color: '#4A4A4A',
+    warmth: 0, brightness: -5, contrast: 42, saturation: -100,
+    shadows: -8, liftBlacks: 0, vignette: 28, grain: 55,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'nadar': {
+    label: 'Nadar', color: '#8B6040',
+    warmth: 45, brightness: -5, contrast: 15, saturation: -65,
+    shadows: 10, liftBlacks: 8, vignette: 35, grain: 15,
+    shadowTint: 8, highlightRecovery: 0
+  },
+  'strand': {
+    label: 'Paul', color: '#606060',
+    warmth: -5, brightness: 3, contrast: 48, saturation: -100,
+    shadows: 5, liftBlacks: 3, vignette: 15, grain: 12,
+    shadowTint: -3, highlightRecovery: 8
+  },
+
+  // — Blanco y negro —
+  'japanese-grain': {
+    label: 'Japanese Grain', color: '#8B7355',
+    warmth: 0, brightness: -5, contrast: -5, saturation: -100,
+    shadows: 22, liftBlacks: 8, vignette: 10, grain: 82,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'silver': {
+    label: 'Silver', color: '#708090',
+    warmth: -8, brightness: 2, contrast: 38, saturation: -100,
+    shadows: 12, liftBlacks: 8, vignette: 18, grain: 22,
+    shadowTint: -8, highlightRecovery: 10
+  },
+
+  // — Luz y tiempo (nuevos) —
+  'blue-hour': {
+    label: 'Blue Hour', color: '#3A5F8A',
+    warmth: -45, brightness: -8, contrast: 28, saturation: -15,
+    shadows: -12, liftBlacks: 5, vignette: 25, grain: 3,
+    shadowTint: -12, highlightRecovery: 5
+  },
+  'midday': {
+    label: 'Midday', color: '#E8D870',
+    warmth: 15, brightness: 18, contrast: 38, saturation: 25,
+    shadows: -20, liftBlacks: 0, vignette: 5, grain: 1,
+    shadowTint: 0, highlightRecovery: 15
+  },
+  'overcast': {
+    label: 'Overcast', color: '#A0A8B0',
+    warmth: -12, brightness: 5, contrast: -15, saturation: -20,
+    shadows: 35, liftBlacks: 15, vignette: 5, grain: 3,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'storm-light': {
+    label: 'Storm Light', color: '#4A5A6A',
+    warmth: -8, brightness: -15, contrast: 55, saturation: -30,
+    shadows: -15, liftBlacks: 0, vignette: 45, grain: 8,
+    shadowTint: -5, highlightRecovery: 0
+  },
+  'candlelight': {
+    label: 'Candlelight', color: '#D4780A',
+    warmth: 75, brightness: -10, contrast: 35, saturation: -25,
+    shadows: -15, liftBlacks: 0, vignette: 55, grain: 12,
+    shadowTint: 8, highlightRecovery: 0
+  },
+  'neon-night': {
+    label: 'Neon Night', color: '#FF2D6B',
+    warmth: -15, brightness: -18, contrast: 42, saturation: 45,
+    shadows: -20, liftBlacks: 0, vignette: 40, grain: 15,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'platinum-sky': {
+    label: 'Platinum Sky', color: '#C8C8C8',
+    warmth: -5, brightness: 22, contrast: -18, saturation: -35,
+    shadows: 45, liftBlacks: 30, vignette: 0, grain: 2,
+    shadowTint: 0, highlightRecovery: 35
+  },
+
+  // — Directores (nuevos) —
+  'kubrick': {
+    label: 'Stanley', color: '#1A2A4A',
+    warmth: -28, brightness: 0, contrast: 48, saturation: -25,
+    shadows: -8, liftBlacks: 5, vignette: 18, grain: 3,
+    shadowTint: -8, highlightRecovery: 0
+  },
+  'lynch': {
+    label: 'David', color: '#2A1A3A',
+    warmth: -8, brightness: -25, contrast: 65, saturation: 15,
+    shadows: -22, liftBlacks: 0, vignette: 70, grain: 8,
+    shadowTint: -5, highlightRecovery: 0
+  },
+  'fellini': {
+    label: 'Federico', color: '#C4900A',
+    warmth: 35, brightness: 3, contrast: 22, saturation: -15,
+    shadows: 25, liftBlacks: 15, vignette: 15, grain: 10,
+    shadowTint: 5, highlightRecovery: 10
+  },
+  'bergman': {
+    label: 'Ingmar', color: '#3A3A3A',
+    warmth: 0, brightness: -8, contrast: 62, saturation: -100,
+    shadows: -8, liftBlacks: 3, vignette: 30, grain: 18,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'villeneuve': {
+    label: 'Denis', color: '#5A7080',
+    warmth: -22, brightness: -5, contrast: 38, saturation: -40,
+    shadows: 5, liftBlacks: 5, vignette: 35, grain: 5,
+    shadowTint: -10, highlightRecovery: 12
+  },
+  'akira': {
+    label: 'Akira', color: '#8B1A1A',
+    warmth: 12, brightness: -5, contrast: 55, saturation: 20,
+    shadows: -12, liftBlacks: 0, vignette: 28, grain: 10,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'tarkovsky': {
+    label: 'Andrei', color: '#5A6A3A',
+    warmth: 18, brightness: -12, contrast: 25, saturation: -45,
+    shadows: 15, liftBlacks: 8, vignette: 40, grain: 22,
+    shadowTint: 5, highlightRecovery: 5
+  },
+  'sorrentino': {
+    label: 'Paolo', color: '#C87A20',
+    warmth: 38, brightness: 2, contrast: 28, saturation: -10,
+    shadows: 15, liftBlacks: 8, vignette: 30, grain: 6,
+    shadowTint: 8, highlightRecovery: 5
+  },
+  'nolan': {
+    label: 'Christopher', color: '#1A3A5A',
+    warmth: -12, brightness: 0, contrast: 42, saturation: -20,
+    shadows: -5, liftBlacks: 0, vignette: 20, grain: 1,
+    shadowTint: -8, highlightRecovery: 5
+  },
+  'sofia': {
+    label: 'Sofía', color: '#D4A0B0',
+    warmth: 10, brightness: 8, contrast: -14, saturation: -16,
+    shadows: 32, liftBlacks: 26, vignette: 8, grain: 3,
+    shadowTint: 6, highlightRecovery: 10
+  },
+  'zhao': {
+    label: 'Chloé', color: '#D49038',
+    warmth: 38, brightness: 5, contrast: 10, saturation: -14,
+    shadows: 16, liftBlacks: 8, vignette: 15, grain: 6,
+    shadowTint: 10, highlightRecovery: 20
+  },
+
+  // — Pintores (nuevos) —
+  'mark': {
+    label: 'Mark', color: '#8B2020',
+    warmth: 32, brightness: 5, contrast: -20, saturation: -15,
+    shadows: 45, liftBlacks: 55, vignette: 0, grain: 1,
+    shadowTint: 10, highlightRecovery: 15
+  },
+  'vermeer': {
+    label: 'Johannes', color: '#4A80A0',
+    warmth: 15, brightness: 5, contrast: 18, saturation: 12,
+    shadows: 35, liftBlacks: 8, vignette: 20, grain: 2,
+    shadowTint: -5, highlightRecovery: 12
+  },
+  'hopper': {
+    label: 'Edward', color: '#D4A020',
+    warmth: 28, brightness: 8, contrast: 45, saturation: 15,
+    shadows: -18, liftBlacks: 0, vignette: 12, grain: 3,
+    shadowTint: 0, highlightRecovery: 8
+  },
+  'rembrandt': {
+    label: 'Rembrandt', color: '#8B5A1A',
+    warmth: 48, brightness: -12, contrast: 58, saturation: -20,
+    shadows: -15, liftBlacks: 0, vignette: 55, grain: 5,
+    shadowTint: 8, highlightRecovery: 0
+  },
+  'goya': {
+    label: 'Francisco', color: '#2A1A0A',
+    warmth: 5, brightness: -28, contrast: 75, saturation: -35,
+    shadows: -25, liftBlacks: 0, vignette: 65, grain: 12,
+    shadowTint: 3, highlightRecovery: 0
+  },
+  'turner': {
+    label: 'Joseph', color: '#D4B870',
+    warmth: 35, brightness: 18, contrast: -12, saturation: -30,
+    shadows: 42, liftBlacks: 35, vignette: 8, grain: 3,
+    shadowTint: 5, highlightRecovery: 28
+  },
+  'hockney': {
+    label: 'David', color: '#1A8AB0',
+    warmth: 8, brightness: 12, contrast: 15, saturation: 55,
+    shadows: 22, liftBlacks: 12, vignette: 0, grain: 1,
+    shadowTint: 0, highlightRecovery: 10
+  },
+  'klimt': {
+    label: 'Gustav', color: '#C8940A',
+    warmth: 55, brightness: -5, contrast: 32, saturation: 35,
+    shadows: 8, liftBlacks: 5, vignette: 38, grain: 5,
+    shadowTint: 10, highlightRecovery: 0
+  },
+
+  // — Cámaras / sistemas (nuevos) —
+  'summilux': {
+    label: 'Summilux', color: '#A87840',
+    warmth: 18, brightness: 3, contrast: 15, saturation: 5,
+    shadows: 20, liftBlacks: 0, vignette: 18, grain: 2,
+    shadowTint: 2, highlightRecovery: 8
+  },
+  'nikkor': {
+    label: 'Nikkor', color: '#F0A000',
+    warmth: 8, brightness: 2, contrast: 22, saturation: 12,
+    shadows: 10, liftBlacks: 0, vignette: 10, grain: 2,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'otus': {
+    label: 'Otus', color: '#1A3A5A',
+    warmth: -5, brightness: 3, contrast: 28, saturation: 8,
+    shadows: 12, liftBlacks: 0, vignette: 8, grain: 1,
+    shadowTint: -3, highlightRecovery: 8
+  },
+  'v-system': {
+    label: 'V-System', color: '#3A3A3A',
+    warmth: 5, brightness: 5, contrast: 12, saturation: 8,
+    shadows: 25, liftBlacks: 5, vignette: 12, grain: 2,
+    shadowTint: 0, highlightRecovery: 18
+  },
+  'polaroid': {
+    label: 'Polaroid', color: '#E05020',
+    warmth: 38, brightness: 8, contrast: -18, saturation: -28,
+    shadows: 35, liftBlacks: 45, vignette: 12, grain: 8,
+    shadowTint: 5, highlightRecovery: 15
+  },
+
+  // — Materiales / procesos (nuevos) —
+  'cianotype': {
+    label: 'Cianotype', color: '#1A4A7A',
+    warmth: -55, brightness: 0, contrast: 35, saturation: 60,
+    shadows: 8, liftBlacks: 5, vignette: 18, grain: 8,
+    shadowTint: -20, highlightRecovery: 5
+  },
+  'sepia': {
+    label: 'Sépia', color: '#8B6040',
+    warmth: 50, brightness: -5, contrast: 20, saturation: -80,
+    shadows: 10, liftBlacks: 8, vignette: 25, grain: 10,
+    shadowTint: 15, highlightRecovery: 0
+  },
+  'cross-process': {
+    label: 'Cross Process', color: '#20A850',
+    warmth: -18, brightness: 5, contrast: 55, saturation: 65,
+    shadows: -15, liftBlacks: 8, vignette: 18, grain: 8,
+    shadowTint: -15, highlightRecovery: 0
+  },
+  'albumen': {
+    label: 'Albumen', color: '#C8A860',
+    warmth: 42, brightness: -8, contrast: 25, saturation: -70,
+    shadows: 5, liftBlacks: 10, vignette: 30, grain: 12,
+    shadowTint: 12, highlightRecovery: 0
+  },
+  'platinum': {
+    label: 'Platinum', color: '#A0A8B0',
+    warmth: -8, brightness: 3, contrast: 32, saturation: -100,
+    shadows: 15, liftBlacks: 12, vignette: 12, grain: 5,
+    shadowTint: -5, highlightRecovery: 12
+  },
+  'push-2': {
+    label: 'Push +2', color: '#4A4A4A',
+    warmth: 0, brightness: -18, contrast: 80, saturation: -85,
+    shadows: -20, liftBlacks: 0, vignette: 22, grain: 45,
+    shadowTint: 0, highlightRecovery: 0
+  },
+
+  // — Ciudades —
+  'tokyo': {
+    label: 'Tokyo', color: '#C820A0',
+    warmth: -18, brightness: -12, contrast: 48, saturation: 42,
+    shadows: -18, liftBlacks: 5, vignette: 38, grain: 14,
+    shadowTint: -10, highlightRecovery: 0
+  },
+  'madrid': {
+    label: 'Madrid', color: '#D4780A',
+    warmth: 48, brightness: 5, contrast: 38, saturation: 22,
+    shadows: -12, liftBlacks: 0, vignette: 20, grain: 3,
+    shadowTint: 5, highlightRecovery: 8
+  },
+  'paris': {
+    label: 'París', color: '#C8A890',
+    warmth: 18, brightness: 5, contrast: -15, saturation: -28,
+    shadows: 25, liftBlacks: 32, vignette: 10, grain: 8,
+    shadowTint: 5, highlightRecovery: 12
+  },
+  'new-york': {
+    label: 'New York', color: '#3A3A3A',
+    warmth: 0, brightness: -5, contrast: 65, saturation: -100,
+    shadows: -12, liftBlacks: 0, vignette: 22, grain: 42,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'london': {
+    label: 'London', color: '#707880',
+    warmth: -20, brightness: 3, contrast: -8, saturation: -32,
+    shadows: 30, liftBlacks: 18, vignette: 8, grain: 5,
+    shadowTint: -5, highlightRecovery: 8
+  },
+  'havana': {
+    label: 'Havana', color: '#C87840',
+    warmth: 52, brightness: 3, contrast: 10, saturation: -18,
+    shadows: 20, liftBlacks: 38, vignette: 15, grain: 20,
+    shadowTint: 8, highlightRecovery: 8
+  },
+  'mumbai': {
+    label: 'Mumbai', color: '#D45A0A',
+    warmth: 62, brightness: 0, contrast: 22, saturation: 18,
+    shadows: 5, liftBlacks: 8, vignette: 30, grain: 10,
+    shadowTint: 10, highlightRecovery: 5
+  },
+  'oslo': {
+    label: 'Oslo', color: '#5A7090',
+    warmth: -42, brightness: 3, contrast: 32, saturation: -18,
+    shadows: 8, liftBlacks: 5, vignette: 12, grain: 2,
+    shadowTint: -15, highlightRecovery: 12
+  },
+  'lisboa': {
+    label: 'Lisboa', color: '#C8906A',
+    warmth: 30, brightness: 8, contrast: -8, saturation: -28,
+    shadows: 28, liftBlacks: 25, vignette: 10, grain: 6,
+    shadowTint: 8, highlightRecovery: 10
+  },
+  'marrakech': {
+    label: 'Marrakech', color: '#C84820',
+    warmth: 65, brightness: -3, contrast: 42, saturation: 28,
+    shadows: -8, liftBlacks: 5, vignette: 32, grain: 8,
+    shadowTint: 12, highlightRecovery: 0
+  },
+  'berlin': {
+    label: 'Berlín', color: '#7A7A8A',
+    warmth: -20, brightness: -4, contrast: 38, saturation: -32,
+    shadows: -10, liftBlacks: 8, vignette: 28, grain: 10,
+    shadowTint: -8, highlightRecovery: 6
+  },
+  'monte-fuji': {
+    label: 'Monte Fuji', color: '#7090B8',
+    warmth: -28, brightness: 5, contrast: 22, saturation: -38,
+    shadows: 15, liftBlacks: 12, vignette: 22, grain: 4,
+    shadowTint: -22, highlightRecovery: 18
+  },
+  'copenhague': {
+    label: 'Copenhague', color: '#7AB898',
+    warmth: -12, brightness: 7, contrast: 14, saturation: -22,
+    shadows: 22, liftBlacks: 18, vignette: 8, grain: 5,
+    shadowTint: -6, highlightRecovery: 8
+  },
+
+  // — Blanco y negro: emulsiones clásicas —
+  'tri-x': {
+    label: 'Tri-X 400', color: '#5A5A5A',
+    warmth: 5, brightness: -3, contrast: 42, saturation: -100,
+    shadows: -5, liftBlacks: 3, vignette: 18, grain: 55,
+    shadowTint: 0, highlightRecovery: 0
+  },
+  'hp5': {
+    label: 'HP5 Plus', color: '#606060',
+    warmth: 0, brightness: 0, contrast: 35, saturation: -100,
+    shadows: 0, liftBlacks: 5, vignette: 15, grain: 42,
+    shadowTint: 0, highlightRecovery: 5
+  },
+  'delta': {
+    label: 'Delta Pro', color: '#484848',
+    warmth: -5, brightness: 2, contrast: 28, saturation: -100,
+    shadows: 5, liftBlacks: 5, vignette: 12, grain: 35,
+    shadowTint: -3, highlightRecovery: 8
+  },
+  'acros': {
+    label: 'Acros', color: '#3A3A3A',
+    warmth: -3, brightness: -2, contrast: 45, saturation: -100,
+    shadows: 8, liftBlacks: 2, vignette: 10, grain: 28,
+    shadowTint: -2, highlightRecovery: 5
+  },
+  'tmax': {
+    label: 'T-Max', color: '#555555',
+    warmth: 2, brightness: 0, contrast: 38, saturation: -100,
+    shadows: 3, liftBlacks: 5, vignette: 10, grain: 32,
+    shadowTint: 0, highlightRecovery: 8
+  },
+  'ortho': {
+    label: 'Ortho', color: '#4A4A5A',
+    warmth: -18, brightness: -5, contrast: 55, saturation: -100,
+    shadows: -12, liftBlacks: 0, vignette: 15, grain: 22,
+    shadowTint: -8, highlightRecovery: 0
+  },
+  'fomapan': {
+    label: 'Fomapan', color: '#686868',
+    warmth: 8, brightness: -5, contrast: 30, saturation: -100,
+    shadows: -5, liftBlacks: 5, vignette: 20, grain: 48,
+    shadowTint: 2, highlightRecovery: 0
+  },
+  'kentmere': {
+    label: 'Kentmere', color: '#505050',
+    warmth: 3, brightness: -8, contrast: 35, saturation: -100,
+    shadows: -8, liftBlacks: 3, vignette: 22, grain: 58,
+    shadowTint: 0, highlightRecovery: 0
+  },
+};
+
+// ── Formatos de recorte ──
+const CROP_FORMATS = [
+  { id: 'free',     label: 'Libre',      sub: '',            ratio: null,    exportW: 1080, exportH: 1350, svgRect: [4,2,16,20] },
+  { id: 'story',    label: 'Story',      sub: '9:16',        ratio: 9/16,    exportW: 1080, exportH: 1920, svgRect: [8,1,8,22] },
+  { id: 'post45',   label: 'Post 4:5',   sub: '4:5',         ratio: 4/5,     exportW: 1080, exportH: 1350, svgRect: [5,2,14,18] },
+  { id: 'square',   label: 'Cuadrado',   sub: '1:1',         ratio: 1,       exportW: 1080, exportH: 1080, svgRect: [3,3,18,18] },
+  { id: 'retrato',  label: 'Retrato',    sub: '3:4',         ratio: 3/4,     exportW: 1080, exportH: 1440, svgRect: [5,3,14,18] },
+  { id: 'horiz',    label: 'Horizontal', sub: '16:9',        ratio: 16/9,    exportW: 1920, exportH: 1080, svgRect: [1,6,22,12] },
+  { id: 'cine',     label: 'Cine',       sub: '2.35:1',      ratio: 2.35,    exportW: 2350, exportH: 1000, svgRect: [1,8,22,8] },
+  { id: 'custom',   label: 'Personaliz.', sub: 'px × px',    ratio: 'custom',exportW: null, exportH: null, svgRect: [3,3,18,18] },
+];
+
+// ── Estado ──
+let originalImage    = null;
+let activePreset     = null;
+let _filterRaf = null;
+function scheduleApplyFilters() {
+  if (_filterRaf) cancelAnimationFrame(_filterRaf);
+  _filterRaf = requestAnimationFrame(() => { _filterRaf = null; applyFilters(); });
+}
+// ── Historia undo/redo ──
+const undoStack = [];
+const redoStack = [];
+
+function captureState() {
+  const s = { preset: activePreset, appliedCrop: appliedCrop ? { ...appliedCrop } : null,
+              rotationDeg, flipH, flipV };
+  Object.keys(sliders).forEach(k => { s[k] = +sliders[k].value; });
+  s.nivelar   = +nivelarSlider.value;
+  s.sharpness = +sharpnessSlider.value;
+  return s;
+}
+
+function applyState(s) {
+  activePreset = s.preset;
+  appliedCrop  = s.appliedCrop ? { ...s.appliedCrop } : null;
+  rotationDeg  = s.rotationDeg ?? 0;
+  flipH        = s.flipH ?? false;
+  flipV        = s.flipV ?? false;
+  Object.keys(sliders).forEach(k => {
+    sliders[k].value = s[k];
+    if (vals[k]) vals[k].textContent = s[k];
+  });
+  nivelarSlider.value  = s.nivelar;
+  sharpnessSlider.value = s.sharpness;
+  document.getElementById('val-nivelar').textContent   = s.nivelar + '°';
+  document.getElementById('val-sharpness').textContent = s.sharpness;
+  document.querySelectorAll('.btn-preset').forEach(b => {
+    const active = b.dataset.key === s.preset;
+    b.classList.toggle('active', active);
+    b.style.borderBottomColor = active ? (PRESETS[s.preset]?.color || '') : 'transparent';
+  });
+  applyFilters();
+  updateHistoryBtns();
+}
+
+function saveHistory(preSnap) {
+  undoStack.push(preSnap);
+  if (undoStack.length > 60) undoStack.shift();
+  redoStack.length = 0;
+  updateHistoryBtns();
+}
+
+function updateHistoryBtns() {
+  document.getElementById('btn-undo').disabled = !originalImage || undoStack.length === 0;
+  document.getElementById('btn-redo').disabled = !originalImage || redoStack.length === 0;
+}
+
+function undo() {
+  if (!originalImage || !undoStack.length) return;
+  if (cropMode) exitCropMode(false);
+  redoStack.push(captureState());
+  applyState(undoStack.pop());
+}
+
+function redo() {
+  if (!originalImage || !redoStack.length) return;
+  if (cropMode) exitCropMode(false);
+  undoStack.push(captureState());
+  applyState(redoStack.pop());
+}
+let showBefore       = false;
+let activeCropFormat = 'free';
+let appliedCrop = null; // { sx, sy, sw, sh, exportW, exportH } en coords de originalImage
+let rotationDeg = 0;   // 0 | 90 | 180 | 270
+let flipH = false;
+let flipV = false;
+let cropMode  = false;
+let cropRect  = { x1: 0.1, y1: 0.1, x2: 0.9, y2: 0.9 }; // normalized 0-1 relative to canvas display
+let _cropDrag = null; // { type:'corner'|'move', corner?:str, clientX, clientY, startRect }
+const CROP_HANDLE_R = 13; // px hit radius for corner handles
+
+// ── DOM ──
+const dropZone    = document.getElementById('drop-zone');
+const canvas      = document.getElementById('canvas');
+const ctx         = canvas.getContext('2d');
+const fileInput   = document.getElementById('file-input');
+
+// Sliders del motor de píxeles
+const sliders = {
+  brightness:        document.getElementById('brightness'),
+  contrast:          document.getElementById('contrast'),
+  saturation:        document.getElementById('saturation'),
+  shadows:           document.getElementById('shadows'),
+  warmth:            document.getElementById('warmth'),
+  liftBlacks:        document.getElementById('liftBlacks'),
+  vignette:          document.getElementById('vignette'),
+  grain:             document.getElementById('grain'),
+  shadowTint:        document.getElementById('shadowTint'),
+  highlightRecovery: document.getElementById('highlightRecovery'),
+  borderSize:        document.getElementById('borderSize'),
+};
+
+// Sliders que se muestran pero no van al motor de píxeles directamente
+const nivelarSlider  = document.getElementById('nivelar');
+const sharpnessSlider = document.getElementById('sharpness');
+
+// Valores mostrados
+const vals = {};
+Object.keys(sliders).forEach(k => { vals[k] = document.getElementById('val-' + k); });
+
+// ── Iconos SVG para los 20 presets ──
+const PRESET_ICONS = {
+  'golden-hour':    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7.1" y2="7.1"/><line x1="16.9" y1="16.9" x2="19.1" y2="19.1"/><line x1="19.1" y1="4.9" x2="16.9" y2="7.1"/><line x1="7.1" y1="16.9" x2="4.9" y2="19.1"/></svg>`,
+  'first-light':    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 17 Q12 5 21 17"/><line x1="3" y1="20" x2="21" y2="20"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="6" y1="7" x2="7.5" y2="8.5"/><line x1="18" y1="7" x2="16.5" y2="8.5"/></svg>`,
+  'dead-of-night':  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 4 A8 8 0 1 0 14 20 A6 6 0 1 1 14 4Z"/></svg>`,
+  'quentin':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="20" height="16"/><line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/><rect x="3" y="7" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="3" y="11" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="3" y="15" width="2.5" height="2" fill="currentColor" stroke="none"/></svg>`,
+  'wes':            `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="20" height="20"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>`,
+  'andy':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="3" fill="currentColor" stroke="none" opacity="0.6"/><circle cx="17" cy="7" r="3" fill="currentColor" stroke="none" opacity="0.4"/><circle cx="7" cy="17" r="3" fill="currentColor" stroke="none" opacity="0.3"/><circle cx="17" cy="17" r="3" fill="currentColor" stroke="none" opacity="0.7"/></svg>`,
+  'caravaggio':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3 C9 7 7 9 7 12 A5 5 0 0 0 17 12 C17 9 15 7 12 3Z"/><line x1="12" y1="17" x2="12" y2="20"/><line x1="9" y1="20" x2="15" y2="20"/></svg>`,
+  'zuloaga':        `<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9" fill="none"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor" stroke="none"/><line x1="12" y1="3" x2="12" y2="21" stroke-linecap="round"/></svg>`,
+  'velvet':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L22 12 L12 22 L2 12 Z"/><path d="M12 7 L17 12 L12 17 L7 12 Z"/></svg>`,
+  'm-system':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>`,
+  'f-chrome':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 L21 20 L3 20 Z"/><line x1="7.5" y1="14" x2="16.5" y2="14"/><line x1="9.5" y1="10" x2="14.5" y2="10"/></svg>`,
+  'h-format':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="7" x2="2" y2="2"/><line x1="2" y1="2" x2="7" y2="2"/><line x1="22" y1="7" x2="22" y2="2"/><line x1="22" y1="2" x2="17" y2="2"/><line x1="2" y1="17" x2="2" y2="22"/><line x1="2" y1="22" x2="7" y2="22"/><line x1="22" y1="17" x2="22" y2="22"/><line x1="22" y1="22" x2="17" y2="22"/></svg>`,
+  'wetzlar':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg>`,
+  'capa':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M8 7 V5 a1 1 0 0 1 1-1 h6 a1 1 0 0 1 1 1 V7"/><circle cx="12" cy="14" r="3.5"/></svg>`,
+  'tobacco':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 19 C9 15 15 15 15 11 C15 7 9 7 9 3"/><path d="M14 19 C14 16 18 15 18 12 C18 9 14 8 14 5"/><line x1="5" y1="19" x2="19" y2="19"/></svg>`,
+  'old-money':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 L3 9 L8 14 L12 5 L16 14 L21 9 L21 18 Z"/><line x1="3" y1="21" x2="21" y2="21"/></svg>`,
+  'matte':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="8" width="17" height="13"/><rect x="6" y="5" width="17" height="13"/></svg>`,
+  'eastman':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><circle cx="12" cy="12" r="2"/></svg>`,
+  'cartier':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="5" width="20" height="14"/><rect x="8" y="9" width="8" height="6"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg>`,
+  'brassai':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="8"/><circle cx="12" cy="11" r="3"/><path d="M5 21 Q12 14 19 21"/><line x1="8" y1="21" x2="16" y2="21"/></svg>`,
+  'doisneau':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 Q3 10 12 8 Q21 10 21 18"/><path d="M8 18 Q8 13 12 12 Q16 13 16 18"/></svg>`,
+  'avedon':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18"/><line x1="3" y1="8" x2="21" y2="8"/></svg>`,
+  'newton':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 L20 21 L4 21 Z"/><line x1="4" y1="21" x2="20" y2="21"/></svg>`,
+  'eggleston':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3 Q18 12 12 21" fill="currentColor" opacity="0.3" stroke="none"/><path d="M12 3 Q6 12 12 21" fill="none"/></svg>`,
+  'shore':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="20" x2="12" y2="20"/><path d="M3 20 Q8 8 12 7 Q16 8 21 20"/><line x1="3" y1="20" x2="21" y2="20"/><line x1="7" y1="14" x2="17" y2="14"/></svg>`,
+  'frank':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" transform="rotate(-4 12 12)"/><line x1="3" y1="9" x2="21" y2="9" transform="rotate(-4 12 12)"/></svg>`,
+  'nadar':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><ellipse cx="12" cy="9" rx="7" ry="5"/><path d="M5 9 Q5 18 12 20 Q19 18 19 9"/><line x1="12" y1="14" x2="12" y2="20"/></svg>`,
+  'strand':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="3" x2="21" y2="3"/><line x1="3" y1="21" x2="21" y2="21"/><line x1="3" y1="3" x2="3" y2="21"/><line x1="21" y1="3" x2="21" y2="21"/><line x1="8" y1="3" x2="8" y2="21"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  'japanese-grain': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="7" x2="22" y2="7"/><line x1="4" y1="4" x2="20" y2="4"/><line x1="7" y1="7" x2="7" y2="22"/><line x1="17" y1="7" x2="17" y2="22"/><line x1="7" y1="13" x2="17" y2="13"/></svg>`,
+  'silver':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="5" width="18" height="14"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="7" y1="5" x2="7" y2="19"/></svg>`,
+
+  // — Luz nuevos —
+  'blue-hour':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  'midday':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="7" r="3"/><line x1="12" y1="1.5" x2="12" y2="3.5"/><line x1="17.5" y1="3.5" x2="16.2" y2="4.8"/><line x1="19.5" y1="8" x2="17.5" y2="8"/><line x1="6.5" y1="3.5" x2="7.8" y2="4.8"/><line x1="4.5" y1="8" x2="6.5" y2="8"/><line x1="12" y1="11" x2="12" y2="22"/><line x1="4" y1="22" x2="20" y2="22"/></svg>`,
+  'overcast':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>`,
+  'storm-light':    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16H5a7 7 0 0 1 6.3-9.9 7 7 0 0 1 6.7 5"/><polyline points="13 13 10 17 14 17 11 21"/></svg>`,
+  'candlelight':    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3 C11 5 10 6.5 10 8.5 A2 2 0 0 0 14 8.5 C14 6.5 13 5 12 3Z"/><line x1="12" y1="10.5" x2="12" y2="18"/><line x1="9" y1="21" x2="15" y2="21"/><line x1="12" y1="18" x2="12" y2="21"/></svg>`,
+  'neon-night':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="21" x2="22" y2="21"/><rect x="4" y="11" width="4" height="10"/><rect x="10" y="5" width="4" height="16"/><rect x="16" y="8" width="4" height="13"/></svg>`,
+  'platinum-sky':   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="14" x2="22" y2="14"/><circle cx="12" cy="14" r="5"/><line x1="12" y1="5" x2="12" y2="7"/><line x1="18" y1="8" x2="17" y2="9"/><line x1="6" y1="8" x2="7" y2="9"/><line x1="21" y1="12" x2="19" y2="12.5"/><line x1="3" y1="12" x2="5" y2="12.5"/></svg>`,
+
+  // — Cine nuevos —
+  'kubrick':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,3 22,21 2,21"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="5" y1="18" x2="19" y2="18"/></svg>`,
+  'lynch':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 6,10 10,6 14,10 18,6 22,10"/><polyline points="2,13 6,17 10,13 14,17 18,13 22,17"/></svg>`,
+  'fellini':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18 Q4 10 12 8 Q20 10 20 18"/><line x1="2" y1="21" x2="22" y2="21"/><line x1="6" y1="18" x2="4" y2="21"/><line x1="18" y1="18" x2="20" y2="21"/><line x1="12" y1="8" x2="12" y2="5"/><line x1="9" y1="5" x2="15" y2="5"/></svg>`,
+  'bergman':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="8" y="2" width="8" height="5" rx="0.5"/><path d="M10 7 L6 20 M14 7 L18 20"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>`,
+  'villeneuve':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16 Q7 6 12 10 Q17 14 22 4"/><line x1="2" y1="20" x2="22" y2="20"/></svg>`,
+  'akira':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor" stroke="none" opacity="0.7"/></svg>`,
+  'tarkovsky':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="3" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+  'sorrentino':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M8 8 Q10 5 12 8 Q14 5 16 8"/><path d="M6 14 Q9 10 12 14 Q15 10 18 14"/><line x1="5" y1="21" x2="19" y2="21"/><line x1="8" y1="18" x2="16" y2="18"/></svg>`,
+  'nolan':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3 L18 3 L12 12 L18 21 L6 21 L12 12 Z"/><line x1="6" y1="3" x2="18" y2="3"/><line x1="6" y1="21" x2="18" y2="21"/></svg>`,
+  'sofia':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 3 Q9 10 12 13 Q15 10 15 3"/><line x1="9" y1="3" x2="15" y2="3"/><line x1="12" y1="13" x2="12" y2="20"/><line x1="8" y1="20" x2="16" y2="20"/></svg>`,
+  'zhao':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="9" r="4"/><line x1="2" y1="16" x2="22" y2="16"/><path d="M2 20 Q8 16 12 18 Q16 16 22 20"/></svg>`,
+
+  // — Arte nuevos —
+  'mark':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="8"/><rect x="3" y="13" width="18" height="8"/></svg>`,
+  'vermeer':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 21 L5 9 Q5 4 12 4 Q19 4 19 9 L19 21"/><line x1="5" y1="14" x2="19" y2="14"/><line x1="3" y1="21" x2="21" y2="21"/></svg>`,
+  'hopper':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="15"/><line x1="3" y1="11" x2="21" y2="11"/><line x1="12" y1="6" x2="12" y2="21"/><path d="M12 6 L12 2 L16 6" fill="currentColor" stroke="none"/></svg>`,
+  'rembrandt':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="4"/><path d="M5 22 L9 12 L15 14 L19 22"/><polygon points="8,22 12,14 16,22" fill="currentColor" stroke="none" opacity="0.3"/></svg>`,
+  'goya':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M8 12 Q6 14 6 17 Q6 21 12 21 Q18 21 18 17 Q18 14 16 12"/><line x1="2" y1="22" x2="22" y2="22"/></svg>`,
+  'turner':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="16" x2="22" y2="16"/><circle cx="12" cy="16" r="6"/><line x1="12" y1="3" x2="12" y2="8"/><line x1="5" y1="5" x2="8" y2="8"/><line x1="19" y1="5" x2="16" y2="8"/><line x1="2" y1="10" x2="5" y2="11"/><line x1="22" y1="10" x2="19" y2="11"/></svg>`,
+  'hockney':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 10 Q6 7 10 10 Q14 13 18 10 Q20 8.5 22 10"/><path d="M2 15 Q6 12 10 15 Q14 18 18 15 Q20 13.5 22 15"/><line x1="2" y1="20" x2="22" y2="20"/></svg>`,
+  'klimt':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 9 Q15 6 18 9 Q21 12 18 15 Q15 18 12 15 Q9 18 6 15 Q3 12 6 9 Q9 6 12 9Z"/><circle cx="7" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="17" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="17" cy="18" r="1" fill="currentColor" stroke="none"/><circle cx="7" cy="18" r="1" fill="currentColor" stroke="none"/></svg>`,
+
+  // — Cámara nuevos —
+  'summilux':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="3" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="21"/><line x1="3" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="21" y2="12"/><line x1="5.6" y1="5.6" x2="9" y2="9"/><line x1="15" y1="15" x2="18.4" y2="18.4"/><line x1="18.4" y1="5.6" x2="15" y2="9"/><line x1="9" y1="15" x2="5.6" y2="18.4"/></svg>`,
+  'nikkor':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><polyline points="9,8 9,16"/><polyline points="9,8 15,16"/><polyline points="15,8 15,16"/></svg>`,
+  'otus':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="12" r="5"/><circle cx="16" cy="12" r="5"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><line x1="13" y1="12" x2="11" y2="12"/></svg>`,
+  'v-system':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="4" width="16" height="16"/><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/><line x1="8" y1="4" x2="8" y2="20"/><line x1="16" y1="4" x2="16" y2="20"/></svg>`,
+  'polaroid':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="21"/><line x1="3" y1="18" x2="21" y2="18"/><circle cx="12" cy="10" r="3"/></svg>`,
+
+  // — Revelado nuevos —
+  'cianotype':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 L12 21"/><path d="M12 6 Q16 8 16 12 Q16 16 12 18"/><path d="M12 6 Q8 8 8 12 Q8 16 12 18"/><path d="M12 8 Q14 10 14 12 Q14 14 12 16"/></svg>`,
+  'sepia':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 L9 8 Q9 14 12 16 Q15 18 15 21"/><path d="M9 3 L15 3 L15 8 Q15 14 12 16 Q9 18 9 21"/><line x1="7" y1="21" x2="17" y2="21"/><line x1="8" y1="11" x2="16" y2="11"/></svg>`,
+  'cross-process':  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3 L17 7 L7 17 L7 21"/><path d="M7 3 L7 7 L17 17 L17 21"/><polyline points="14,3 17,3 17,6"/><polyline points="10,21 7,21 7,18"/></svg>`,
+  'albumen':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><ellipse cx="12" cy="13" rx="7" ry="8.5"/><path d="M9 9 Q12 5 15 9" stroke-width="1"/></svg>`,
+  'platinum':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="8" width="18" height="8"/><line x1="3" y1="10.5" x2="21" y2="10.5"/><line x1="3" y1="13.5" x2="21" y2="13.5"/><line x1="6" y1="8" x2="6" y2="16"/><line x1="18" y1="8" x2="18" y2="16"/></svg>`,
+  'push-2':         `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14"/><line x1="7" y1="5" x2="7" y2="19"/><line x1="17" y1="5" x2="17" y2="19"/><line x1="12" y1="15" x2="12" y2="9"/><polyline points="9,12 12,9 15,12"/></svg>`,
+
+  // — Ciudades —
+  'tokyo':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="6" y1="21" x2="6" y2="11"/><line x1="18" y1="21" x2="18" y2="11"/><line x1="3" y1="11" x2="21" y2="11"/><path d="M4 8 Q12 4 20 8"/><line x1="8" y1="15" x2="16" y2="15"/></svg>`,
+  'madrid':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="15" rx="6" ry="5"/><path d="M7 13 Q5 8 4 6"/><path d="M17 13 Q19 8 20 6"/><path d="M4 6 Q3 4 5 5"/><path d="M20 6 Q21 4 19 5"/><circle cx="10" cy="14" r="0.8" fill="currentColor" stroke="none"/><circle cx="14" cy="14" r="0.8" fill="currentColor" stroke="none"/></svg>`,
+  'paris':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 21 L11 14 L12 4 L13 14 L14 21"/><line x1="7" y1="21" x2="17" y2="21"/><line x1="10" y1="12" x2="14" y2="12"/><line x1="10" y1="17" x2="14" y2="17"/><line x1="9" y1="9" x2="15" y2="9"/></svg>`,
+  'new-york':   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="21" x2="22" y2="21"/><rect x="3" y="13" width="4" height="8"/><path d="M9 21 L9 8 L10.5 6 L12 3 L13.5 6 L15 8 L15 21"/><rect x="17" y="14" width="4" height="7"/></svg>`,
+  'london':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="14" width="6" height="7"/><rect x="8" y="8" width="8" height="6"/><path d="M8 8 L12 4 L16 8"/><line x1="12" y1="4" x2="12" y2="2"/><circle cx="12" cy="11" r="2"/></svg>`,
+  'havana':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14 L5 10 L9 8 L15 8 L19 10 L21 14"/><line x1="3" y1="14" x2="21" y2="14"/><line x1="3" y1="14" x2="3" y2="16"/><line x1="21" y1="14" x2="21" y2="16"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><line x1="9" y1="11" x2="14" y2="11"/></svg>`,
+  'mumbai':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 21 L5 12 Q5 5 12 5 Q19 5 19 12 L19 21"/><line x1="3" y1="21" x2="21" y2="21"/><line x1="5" y1="16" x2="9" y2="16"/><line x1="15" y1="16" x2="19" y2="16"/><line x1="8" y1="21" x2="8" y2="16"/><line x1="16" y1="21" x2="16" y2="16"/></svg>`,
+  'oslo':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20 L6 10 L9 14 L14 5 L18 12 L22 20"/><line x1="2" y1="20" x2="22" y2="20"/></svg>`,
+  'lisboa':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="10" width="18" height="8"/><line x1="3" y1="14" x2="21" y2="14"/><rect x="5" y="11" width="3" height="2.5"/><rect x="10" y="11" width="3" height="2.5"/><rect x="15" y="11" width="3" height="2.5"/><circle cx="7" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/><line x1="12" y1="10" x2="12" y2="7"/><line x1="7" y1="7" x2="17" y2="7"/></svg>`,
+  'marrakech':  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 21 L7 13 Q7 6 12 6 Q17 6 17 13 L17 21"/><line x1="5" y1="21" x2="19" y2="21"/><line x1="7" y1="17" x2="17" y2="17"/><path d="M9 13 Q12 10 15 13"/></svg>`,
+  'berlin':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="20" x2="22" y2="20"/><rect x="4" y="10" width="6" height="10"/><rect x="14" y="6" width="6" height="14"/><path d="M10 10 L14 6"/><line x1="17" y1="6" x2="17" y2="3"/><line x1="15" y1="3" x2="19" y2="3"/></svg>`,
+  'monte-fuji': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20 L8 9 L11 12 L12 10 L13 12 L16 9 L22 20"/><line x1="2" y1="20" x2="22" y2="20"/><path d="M10 9 L12 5 L14 9"/></svg>`,
+  'copenhague': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="7"/><rect x="9" y="7" width="6" height="11"/><rect x="4" y="12" width="5" height="6"/><rect x="15" y="12" width="5" height="6"/><line x1="2" y1="18" x2="22" y2="18"/></svg>`,
+
+  // — Grano: emulsiones clásicas —
+  'tri-x':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="6" y="4" width="12" height="16" rx="1"/><line x1="6" y1="7" x2="18" y2="7"/><line x1="6" y1="17" x2="18" y2="17"/><circle cx="12" cy="12" r="2.5"/><rect x="4" y="2" width="2" height="3" rx="0.5"/><rect x="18" y="2" width="2" height="3" rx="0.5"/></svg>`,
+  'hp5':            `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="6" width="20" height="12"/><line x1="6" y1="6" x2="6" y2="18"/><line x1="18" y1="6" x2="18" y2="18"/><rect x="3" y="8" width="2" height="2.5" fill="currentColor" stroke="none"/><rect x="3" y="12.5" width="2" height="2.5" fill="currentColor" stroke="none"/><rect x="19" y="8" width="2" height="2.5" fill="currentColor" stroke="none"/><rect x="19" y="12.5" width="2" height="2.5" fill="currentColor" stroke="none"/></svg>`,
+  'delta':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 L21 20 L3 20 Z"/><line x1="7.5" y1="15" x2="16.5" y2="15"/><line x1="9.5" y1="11.5" x2="14.5" y2="11.5"/></svg>`,
+  'acros':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="8" width="3" height="8" fill="currentColor" stroke="none" opacity="0.9"/><rect x="6.5" y="9.5" width="3" height="6.5" fill="currentColor" stroke="none" opacity="0.7"/><rect x="11" y="11" width="3" height="5" fill="currentColor" stroke="none" opacity="0.5"/><rect x="15.5" y="12.5" width="3" height="3.5" fill="currentColor" stroke="none" opacity="0.3"/><rect x="20" y="14" width="2" height="2" fill="currentColor" stroke="none" opacity="0.15"/><line x1="2" y1="20" x2="22" y2="20"/></svg>`,
+  'tmax':           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="18" x2="22" y2="18"/><line x1="2" y1="8" x2="22" y2="8"/><line x1="2" y1="13" x2="22" y2="13" stroke-dasharray="2 2"/><line x1="2" y1="8" x2="22" y2="18"/></svg>`,
+  'ortho':          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,3 22,21 2,21"/><line x1="12" y1="3" x2="7" y2="21"/><line x1="12" y1="3" x2="17" y2="21"/><line x1="4" y1="16" x2="20" y2="16"/></svg>`,
+  'fomapan':        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="21"/><line x1="3" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="21" y2="12"/><line x1="5.6" y1="5.6" x2="9.5" y2="9.5"/></svg>`,
+  'kentmere':       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="22" x2="12" y2="8"/><path d="M12 14 Q8 12 6 8 Q10 8 12 14"/><path d="M12 10 Q16 8 18 4 Q14 4 12 10"/><path d="M12 18 Q8 16 7 12 Q10 12 12 18"/></svg>`,
+};
+
+// ── Construir formatos de recorte ──
+const cropFormatsEl = document.getElementById('crop-formats');
+CROP_FORMATS.forEach(fmt => {
+  if (fmt.id === 'custom') return; // inputs siempre visibles, no necesita botón
+  const [rx, ry, rw, rh] = fmt.svgRect;
+  const btn = document.createElement('button');
+  btn.className = 'btn-crop' + (fmt.id === 'free' ? ' active' : '');
+  btn.dataset.id = fmt.id;
+  btn.innerHTML = `
+    <svg class="crop-shape" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="1.4" stroke-linecap="round">
+      <rect x="${rx}" y="${ry}" width="${rw}" height="${rh}"/>
+    </svg>
+    <span class="crop-name">${fmt.label}<br><span style="opacity:.6">${fmt.sub}</span></span>
+  `;
+  btn.addEventListener('click', () => setCropFormat(fmt.id, btn));
+  cropFormatsEl.appendChild(btn);
+});
+
+function setCropFormat(id, btn) {
+  if (cropMode && activeCropFormat === id) return;
+  if (cropMode) exitCropMode(false);
+  activeCropFormat = id;
+  cropFormatsEl.querySelectorAll('.btn-crop').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('crop-custom-inputs').classList.toggle('visible', id === 'free');
+  if (originalImage) enterCropMode();
+  else updateCropOverlay();
+}
+
+function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+
+const cropWInput  = document.getElementById('crop-custom-w');
+const cropHInput  = document.getElementById('crop-custom-h');
+const cropRatioW  = document.getElementById('crop-ratio-w');
+const cropRatioH  = document.getElementById('crop-ratio-h');
+
+// Actualiza los inputs de proporción a partir de los valores de píxeles
+function syncInputsFromCropRect() {
+  if (!canvas.width || !canvas.height) return;
+  const sw = Math.round((cropRect.x2 - cropRect.x1) * canvas.width);
+  const sh = Math.round((cropRect.y2 - cropRect.y1) * canvas.height);
+  cropWInput.value = sw;
+  cropHInput.value = sh;
+  syncRatioFromPixels();
+}
+
+function syncRatioFromPixels() {
+  const w = parseInt(cropWInput.value);
+  const h = parseInt(cropHInput.value);
+  if (w > 0 && h > 0) {
+    const g = gcd(w, h);
+    cropRatioW.value = w / g;
+    cropRatioH.value = h / g;
+  }
+}
+
+// Rellena píxeles y proporción con las dimensiones del canvas actual
+function updateRatioDisplay() {
+  const srcW = appliedCrop ? appliedCrop.sw : (originalImage ? originalImage.width  : null);
+  const srcH = appliedCrop ? appliedCrop.sh : (originalImage ? originalImage.height : null);
+  if (srcW && srcH) {
+    cropWInput.value = srcW;
+    cropHInput.value = srcH;
+    syncRatioFromPixels();
+  }
+}
+
+// Píxel W cambia → recalcula H y actualiza ratio
+cropWInput.addEventListener('input', () => {
+  const rw = parseInt(cropRatioW.value) || 1;
+  const rh = parseInt(cropRatioH.value) || 1;
+  if (cropWInput.value) cropHInput.value = Math.round(parseInt(cropWInput.value) * rh / rw) || '';
+  syncRatioFromPixels();
+  onPixelInputChange();
+});
+
+// Píxel H cambia → recalcula W y actualiza ratio
+cropHInput.addEventListener('input', () => {
+  const rw = parseInt(cropRatioW.value) || 1;
+  const rh = parseInt(cropRatioH.value) || 1;
+  if (cropHInput.value) cropWInput.value = Math.round(parseInt(cropHInput.value) * rw / rh) || '';
+  syncRatioFromPixels();
+  onPixelInputChange();
+});
+
+// Proporción W cambia → recalcula H de píxeles
+cropRatioW.addEventListener('input', () => {
+  const rw = parseInt(cropRatioW.value) || 1;
+  const rh = parseInt(cropRatioH.value) || 1;
+  if (cropWInput.value) cropHInput.value = Math.round(parseInt(cropWInput.value) * rh / rw) || '';
+  onPixelInputChange();
+});
+
+// Proporción H cambia → recalcula W de píxeles
+cropRatioH.addEventListener('input', () => {
+  const rw = parseInt(cropRatioW.value) || 1;
+  const rh = parseInt(cropRatioH.value) || 1;
+  if (cropHInput.value) cropWInput.value = Math.round(parseInt(cropHInput.value) * rw / rh) || '';
+  onPixelInputChange();
+});
+
+function onPixelInputChange() {
+  if (activeCropFormat === 'free') {
+    if (originalImage && !cropMode) enterCropMode();
+    else if (cropMode) { initCropRect(); updateCropOverlay(); }
+  }
+}
+
+// ── Overlay de recorte ──
+const overlayCanvas = document.getElementById('crop-overlay-canvas');
+const overlayCtx    = overlayCanvas.getContext('2d');
+
+// ── Modo recorte interactivo ──
+function getActiveRatio() {
+  if (activeCropFormat === 'free' || activeCropFormat === 'custom') {
+    const cw = parseFloat(document.getElementById('crop-custom-w').value) || 1080;
+    const ch = parseFloat(document.getElementById('crop-custom-h').value) || 1350;
+    return cw / ch;
+  }
+  const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
+  return fmt ? fmt.ratio : null;
+}
+
+function initCropRect() {
+  const ratio = getActiveRatio();
+  const r = canvas.getBoundingClientRect();
+  const dw = r.width || 1, dh = r.height || 1;
+  const margin = 0.06;
+  const avail  = 1 - 2 * margin;
+
+  if (!ratio) { cropRect = { x1: 0, y1: 0, x2: 1, y2: 1 }; return; }
+
+  const canvasRatio = dw / dh;
+  let fw, fh;
+  if (canvasRatio > ratio) { fh = avail; fw = fh * ratio * dh / dw; }
+  else                     { fw = avail; fh = fw * dw / (ratio * dh); }
+
+  cropRect = { x1: (1-fw)/2, y1: (1-fh)/2, x2: (1+fw)/2, y2: (1+fh)/2 };
+}
+
+function enterCropMode() {
+  if (!originalImage) return;
+  cropMode = true;
+  initCropRect();
+  syncInputsFromCropRect();
+  overlayCanvas.classList.add('crop-active');
+  document.getElementById('crop-mode-bar').classList.add('visible');
+  updateCropOverlay();
+}
+
+function exitCropMode(apply) {
+  cropMode = false;
+  overlayCanvas.classList.remove('crop-active');
+  overlayCanvas.style.cursor = '';
+  document.getElementById('crop-mode-bar').classList.remove('visible');
+
+  if (apply && originalImage) {
+    saveHistory(captureState());
+    const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
+    let exportW, exportH;
+    if (activeCropFormat === 'free' || activeCropFormat === 'custom') {
+      exportW = parseFloat(document.getElementById('crop-custom-w').value) || Math.round((cropRect.x2 - cropRect.x1) * canvas.width);
+      exportH = parseFloat(document.getElementById('crop-custom-h').value) || Math.round((cropRect.y2 - cropRect.y1) * canvas.height);
+    } else if (fmt) {
+      exportW = fmt.exportW; exportH = fmt.exportH;
+    }
+    if (exportW && exportH) {
+      const sx = Math.round(Math.max(0, cropRect.x1 * canvas.width));
+      const sy = Math.round(Math.max(0, cropRect.y1 * canvas.height));
+      const sw = Math.round(Math.min(canvas.width  - sx, (cropRect.x2 - cropRect.x1) * canvas.width));
+      const sh = Math.round(Math.min(canvas.height - sy, (cropRect.y2 - cropRect.y1) * canvas.height));
+      appliedCrop = { sx, sy, sw: Math.max(1, sw), sh: Math.max(1, sh), exportW, exportH };
+    }
+    overlayCanvas.style.display = 'none';
+    activeCropFormat = 'free';
+    cropFormatsEl.querySelectorAll('.btn-crop').forEach(b => b.classList.toggle('active', b.dataset.id === 'free'));
+    document.getElementById('crop-custom-inputs').classList.add('visible');
+    applyFilters();
+  } else {
+    initCropRect();
+    updateCropOverlay();
+  }
+}
+document.getElementById('btn-crop-apply').addEventListener('click', () => exitCropMode(true));
+document.getElementById('btn-crop-cancel').addEventListener('click', () => exitCropMode(false));
+
+// ── Interacción con esquinas y bordes del marco ──
+function getCropHit(clientX, clientY) {
+  const r = overlayCanvas.getBoundingClientRect();
+  const px = clientX - r.left, py = clientY - r.top;
+  const w = r.width, h = r.height;
+  const x1 = cropRect.x1 * w, y1 = cropRect.y1 * h;
+  const x2 = cropRect.x2 * w, y2 = cropRect.y2 * h;
+  const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+  const R = CROP_HANDLE_R;
+
+  // Corners first (priority)
+  const corners = { tl:[x1,y1], tr:[x2,y1], bl:[x1,y2], br:[x2,y2] };
+  for (const [name, [hx, hy]] of Object.entries(corners)) {
+    if (Math.hypot(px - hx, py - hy) <= R) return { type: 'corner', corner: name };
+  }
+  // Edge midpoints
+  if (Math.hypot(px - mx, py - y1) <= R) return { type: 'edge', edge: 'top' };
+  if (Math.hypot(px - mx, py - y2) <= R) return { type: 'edge', edge: 'bottom' };
+  if (Math.hypot(px - x1, py - my) <= R) return { type: 'edge', edge: 'left' };
+  if (Math.hypot(px - x2, py - my) <= R) return { type: 'edge', edge: 'right' };
+  // Edge lines (full length, tighter zone)
+  const EZ = 6;
+  if (py >= y1 && py <= y2) {
+    if (Math.abs(px - x1) <= EZ) return { type: 'edge', edge: 'left' };
+    if (Math.abs(px - x2) <= EZ) return { type: 'edge', edge: 'right' };
+  }
+  if (px >= x1 && px <= x2) {
+    if (Math.abs(py - y1) <= EZ) return { type: 'edge', edge: 'top' };
+    if (Math.abs(py - y2) <= EZ) return { type: 'edge', edge: 'bottom' };
+  }
+  // Interior → move
+  if (px >= x1 && px <= x2 && py >= y1 && py <= y2) return { type: 'move' };
+  return null;
+}
+
+const HANDLE_CURSORS = {
+  tl: 'nwse-resize', tr: 'nesw-resize', bl: 'nesw-resize', br: 'nwse-resize',
+  top: 'n-resize', bottom: 's-resize', left: 'w-resize', right: 'e-resize',
+};
+
+function applyCropDrag(clientX, clientY) {
+  const r = overlayCanvas.getBoundingClientRect();
+  const dx = (clientX - _cropDrag.clientX) / r.width;
+  const dy = (clientY - _cropDrag.clientY) / r.height;
+  const sr = _cropDrag.startRect;
+  const MIN = 0.04;
+  const ratio = getActiveRatio();
+  const dw = r.width, dh = r.height;
+
+  if (_cropDrag.type === 'move') {
+    const rw = sr.x2 - sr.x1, rh = sr.y2 - sr.y1;
+    const nx1 = Math.max(0, Math.min(1 - rw, sr.x1 + dx));
+    const ny1 = Math.max(0, Math.min(1 - rh, sr.y1 + dy));
+    cropRect = { x1: nx1, y1: ny1, x2: nx1 + rw, y2: ny1 + rh };
+
+  } else if (_cropDrag.type === 'edge') {
+    let nx1 = sr.x1, ny1 = sr.y1, nx2 = sr.x2, ny2 = sr.y2;
+    const { edge } = _cropDrag;
+    const cx = (sr.x1 + sr.x2) / 2, cy = (sr.y1 + sr.y2) / 2;
+
+    if (edge === 'top')    ny1 = Math.min(sr.y2 - MIN, sr.y1 + dy);
+    else if (edge === 'bottom') ny2 = Math.max(sr.y1 + MIN, sr.y2 + dy);
+    else if (edge === 'left')   nx1 = Math.min(sr.x2 - MIN, sr.x1 + dx);
+    else if (edge === 'right')  nx2 = Math.max(sr.x1 + MIN, sr.x2 + dx);
+
+    cropRect = {
+      x1: Math.max(0, Math.min(1, nx1)), y1: Math.max(0, Math.min(1, ny1)),
+      x2: Math.max(0, Math.min(1, nx2)), y2: Math.max(0, Math.min(1, ny2)),
+    };
+
+  } else {
+    // Corner
+    const { corner } = _cropDrag;
+    let nx1 = sr.x1, ny1 = sr.y1, nx2 = sr.x2, ny2 = sr.y2;
+    if (corner === 'tl') { nx1 = Math.min(sr.x2 - MIN, sr.x1 + dx); ny1 = Math.min(sr.y2 - MIN, sr.y1 + dy); }
+    else if (corner === 'tr') { nx2 = Math.max(sr.x1 + MIN, sr.x2 + dx); ny1 = Math.min(sr.y2 - MIN, sr.y1 + dy); }
+    else if (corner === 'bl') { nx1 = Math.min(sr.x2 - MIN, sr.x1 + dx); ny2 = Math.max(sr.y1 + MIN, sr.y2 + dy); }
+    else if (corner === 'br') { nx2 = Math.max(sr.x1 + MIN, sr.x2 + dx); ny2 = Math.max(sr.y1 + MIN, sr.y2 + dy); }
+
+    if (ratio) {
+      const nw = (nx2 - nx1) * dw;
+      const nhN = (nw / ratio) / dh;
+      if (corner === 'tl' || corner === 'bl') {
+        if (corner === 'tl') ny1 = ny2 - nhN; else ny2 = ny1 + nhN;
+      } else {
+        if (corner === 'tr') ny1 = ny2 - nhN; else ny2 = ny1 + nhN;
+      }
+    }
+
+    cropRect = {
+      x1: Math.max(0, Math.min(1, nx1)), y1: Math.max(0, Math.min(1, ny1)),
+      x2: Math.max(0, Math.min(1, nx2)), y2: Math.max(0, Math.min(1, ny2)),
+    };
+  }
+  syncInputsFromCropRect();
+  updateCropOverlay();
+}
+
+overlayCanvas.addEventListener('mousedown', e => {
+  if (!cropMode) return;
+  const hit = getCropHit(e.clientX, e.clientY);
+  if (hit) { _cropDrag = { ...hit, clientX: e.clientX, clientY: e.clientY, startRect: { ...cropRect } }; e.preventDefault(); }
+});
+window.addEventListener('mousemove', e => {
+  if (!cropMode) return;
+  if (_cropDrag) { applyCropDrag(e.clientX, e.clientY); return; }
+  const hit = getCropHit(e.clientX, e.clientY);
+  overlayCanvas.style.cursor = hit
+    ? (hit.type === 'corner' ? HANDLE_CURSORS[hit.corner] : hit.type === 'edge' ? HANDLE_CURSORS[hit.edge] : 'move')
+    : 'default';
+});
+window.addEventListener('mouseup', () => { _cropDrag = null; });
+
+overlayCanvas.addEventListener('touchstart', e => {
+  if (!cropMode) return;
+  const t = e.touches[0];
+  const hit = getCropHit(t.clientX, t.clientY);
+  if (hit) { _cropDrag = { ...hit, clientX: t.clientX, clientY: t.clientY, startRect: { ...cropRect } }; e.preventDefault(); }
+}, { passive: false });
+window.addEventListener('touchmove', e => {
+  if (!cropMode || !_cropDrag) return;
+  const t = e.touches[0];
+  applyCropDrag(t.clientX, t.clientY);
+  e.preventDefault();
+}, { passive: false });
+window.addEventListener('touchend', () => { _cropDrag = null; });
+
+function updateCropOverlay() {
+  if (!originalImage) { overlayCanvas.style.display = 'none'; return; }
+
+  const canvasRect = canvas.getBoundingClientRect();
+  const areaRect   = document.getElementById('canvas-area').getBoundingClientRect();
+  const w = canvasRect.width, h = canvasRect.height;
+
+  overlayCanvas.width  = w; overlayCanvas.height = h;
+  overlayCanvas.style.width  = w + 'px'; overlayCanvas.style.height = h + 'px';
+  overlayCanvas.style.left   = (canvasRect.left - areaRect.left) + 'px';
+  overlayCanvas.style.top    = (canvasRect.top  - areaRect.top)  + 'px';
+  overlayCanvas.style.display = 'block';
+
+  const x  = cropRect.x1 * w, y  = cropRect.y1 * h;
+  const cw = (cropRect.x2 - cropRect.x1) * w, ch = (cropRect.y2 - cropRect.y1) * h;
+
+  overlayCtx.clearRect(0, 0, w, h);
+
+  // Sombra fuera del recorte
+  overlayCtx.fillStyle = 'rgba(0,0,0,0.58)';
+  overlayCtx.fillRect(0, 0, w, h);
+  overlayCtx.clearRect(x, y, cw, ch);
+
+  // Tercios
+  overlayCtx.strokeStyle = 'rgba(255,255,255,0.18)';
+  overlayCtx.lineWidth = 0.5;
+  overlayCtx.beginPath();
+  for (let i = 1; i < 3; i++) {
+    overlayCtx.moveTo(x + cw * i/3, y); overlayCtx.lineTo(x + cw * i/3, y + ch);
+    overlayCtx.moveTo(x, y + ch * i/3); overlayCtx.lineTo(x + cw, y + ch * i/3);
+  }
+  overlayCtx.stroke();
+
+  // Borde
+  overlayCtx.strokeStyle = 'rgba(255,255,255,0.4)';
+  overlayCtx.lineWidth = 1;
+  overlayCtx.strokeRect(x, y, cw, ch);
+
+  // Asas L en esquinas
+  const arm = Math.min(cw, ch) * 0.12;
+  overlayCtx.strokeStyle = 'rgba(255,255,255,0.95)';
+  overlayCtx.lineWidth = 2;
+  overlayCtx.lineCap = 'square';
+  overlayCtx.beginPath();
+  [[x, y, 1, 1], [x+cw, y, -1, 1], [x, y+ch, 1, -1], [x+cw, y+ch, -1, -1]].forEach(([cx, cy, sx, sy]) => {
+    overlayCtx.moveTo(cx + sx * arm, cy); overlayCtx.lineTo(cx, cy); overlayCtx.lineTo(cx, cy + sy * arm);
+  });
+  overlayCtx.stroke();
+  overlayCtx.lineCap = 'butt';
+
+  // Indicadores arrastrables (esquinas + bordes)
+  if (cropMode) {
+    overlayCtx.fillStyle = 'rgba(255,255,255,0.06)';
+    overlayCtx.fillRect(x, y, cw, ch);
+    const hs = 5;
+    overlayCtx.fillStyle = 'rgba(255,255,255,0.92)';
+    // Edge midpoints (rectangles alargados)
+    const es = 14, et = 4;
+    [[x+cw/2-es/2, y-et/2, es, et], [x+cw/2-es/2, y+ch-et/2, es, et],
+     [x-et/2, y+ch/2-es/2, et, es], [x+cw-et/2, y+ch/2-es/2, et, es]]
+      .forEach(([rx, ry, rw2, rh2]) => overlayCtx.fillRect(rx, ry, rw2, rh2));
+    // Corners
+    [[x, y], [x+cw, y], [x, y+ch], [x+cw, y+ch]].forEach(([hx, hy]) => {
+      overlayCtx.fillRect(hx - hs, hy - hs, hs*2, hs*2);
+    });
+  }
+}
+
+// ── Grupos de presets ──
+const GROUPS = [
+  { label: 'Luz',      keys: ['golden-hour','first-light','dead-of-night','blue-hour','midday','overcast','storm-light','candlelight','neon-night','platinum-sky'] },
+  { label: 'Cine',     keys: ['quentin','wes','andy','kubrick','lynch','fellini','bergman','villeneuve','akira','tarkovsky','sorrentino','nolan','sofia','zhao'] },
+  { label: 'Arte',     keys: ['caravaggio','zuloaga','velvet','vermeer','hopper','rembrandt','goya','turner','hockney','klimt','mark'] },
+  { label: 'Cámara',   keys: ['m-system','f-chrome','h-format','wetzlar','capa','summilux','nikkor','otus','v-system','polaroid'] },
+  { label: 'Revelado', keys: ['tobacco','old-money','matte','eastman','cianotype','sepia','cross-process','albumen','platinum','push-2'] },
+  { label: 'Visor',    keys: ['cartier','brassai','doisneau','avedon','newton','eggleston','shore','frank','nadar','strand'] },
+  { label: 'Grano',    keys: ['japanese-grain','silver','tri-x','hp5','delta','acros','tmax','ortho','fomapan','kentmere'] },
+  { label: 'Ciudades', keys: ['tokyo','madrid','paris','new-york','london','havana','mumbai','oslo','lisboa','marrakech','monte-fuji','copenhague','berlin'] },
+];
+
+// ── Iconos de grupos ──
+const GROUP_ICONS = {
+  'Luz':      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7.1" y2="7.1"/><line x1="16.9" y1="16.9" x2="19.1" y2="19.1"/><line x1="19.1" y1="4.9" x2="16.9" y2="7.1"/><line x1="7.1" y1="16.9" x2="4.9" y2="19.1"/></svg>`,
+  'Cine':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="20" height="16"/><line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/><rect x="3" y="7" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="3" y="11" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="3" y="15" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="18.5" y="7" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="18.5" y="11" width="2.5" height="2" fill="currentColor" stroke="none"/><rect x="18.5" y="15" width="2.5" height="2" fill="currentColor" stroke="none"/></svg>`,
+  'Arte':     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c3.1 0 5.6-2.5 5.6-5.6C22 6 17.5 2 12 2z"/><circle cx="7" cy="10" r="1.2" fill="currentColor" stroke="none"/><circle cx="11" cy="7" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="9" r="1.2" fill="currentColor" stroke="none"/></svg>`,
+  'Cámara':   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M8 7 V5 a1 1 0 0 1 1-1 h6 a1 1 0 0 1 1 1 V7"/><circle cx="12" cy="14" r="3.5"/></svg>`,
+  'Revelado': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="20"/><line x1="4" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="20" y2="12"/><line x1="12" y1="12" x2="16" y2="9"/></svg>`,
+  'Visor':    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  'Grano':    `<svg viewBox="0 0 24 24" fill="none"><circle cx="5" cy="6" r="1.1" fill="currentColor"/><circle cx="10" cy="4" r="1.1" fill="currentColor"/><circle cx="15" cy="7" r="1.1" fill="currentColor"/><circle cx="20" cy="5" r="1.1" fill="currentColor"/><circle cx="7" cy="12" r="1.1" fill="currentColor"/><circle cx="13" cy="11" r="1.1" fill="currentColor"/><circle cx="18" cy="13" r="1.1" fill="currentColor"/><circle cx="4" cy="17" r="1.1" fill="currentColor"/><circle cx="10" cy="19" r="1.1" fill="currentColor"/><circle cx="16" cy="17" r="1.1" fill="currentColor"/><circle cx="21" cy="15" r="1.1" fill="currentColor"/></svg>`,
+  'Ciudades': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.7 2 6 4.7 6 8c0 5.3 6 14 6 14s6-8.7 6-14c0-3.3-2.7-6-6-6z"/><circle cx="12" cy="8" r="2.2"/></svg>`,
+};
+
+// ── Construir tab bar + drawers ──
+const tabBar    = document.getElementById('tab-bar');
+const tabDrawer = document.getElementById('tab-drawer');
+let activeTab   = null;
+
+GROUPS.forEach((group, gi) => {
+  // Tab
+  const tab = document.createElement('button');
+  tab.className = 'tab-btn';
+  tab.dataset.group = String(gi);
+  tab.innerHTML = `<span class="tab-icon">${GROUP_ICONS[group.label] || ''}</span><span>${group.label}</span>`;
+  tab.addEventListener('click', () => toggleTab(String(gi), tab));
+  tabBar.appendChild(tab);
+
+  // Drawer container para este grupo (insertado antes de drawer-geo)
+  const container = document.createElement('div');
+  container.className = 'drawer-presets';
+  container.id = 'drawer-group-' + gi;
+  tabDrawer.appendChild(container);
+
+  group.keys.forEach(key => {
+    const preset = PRESETS[key];
+    if (!preset) return;
+    const btn = document.createElement('button');
+    btn.className = 'btn-preset';
+    btn.dataset.key = key;
+    if (preset.color) btn.style.setProperty('--preset-color', preset.color);
+    btn.innerHTML = `
+      <span class="preset-icon">${PRESET_ICONS[key] || ''}</span>
+      <span class="preset-label">${preset.label}</span>
+    `;
+    btn.addEventListener('click', () => applyPreset(key, btn));
+    container.appendChild(btn);
+  });
+});
+
+// ── Scroll hints para indicar que hay más contenido ──
+const hintedGroups = new Set();
+
+function attachScrollFade(el) {
+  if (!el) return;
+  function update() {
+    const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+    el.classList.toggle('scrolled-end', atEnd);
+  }
+  el.addEventListener('scroll', update, { passive: true });
+  update();
+}
+
+function hintScroll(container) {
+  if (!container || container.scrollWidth <= container.clientWidth + 4) return;
+  if (hintedGroups.has(container.id)) return;
+  hintedGroups.add(container.id);
+  // Pequeño bounce para indicar que hay más contenido a la derecha
+  setTimeout(() => {
+    container.scrollTo({ left: 72, behavior: 'smooth' });
+    setTimeout(() => container.scrollTo({ left: 0, behavior: 'smooth' }), 420);
+  }, 180);
+}
+
+function toggleTab(key, clickedTab) {
+  const isSame = activeTab === key;
+
+  // Desactivar todos los tabs y ocultar drawers
+  tabBar.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.drawer-presets').forEach(el => el.classList.remove('visible'));
+
+  if (isSame) {
+    activeTab = null;
+    tabDrawer.classList.remove('open');
+    return;
+  }
+
+  activeTab = key;
+  clickedTab.classList.add('active');
+  const drawer = document.getElementById('drawer-group-' + key);
+  drawer?.classList.add('visible');
+  tabDrawer.classList.add('open');
+
+  // Hint de scroll al abrir el drawer
+  if (drawer) {
+    attachScrollFade(drawer);
+    hintScroll(drawer);
+  }
+}
+
+// Fade en tab-bar al cargar
+attachScrollFade(tabBar);
+
+// ── Aplicar preset ──
+function applyPreset(key, btn) {
+  if (activePreset === key) {
+    saveHistory(captureState());
+    resetSliders();
+    return;
+  }
+  saveHistory(captureState());
+  activePreset = key;
+
+  // Desactiva todos
+  document.querySelectorAll('.btn-preset').forEach(b => {
+    b.classList.remove('active');
+    b.style.borderBottomColor = 'transparent';
+  });
+
+  // Activa este con su color
+  btn.classList.add('active');
+  const color = PRESETS[key].color;
+  btn.style.borderBottomColor = color;
+
+  // Aplica valores
+  const p = PRESETS[key];
+  Object.keys(sliders).forEach(k => {
+    if (p[k] !== undefined) {
+      sliders[k].value = p[k];
+      if (vals[k]) vals[k].textContent = p[k];
+    }
+  });
+
+  // Actualiza texto de anotación con nombre del preset si está vacío
+  const annotInput = document.getElementById('annotation-text');
+  if (!annotInput.value) annotInput.placeholder = PRESETS[key].label + ' / Sevilla 2026';
+
+  applyFilters();
+}
+
+// ── Carga de imagen ──
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) loadImage(e.target.files[0]);
+});
+dropZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropZone.classList.add('drag-over');
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadImage(file);
+});
+
+function loadImage(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      // Reset estado antes de cargar la nueva foto
+      rotationDeg = 0; flipH = false; flipV = false;
+      cropRect = { x1: 0.1, y1: 0.1, x2: 0.9, y2: 0.9 };
+      appliedCrop = null;
+      activePreset = null;
+      resetSliders();
+      undoStack.length = 0;
+      redoStack.length = 0;
+      updateHistoryBtns();
+      document.querySelectorAll('.btn-preset').forEach(b => {
+        b.classList.remove('active');
+        b.style.borderBottomColor = 'transparent';
+      });
+      document.getElementById('before-badge').style.display = 'none';
+
+      originalImage = img;
+      dropZone.style.display = 'none';
+      canvas.style.display = 'block';
+      document.getElementById('btn-change-photo').disabled = false;
+      updateAnnotationState();
+      // Inicializar inputs con las dimensiones reales de la imagen
+      cropWInput.value = img.width;
+      cropHInput.value = img.height;
+      syncRatioFromPixels();
+      applyFilters();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── Cambiar foto ──
+document.getElementById('btn-change-photo').addEventListener('click', () => {
+  if (cropMode) exitCropMode(false);
+  fileInput.value = '';
+  fileInput.click();
+});
+
+// ── Nivelar: rota y escala dentro del canvas (sin CSS transform) ──
+nivelarSlider.addEventListener('input', () => {
+  document.getElementById('val-nivelar').textContent = parseFloat(nivelarSlider.value) + '°';
+  scheduleApplyFilters();
+});
+
+// ── Sharpness: solo afecta al export (muestra valor en UI) ──
+sharpnessSlider.addEventListener('input', () => {
+  document.getElementById('val-sharpness').textContent = sharpnessSlider.value;
+});
+
+// ── Motor de píxeles ──
+function processPixels(data, p) {
+  const contrastFactor = (259 * (p.contrast + 255)) / (255 * (259 - p.contrast));
+  const satFactor      = (p.saturation + 100) / 100;
+  const w              = p.warmth / 100;
+  const lift           = p.liftBlacks * 0.65;
+
+  for (let i = 0; i < data.length; i += 4) {
+    let r = data[i], g = data[i+1], b = data[i+2];
+    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+    // Saturación
+    r = lum + (r - lum) * satFactor;
+    g = lum + (g - lum) * satFactor;
+    b = lum + (b - lum) * satFactor;
+
+    // Tinte en sombras
+    if (p.shadowTint !== 0 && lum < 140) {
+      const t = (p.shadowTint / 100) * (1 - lum / 140) * 20;
+      g += t; r -= t * 0.25; b -= t * 0.15;
+    }
+
+    // Temperatura
+    r += w * 28; g += w * 8; b -= w * 22;
+
+    // Sombras
+    if (p.shadows !== 0 && lum < 128) {
+      const boost = (p.shadows / 100) * (1 - lum / 128) * 55;
+      r += boost; g += boost; b += boost;
+    }
+
+    // Brillo
+    r += p.brightness; g += p.brightness; b += p.brightness;
+
+    // Contraste
+    r = contrastFactor * (r - 128) + 128;
+    g = contrastFactor * (g - 128) + 128;
+    b = contrastFactor * (b - 128) + 128;
+
+    // Recuperar luces
+    if (p.highlightRecovery > 0 && lum > 190) {
+      const pull = ((lum - 190) / 65) * (p.highlightRecovery / 100) * 40;
+      r -= pull; g -= pull; b -= pull;
+    }
+
+    // Lift blacks (matte)
+    if (lift > 0) {
+      r = (r / 255) * (255 - lift) + lift;
+      g = (g / 255) * (255 - lift) + lift;
+      b = (b / 255) * (255 - lift) + lift;
+    }
+
+    // Grano
+    if (p.grain > 0) {
+      const noise = (Math.random() - 0.5) * p.grain * 0.85;
+      r += noise; g += noise; b += noise;
+    }
+
+    data[i]   = Math.min(255, Math.max(0, r));
+    data[i+1] = Math.min(255, Math.max(0, g));
+    data[i+2] = Math.min(255, Math.max(0, b));
+  }
+}
+
+function applyVignette(c, w, h, vignette) {
+  if (vignette <= 0) return;
+  const cx = w / 2, cy = h / 2;
+  const grad = c.createRadialGradient(cx, cy, h * 0.22, cx, cy, h * 0.82);
+  grad.addColorStop(0, 'rgba(0,0,0,0)');
+  grad.addColorStop(1, `rgba(0,0,0,${(vignette / 100) * 0.88})`);
+  c.fillStyle = grad;
+  c.fillRect(0, 0, w, h);
+}
+
+function applyFilters() {
+  if (!originalImage) return;
+
+  const border = parseInt(sliders.borderSize.value);
+  const p = {};
+  Object.keys(sliders).forEach(k => { p[k] = parseInt(sliders[k].value); });
+
+  const srcW = appliedCrop ? appliedCrop.sw : originalImage.width;
+  const srcH = appliedCrop ? appliedCrop.sh : originalImage.height;
+
+  // Rotation swaps canvas dimensions for 90°/270°
+  const rotated90 = rotationDeg === 90 || rotationDeg === 270;
+  const imgW = rotated90 ? srcH : srcW;
+  const imgH = rotated90 ? srcW : srcH;
+  canvas.width  = imgW + border * 2;
+  canvas.height = imgH + border * 2;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.beginPath(); ctx.rect(border, border, imgW, imgH); ctx.clip();
+  ctx.translate(border + imgW / 2, border + imgH / 2);
+
+  const deg = parseFloat(nivelarSlider.value);
+  if (deg !== 0) {
+    const rad = deg * Math.PI / 180;
+    const cosA = Math.abs(Math.cos(rad)), sinA = Math.abs(Math.sin(rad));
+    const scale = Math.max(
+      (imgW * cosA + imgH * sinA) / imgW,
+      (imgW * sinA + imgH * cosA) / imgH
+    );
+    ctx.rotate(rad);
+    ctx.scale(scale, scale);
+  }
+  if (rotationDeg) ctx.rotate(rotationDeg * Math.PI / 180);
+  if (flipH) ctx.scale(-1, 1);
+  if (flipV) ctx.scale(1, -1);
+
+  if (appliedCrop) {
+    ctx.drawImage(originalImage, appliedCrop.sx, appliedCrop.sy, srcW, srcH, -srcW / 2, -srcH / 2, srcW, srcH);
+  } else {
+    ctx.drawImage(originalImage, -srcW / 2, -srcH / 2, srcW, srcH);
+  }
+  ctx.restore();
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  processPixels(imageData.data, p);
+  ctx.putImageData(imageData, 0, 0);
+  applyVignette(ctx, canvas.width, canvas.height, p.vignette);
+
+  // Anotación manuscrita sobre el borde blanco
+  const annotToggle = document.getElementById('annotation-toggle');
+  const annotInput  = document.getElementById('annotation-text');
+  if (annotToggle?.checked && border > 0) {
+    const text = annotInput.value || annotInput.placeholder;
+    const fontSize = Math.max(22, border * 0.38);
+    ctx.save();
+    ctx.font = `${fontSize}px 'Pinyon Script', cursive`;
+    ctx.fillStyle = '#1a1a1a';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, canvas.width / 2, canvas.height - border * 0.32);
+    ctx.restore();
+  }
+}
+
+// ── Sliders: escuchar cambios ──
+Object.entries(sliders).forEach(([key, slider]) => {
+  let _pre = null;
+  slider.addEventListener('mousedown',  () => { _pre = captureState(); });
+  slider.addEventListener('touchstart', () => { _pre = captureState(); }, { passive: true });
+  slider.addEventListener('change',     () => { if (_pre) { saveHistory(_pre); _pre = null; } });
+  slider.addEventListener('input', () => {
+    if (vals[key]) vals[key].textContent = slider.value + (key === 'warmth' ? '°' : '');
+    activePreset = null;
+    document.querySelectorAll('.btn-preset').forEach(b => {
+      b.classList.remove('active');
+      b.style.borderBottomColor = 'transparent';
+    });
+    scheduleApplyFilters();
+  });
+});
+
+// ── Exportar ──
+document.getElementById('btn-export').addEventListener('click', () => {
+  if (!originalImage) return;
+
+  const btn = document.getElementById('btn-export');
+  btn.style.opacity = '0.6';
+  btn.style.pointerEvents = 'none';
+
+  document.fonts.load('48px "Pinyon Script"').finally(() => {
+    const exp    = document.createElement('canvas');
+    const expCtx = exp.getContext('2d');
+
+    // Calcular tamaño y recorte
+    let srcX = 0, srcY = 0, srcW = canvas.width, srcH = canvas.height;
+    let expW, expH;
+
+    if (appliedCrop) {
+      expW = appliedCrop.exportW; expH = appliedCrop.exportH;
+    } else if (activeCropFormat !== 'free') {
+      const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
+      if (activeCropFormat === 'custom') {
+        expW = parseFloat(document.getElementById('crop-custom-w').value) || canvas.width;
+        expH = parseFloat(document.getElementById('crop-custom-h').value) || canvas.height;
+        srcX = Math.round(cropRect.x1 * canvas.width);
+        srcY = Math.round(cropRect.y1 * canvas.height);
+        srcW = Math.round((cropRect.x2 - cropRect.x1) * canvas.width);
+        srcH = Math.round((cropRect.y2 - cropRect.y1) * canvas.height);
+      } else if (fmt && fmt.ratio) {
+        expW = fmt.exportW; expH = fmt.exportH;
+        srcX = Math.round(cropRect.x1 * canvas.width);
+        srcY = Math.round(cropRect.y1 * canvas.height);
+        srcW = Math.round((cropRect.x2 - cropRect.x1) * canvas.width);
+        srcH = Math.round((cropRect.y2 - cropRect.y1) * canvas.height);
+      } else {
+        expW = canvas.width; expH = canvas.height;
+      }
+    } else {
+      // Sin recorte activo: exportar el canvas en sus dimensiones reales
+      expW = canvas.width; expH = canvas.height;
+    }
+
+    exp.width  = expW;
+    exp.height = expH;
+
+    expCtx.drawImage(canvas, srcX, srcY, srcW, srcH, 0, 0, expW, expH);
+
+    // Nitidez al exportar
+    const sharpAmount = parseInt(sharpnessSlider.value) / 100;
+    if (sharpAmount > 0) {
+      const imgData = expCtx.getImageData(0, 0, expW, expH);
+      sharpenImageData(imgData, sharpAmount * 0.8);
+      expCtx.putImageData(imgData, 0, 0);
+    }
+
+    const link    = document.createElement('a');
+    const rawName = document.getElementById('filename-input').value.trim();
+    const safeName = rawName.replace(/[^\w\-. ]/g, '').replace(/\s+/g, '-') || 'noir-studio';
+    link.download = safeName + '.jpg';
+    link.href     = exp.toDataURL('image/jpeg', 0.93);
+    link.click();
+
+    btn.style.opacity = '';
+    btn.style.pointerEvents = '';
+  }, 16);
+});
+
+// ── Sharpening (Laplacian unsharp mask) ──
+function sharpenImageData(imageData, amount) {
+  const w   = imageData.width;
+  const h   = imageData.height;
+  const src = new Uint8ClampedArray(imageData.data);
+  const dst = imageData.data;
+
+  for (let y = 1; y < h - 1; y++) {
+    for (let x = 1; x < w - 1; x++) {
+      const i = (y * w + x) * 4;
+      for (let c = 0; c < 3; c++) {
+        const center = src[i + c];
+        const neighbors = src[((y - 1) * w + x) * 4 + c]
+                        + src[((y + 1) * w + x) * 4 + c]
+                        + src[(y * w + x - 1) * 4 + c]
+                        + src[(y * w + x + 1) * 4 + c];
+        dst[i + c] = Math.min(255, Math.max(0,
+          Math.round(center + amount * (4 * center - neighbors))
+        ));
+      }
+    }
+  }
+}
+
+// ── Reset ──
+function resetSliders() {
+  Object.values(sliders).forEach(s => { s.value = s.defaultValue; });
+  Object.keys(vals).forEach(k => { if (vals[k]) vals[k].textContent = sliders[k].defaultValue; });
+  nivelarSlider.value = 0;
+  document.getElementById('val-nivelar').textContent = '0°';
+  document.querySelectorAll('.btn-preset').forEach(b => {
+    b.classList.remove('active');
+    b.style.borderBottomColor = 'transparent';
+  });
+  activePreset = null;
+  // Reset transformaciones
+  rotationDeg = 0; flipH = false; flipV = false;
+  // Reset recorte
+  if (cropMode) exitCropMode(false);
+  appliedCrop = null;
+  activeCropFormat = 'free';
+  cropRect = { x1: 0.1, y1: 0.1, x2: 0.9, y2: 0.9 };
+  cropFormatsEl.querySelectorAll('.btn-crop').forEach(b => b.classList.toggle('active', b.dataset.id === 'free'));
+  document.getElementById('crop-custom-inputs').classList.add('visible');
+  if (originalImage) syncInputsFromCropRect();
+  applyFilters();
+}
+
+document.getElementById('btn-reset').addEventListener('click', resetSliders);
+
+// ── Girar y voltear ──
+document.getElementById('btn-rotate-l').addEventListener('click', () => {
+  saveHistory(captureState());
+  rotationDeg = (rotationDeg + 270) % 360;
+  scheduleApplyFilters();
+});
+document.getElementById('btn-rotate-r').addEventListener('click', () => {
+  saveHistory(captureState());
+  rotationDeg = (rotationDeg + 90) % 360;
+  scheduleApplyFilters();
+});
+document.getElementById('btn-flip-h').addEventListener('click', () => {
+  saveHistory(captureState());
+  flipH = !flipH;
+  scheduleApplyFilters();
+});
+document.getElementById('btn-flip-v').addEventListener('click', () => {
+  saveHistory(captureState());
+  flipV = !flipV;
+  scheduleApplyFilters();
+});
+
+// ── Undo / Redo ──
+document.getElementById('btn-undo').addEventListener('click', undo);
+document.getElementById('btn-redo').addEventListener('click', redo);
+
+// ── Anotación toggle ──
+function updateAnnotationState() {
+  const hasBorder = parseInt(sliders.borderSize.value) > 0;
+  const row = document.querySelector('.annotation-row');
+  const toggle = document.getElementById('annotation-toggle');
+  row.classList.toggle('disabled', !hasBorder);
+  if (!hasBorder && toggle.checked) {
+    toggle.checked = false;
+    document.getElementById('annotation-text').classList.remove('visible');
+  }
+}
+
+document.getElementById('annotation-toggle').addEventListener('change', (e) => {
+  document.getElementById('annotation-text').classList.toggle('visible', e.target.checked);
+  applyFilters();
+});
+document.getElementById('annotation-text').addEventListener('input', scheduleApplyFilters);
+
+sliders.borderSize.addEventListener('input', updateAnnotationState);
+
+// ── Pilares: colapsar/expandir ──
+function togglePillar(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+// ── Atajos de teclado ──
+// A / Espacio: ver antes (mantener pulsado)
+// V: toggle marco blanco
+// B: aplica Zuloaga
+// S: exportar
+function showOriginal() {
+  if (!originalImage || showBefore) return;
+  showBefore = true;
+  document.getElementById('before-badge').style.display = 'block';
+  const border = parseInt(sliders.borderSize.value);
+  canvas.width  = originalImage.width  + border * 2;
+  canvas.height = originalImage.height + border * 2;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(originalImage, border, border);
+}
+
+function hideOriginal() {
+  if (!showBefore) return;
+  showBefore = false;
+  document.getElementById('before-badge').style.display = 'none';
+  applyFilters();
+}
+
+// Soporte: tecla + long press móvil
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+
+  // Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z
+  if (e.ctrlKey || e.metaKey) {
+    if (e.key === 'z' || e.key === 'Z') {
+      e.preventDefault();
+      if (e.shiftKey) redo(); else undo();
+      return;
+    }
+    if (e.key === 'y' || e.key === 'Y') { e.preventDefault(); redo(); return; }
+  }
+
+  if ((e.key.toLowerCase() === 'a' || e.key === ' ') && !e.repeat) {
+    if (e.key === ' ') e.preventDefault();
+    showOriginal();
+    return;
+  }
+
+  switch (e.key.toLowerCase()) {
+    case 'v': {
+      const cur  = parseInt(sliders.borderSize.value);
+      const next = cur > 0 ? 0 : 60;
+      sliders.borderSize.value = next;
+      vals.borderSize.textContent = next;
+      activePreset = null;
+      document.querySelectorAll('.btn-preset').forEach(b => {
+        b.classList.remove('active');
+        b.style.borderBottomColor = 'transparent';
+      });
+      applyFilters();
+      break;
+    }
+    case 'b': {
+      const btn = document.querySelector('.btn-preset[data-key="zuloaga"]');
+      if (btn) applyPreset('zuloaga', btn);
+      break;
+    }
+    case 's': {
+      document.getElementById('btn-export').click();
+      break;
+    }
+  }
+});
+
+document.addEventListener('keyup', e => {
+  if (e.key.toLowerCase() === 'a' || e.key === ' ') hideOriginal();
+});
+
+// Long press en canvas (móvil)
+let longPressTimer = null;
+canvas.addEventListener('touchstart', e => {
+  longPressTimer = setTimeout(showOriginal, 350);
+}, { passive: true });
+canvas.addEventListener('touchend', () => {
+  clearTimeout(longPressTimer);
+  hideOriginal();
+});
+canvas.addEventListener('touchcancel', () => {
+  clearTimeout(longPressTimer);
+  hideOriginal();
+});
+
+// ── Nav móvil ──
+let activeMobileSheet = null;
+
+function toggleMobileSheet(pillarId, btn) {
+  const isSame = activeMobileSheet === pillarId;
+
+  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.pillar').forEach(p => p.classList.remove('mobile-open'));
+
+  if (isSame) {
+    activeMobileSheet = null;
+    return;
+  }
+
+  activeMobileSheet = pillarId;
+  btn.classList.add('active');
+
+  const pillar = document.getElementById(pillarId);
+  pillar.classList.add('mobile-open');
+  pillar.classList.remove('collapsed');
+}
+
+// Exportar desde móvil
+document.getElementById('btn-export-mobile').addEventListener('click', () => {
+  document.getElementById('btn-export').click();
+});
+
+
+// ── URL params para SEO ──
+const params = new URLSearchParams(window.location.search);
+const toolParam = params.get('tool');
+const resolvedTool = toolParam === 'noir' ? 'dead-of-night' : toolParam;
+if (resolvedTool && PRESETS[resolvedTool]) {
+  const btn = document.querySelector(`.btn-preset[data-key="${resolvedTool}"]`);
+  if (btn) applyPreset(resolvedTool, btn);
+}
+if (toolParam === 'border') {
+  sliders.borderSize.value = '60';
+  vals.borderSize.textContent = '60';
+}
+</script>
+</body>
+</html>
