@@ -424,52 +424,69 @@
     .pillar.collapsed .pillar-body { display: none; }
 
     /* ── Controles ── */
-    .control { margin-bottom: 14px; }
+    .control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 13px;
+    }
     .control:last-child { margin-bottom: 0; }
 
-    .control label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.52rem;
-      letter-spacing: 0.15em;
+    .ctrl-label {
+      font-size: 0.46rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--text);
-      margin-bottom: 8px;
+      color: var(--muted);
+      width: 76px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
     }
 
-    .control label span {
+    .ctrl-value {
+      font-size: 0.52rem;
+      letter-spacing: 0.04em;
       color: var(--accent);
       font-variant-numeric: tabular-nums;
-      font-weight: 400;
+      width: 28px;
+      text-align: right;
+      flex-shrink: 0;
     }
 
     input[type="range"] {
       -webkit-appearance: none;
-      width: 100%;
+      flex: 1;
       height: 1px;
       background: #2e2b27;
       outline: none;
       cursor: pointer;
+      padding: 0;
+      margin: 0;
     }
     #warmth {
       background: linear-gradient(to right, #3a6a8a 0%, #2a2723 50%, #a06828 100%);
     }
-    .warmth-ends {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 4px;
-    }
-    .warmth-cold { font-size: 0.38rem; letter-spacing: 0.1em; color: #5a8aaa; }
-    .warmth-warm { font-size: 0.38rem; letter-spacing: 0.1em; color: #a06828; }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 9px; height: 9px;
-      border-radius: 50%;
-      background: var(--accent);
+      width: 14px;
+      height: 20px;
+      background-color: transparent;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='20'%3E%3Crect x='0' y='0' width='14' height='2' fill='%23e8e2d8'/%3E%3Crect x='6' y='2' width='2' height='18' fill='%23e8e2d8'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
       cursor: pointer;
-      transition: transform 0.15s;
+      margin-top: -2px;
+      border: none;
     }
-    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+    input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 20px;
+      background-color: transparent;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='20'%3E%3Crect x='0' y='0' width='14' height='2' fill='%23e8e2d8'/%3E%3Crect x='6' y='2' width='2' height='18' fill='%23e8e2d8'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      border: none;
+      border-radius: 0;
+      cursor: pointer;
+    }
 
     /* ── Anotación ── */
     .annotation-row {
@@ -574,6 +591,11 @@
 
     .footer-info {
       display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .footer-name-row {
+      display: flex;
       align-items: center;
       gap: 6px;
     }
@@ -584,6 +606,24 @@
       color: var(--muted);
       white-space: nowrap;
     }
+    #exif-bar {
+      display: none;
+      align-items: center;
+      gap: 14px;
+    }
+    #exif-bar.visible { display: flex; }
+    .exif-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.46rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .exif-item svg { opacity: 0.5; flex-shrink: 0; }
+    .exif-val { color: var(--text); }
     #filename-input {
       background: transparent;
       border: none;
@@ -984,27 +1024,27 @@
       <div class="pillar-body">
 
         <div class="control">
-          <label>Temperatura <span id="val-warmth">0°</span></label>
+          <span class="ctrl-label">Temperatura</span>
           <input type="range" id="warmth" min="-100" max="100" value="0">
-          <div class="warmth-ends">
-            <span class="warmth-cold">−100°</span>
-            <span class="warmth-warm">+100°</span>
-          </div>
+          <span class="ctrl-value" id="val-warmth">0°</span>
         </div>
 
         <div class="control">
-          <label>Saturación <span id="val-saturation">0</span></label>
+          <span class="ctrl-label">Saturación</span>
           <input type="range" id="saturation" min="-100" max="100" value="0">
+          <span class="ctrl-value" id="val-saturation">0</span>
         </div>
 
         <div class="control">
-          <label>Negros lavados <span id="val-liftBlacks">0</span></label>
+          <span class="ctrl-label">Lavados</span>
           <input type="range" id="liftBlacks" min="0" max="100" value="0">
+          <span class="ctrl-value" id="val-liftBlacks">0</span>
         </div>
 
         <div class="control">
-          <label>Tinte sombras <span id="val-shadowTint">0</span></label>
+          <span class="ctrl-label">Tinte</span>
           <input type="range" id="shadowTint" min="-100" max="100" value="0">
+          <span class="ctrl-value" id="val-shadowTint">0</span>
         </div>
 
       </div>
@@ -1034,18 +1074,21 @@
       <div class="pillar-body">
 
         <div class="control">
-          <label>Grano <span id="val-grain">0</span></label>
+          <span class="ctrl-label">Grano</span>
           <input type="range" id="grain" min="0" max="100" value="0">
+          <span class="ctrl-value" id="val-grain">0</span>
         </div>
 
         <div class="control">
-          <label>Nitidez <span id="val-sharpness">45</span></label>
+          <span class="ctrl-label">Nitidez</span>
           <input type="range" id="sharpness" min="0" max="100" value="45">
+          <span class="ctrl-value" id="val-sharpness">45</span>
         </div>
 
         <div class="control">
-          <label>Viñeta <span id="val-vignette">0</span></label>
+          <span class="ctrl-label">Viñeta</span>
           <input type="range" id="vignette" min="0" max="100" value="0">
+          <span class="ctrl-value" id="val-vignette">0</span>
         </div>
 
       </div>
@@ -1070,23 +1113,27 @@
       <div class="pillar-body">
 
         <div class="control">
-          <label>Luminancia <span id="val-brightness">0</span></label>
+          <span class="ctrl-label">Brillo</span>
           <input type="range" id="brightness" min="-100" max="100" value="0">
+          <span class="ctrl-value" id="val-brightness">0</span>
         </div>
 
         <div class="control">
-          <label>Contraste <span id="val-contrast">0</span></label>
+          <span class="ctrl-label">Contraste</span>
           <input type="range" id="contrast" min="-100" max="100" value="0">
+          <span class="ctrl-value" id="val-contrast">0</span>
         </div>
 
         <div class="control">
-          <label>Sombras <span id="val-shadows">0</span></label>
+          <span class="ctrl-label">Sombras</span>
           <input type="range" id="shadows" min="-100" max="100" value="0">
+          <span class="ctrl-value" id="val-shadows">0</span>
         </div>
 
         <div class="control">
-          <label>Luces <span id="val-highlightRecovery">0</span></label>
+          <span class="ctrl-label">Luces</span>
           <input type="range" id="highlightRecovery" min="0" max="100" value="0">
+          <span class="ctrl-value" id="val-highlightRecovery">0</span>
         </div>
 
       </div>
@@ -1106,13 +1153,15 @@
       <div class="pillar-body">
 
         <div class="control">
-          <label>Marco blanco <span id="val-borderSize">0</span></label>
+          <span class="ctrl-label">Marco</span>
           <input type="range" id="borderSize" min="0" max="120" value="0">
+          <span class="ctrl-value" id="val-borderSize">0</span>
         </div>
 
         <div class="control">
-          <label>Nivelar <span id="val-nivelar">0°</span></label>
+          <span class="ctrl-label">Nivelar</span>
           <input type="range" id="nivelar" min="-10" max="10" step="0.5" value="0">
+          <span class="ctrl-value" id="val-nivelar">0°</span>
         </div>
 
         <p class="transform-header">Transformar</p>
@@ -1188,9 +1237,29 @@
 <!-- La Salida -->
 <footer>
   <div class="footer-info">
-    <span class="footer-info-label">Nombre:</span>
-    <input type="text" id="filename-input" placeholder="noir-studio" maxlength="80" spellcheck="false" autocomplete="off">
-    <span class="footer-info-label">.jpg</span>
+    <div class="footer-name-row">
+      <span class="footer-info-label">Nombre:</span>
+      <input type="text" id="filename-input" placeholder="noir-studio" maxlength="80" spellcheck="false" autocomplete="off">
+      <span class="footer-info-label">.jpg</span>
+    </div>
+    <div id="exif-bar">
+      <span class="exif-item">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14"/><path d="M8 7V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><circle cx="12" cy="14" r="3"/></svg>
+        <span class="exif-val" id="exif-camera">—</span>
+      </span>
+      <span class="exif-item">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="12" x2="16" y2="9"/><line x1="12" y1="3" x2="12" y2="5"/></svg>
+        <span class="exif-val" id="exif-exposure">—</span>
+      </span>
+      <span class="exif-item">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+        <span class="exif-val" id="exif-aperture">—</span>
+      </span>
+      <span class="exif-item">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="6" width="18" height="12"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="6" x2="7" y2="18"/></svg>
+        <span class="exif-val" id="exif-iso">—</span>
+      </span>
+    </div>
   </div>
   <button id="btn-export">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:7px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -2561,7 +2630,80 @@ dropZone.addEventListener('drop', e => {
   if (file && file.type.startsWith('image/')) loadImage(file);
 });
 
+function readExif(buffer) {
+  const view = new DataView(buffer);
+  if (view.getUint16(0) !== 0xFFD8) return {};
+  let offset = 2;
+  while (offset < view.byteLength - 4) {
+    const marker = view.getUint16(offset);
+    const len = view.getUint16(offset + 2);
+    if (marker === 0xFFE1) {
+      const exifHeader = String.fromCharCode(...new Uint8Array(buffer, offset + 4, 6));
+      if (!exifHeader.startsWith('Exif')) break;
+      const tiffStart = offset + 10;
+      const endian = view.getUint16(tiffStart);
+      const le = endian === 0x4949;
+      const read16 = o => le ? view.getUint16(tiffStart + o, true) : view.getUint16(tiffStart + o);
+      const read32 = o => le ? view.getUint32(tiffStart + o, true) : view.getUint32(tiffStart + o);
+      const readRat = o => { const n = read32(o); const d = read32(o+4); return d ? n/d : 0; };
+      const ifdOffset = read32(4);
+      const entries = read16(ifdOffset);
+      const tags = {};
+      for (let i = 0; i < entries; i++) {
+        const e = ifdOffset + 2 + i * 12;
+        const tag = read16(e);
+        const type = read16(e + 2);
+        const valOffset = e + 8;
+        if (tag === 0x010F) { // Make
+          const off = read32(valOffset); let s='';
+          for (let j=0; j<32; j++) { const c=view.getUint8(tiffStart+off+j); if(!c) break; s+=String.fromCharCode(c); }
+          tags.make = s.trim();
+        } else if (tag === 0x0110) { // Model
+          const off = read32(valOffset); let s='';
+          for (let j=0; j<64; j++) { const c=view.getUint8(tiffStart+off+j); if(!c) break; s+=String.fromCharCode(c); }
+          tags.model = s.trim();
+        } else if (tag === 0x8769) { // ExifIFD pointer
+          const exifIFD = read32(valOffset);
+          const eEntries = read16(exifIFD);
+          for (let j=0; j<eEntries; j++) {
+            const ee = exifIFD + 2 + j * 12;
+            const etag = read16(ee);
+            const evoff = ee + 8;
+            if (etag === 0x829A) tags.exposureTime = readRat(read32(evoff));
+            else if (etag === 0x829D) tags.fNumber = readRat(read32(evoff));
+            else if (etag === 0x8827) tags.iso = le ? view.getUint16(tiffStart+read32(evoff),true) : view.getUint16(tiffStart+read32(evoff));
+          }
+        }
+      }
+      return tags;
+    }
+    offset += 2 + len;
+  }
+  return {};
+}
+
+function displayExif(tags) {
+  const bar = document.getElementById('exif-bar');
+  if (!tags || (!tags.model && !tags.exposureTime && !tags.fNumber && !tags.iso)) {
+    bar.classList.remove('visible'); return;
+  }
+  bar.classList.add('visible');
+  const cam = tags.model ? (tags.make && !tags.model.toLowerCase().includes(tags.make.toLowerCase()) ? tags.make + ' ' + tags.model : tags.model) : '—';
+  document.getElementById('exif-camera').textContent = cam;
+  if (tags.exposureTime) {
+    const t = tags.exposureTime;
+    document.getElementById('exif-exposure').textContent = t < 1 ? '1/' + Math.round(1/t) + 's' : t.toFixed(1) + 's';
+  }
+  if (tags.fNumber) document.getElementById('exif-aperture').textContent = 'f/' + tags.fNumber.toFixed(1);
+  if (tags.iso) document.getElementById('exif-iso').textContent = 'ISO ' + tags.iso;
+}
+
 function loadImage(file) {
+  // Leer EXIF del binario antes de convertir a dataURL
+  const exifReader = new FileReader();
+  exifReader.onload = ev => displayExif(readExif(ev.target.result));
+  exifReader.readAsArrayBuffer(file);
+
   const reader = new FileReader();
   reader.onload = e => {
     const img = new Image();
@@ -2580,6 +2722,7 @@ function loadImage(file) {
         b.style.borderBottomColor = 'transparent';
       });
       document.getElementById('before-badge').style.display = 'none';
+      document.getElementById('exif-bar').classList.remove('visible');
 
       originalImage = img;
       dropZone.style.display = 'none';
