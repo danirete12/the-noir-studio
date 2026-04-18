@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDisplayName</key>
+    <string>Noir Studio</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.thenoirstudio.app</string>
+    <key>CFBundleName</key>
+    <string>NoirStudio</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>UILaunchStoryboardName</key>
+    <string>LaunchScreen</string>
+    <!-- iPhone únicamente, sin iPad -->
+    <key>UIDeviceFamily</key>
+    <array>
+        <integer>1</integer>
+    </array>
+    <!-- Portrait y portrait upside-down -->
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+    </array>
+    <!-- Status bar oculta (pantalla completa) -->
+    <key>UIStatusBarHidden</key>
+    <true/>
+    <key>UIViewControllerBasedStatusBarAppearance</key>
+    <true/>
+    <!-- iOS 15+ -->
+    <key>MinimumOSVersion</key>
+    <string>15.0</string>
+    <!-- Necesario para guardar fotos exportadas en Fotos -->
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Noir Studio necesita acceso para guardar tus fotos editadas en el carrete.</string>
+    <!-- Acceso a la cámara (para futura funcionalidad) -->
+    <key>NSCameraUsageDescription</key>
+    <string>Noir Studio puede usar la cámara para fotografiar directamente en el editor.</string>
+</dict>
+</plist>
