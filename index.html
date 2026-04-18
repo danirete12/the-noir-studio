@@ -863,22 +863,43 @@
       .pillar-mobile-only { display: none !important; }
       .pillar-mobile-only.mobile-open { display: block !important; }
 
-      /* Presets dentro del pillar móvil */
-      .mobile-preset-group-label {
-        font-size: 0.36rem;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--muted);
-        padding: 10px 14px 2px;
-      }
-      .mobile-preset-scroll {
+      /* Presets VSCO-style: tabs de categoría + strip horizontal */
+      #pillar-presets .pillar-body { overflow: visible; padding: 0; }
+
+      .mobile-preset-cats {
         display: flex;
         overflow-x: auto;
         scrollbar-width: none;
-        padding: 2px 14px 6px;
+        border-bottom: 1px solid var(--border);
+        padding: 0 10px;
       }
-      .mobile-preset-scroll::-webkit-scrollbar { display: none; }
-      #pillar-presets .pillar-body { overflow: visible; padding: 0 0 8px; }
+      .mobile-preset-cats::-webkit-scrollbar { display: none; }
+
+      .mobile-cat-btn {
+        flex: 0 0 auto;
+        background: none;
+        border: none;
+        border-bottom: 1.5px solid transparent;
+        padding: 10px 12px 9px;
+        font-family: var(--font-sans);
+        font-size: 0.52rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+        cursor: pointer;
+        margin-bottom: -1px;
+        white-space: nowrap;
+        transition: color 0.2s, border-color 0.2s;
+      }
+      .mobile-cat-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+      .mobile-preset-strip {
+        display: flex;
+        overflow-x: auto;
+        scrollbar-width: none;
+        padding: 4px 10px 8px;
+      }
+      .mobile-preset-strip::-webkit-scrollbar { display: none; }
 
       /* Header compacto */
       header { padding: 8px 12px; }
@@ -2558,17 +2579,20 @@ GROUPS.forEach((group, gi) => {
   });
 });
 
-// ── Presets en pillar móvil ──
+// ── Presets en pillar móvil — VSCO style ──
 const mobilePresetsBody = document.getElementById('pillar-presets-body');
 if (mobilePresetsBody) {
-  GROUPS.forEach(group => {
-    const label = document.createElement('div');
-    label.className = 'mobile-preset-group-label';
-    label.textContent = group.label;
-    mobilePresetsBody.appendChild(label);
-    const row = document.createElement('div');
-    row.className = 'mobile-preset-scroll';
-    group.keys.forEach(key => {
+  const catsRow = document.createElement('div');
+  catsRow.className = 'mobile-preset-cats';
+  const strip = document.createElement('div');
+  strip.className = 'mobile-preset-strip';
+  let _activeMobileCat = 0;
+
+  function showMobileGroup(gi) {
+    _activeMobileCat = gi;
+    catsRow.querySelectorAll('.mobile-cat-btn').forEach((b, i) => b.classList.toggle('active', i === gi));
+    strip.innerHTML = '';
+    GROUPS[gi].keys.forEach(key => {
       const preset = PRESETS[key];
       if (!preset) return;
       const btn = document.createElement('button');
@@ -2577,10 +2601,22 @@ if (mobilePresetsBody) {
       if (preset.color) btn.style.setProperty('--preset-color', preset.color);
       btn.innerHTML = `<span class="preset-icon">${PRESET_ICONS[key] || ''}</span><span class="preset-label">${preset.label}</span>`;
       btn.addEventListener('click', () => applyPreset(key, btn));
-      row.appendChild(btn);
+      strip.appendChild(btn);
     });
-    mobilePresetsBody.appendChild(row);
+    strip.scrollLeft = 0;
+  }
+
+  GROUPS.forEach((group, gi) => {
+    const tab = document.createElement('button');
+    tab.className = 'mobile-cat-btn' + (gi === 0 ? ' active' : '');
+    tab.textContent = group.label;
+    tab.addEventListener('click', () => showMobileGroup(gi));
+    catsRow.appendChild(tab);
   });
+
+  mobilePresetsBody.appendChild(catsRow);
+  mobilePresetsBody.appendChild(strip);
+  showMobileGroup(0);
 }
 
 // ── Scroll hints para indicar que hay más contenido ──
