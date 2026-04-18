@@ -916,11 +916,10 @@
         height: 0;
       }
 
-      /* Canvas: altura fija en la parte superior */
+      /* Canvas: ocupa todo el espacio sobrante */
       .canvas-area {
-        flex: 0 0 auto;
-        height: 38dvh;
-        min-height: 150px;
+        flex: 1;
+        min-height: 120px;
         padding: 8px;
         overflow: hidden;
         touch-action: none;
@@ -930,10 +929,10 @@
         max-width: 100%;
       }
 
-      /* Panel: ocupa el resto, siempre visible, scrollable */
+      /* Panel: solo tan alto como su contenido, máximo 55dvh */
       .panel {
-        flex: 1;
-        height: 0;
+        flex: 0 0 auto;
+        max-height: 55dvh;
         position: static !important;
         transform: none !important;
         transition: none !important;
@@ -941,7 +940,6 @@
         border-top: 1px solid var(--border);
         border-radius: 0;
         box-shadow: none;
-        max-height: none;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         padding-bottom: 64px;
