@@ -953,10 +953,13 @@
 
       /* Header compacto — 2 filas en móvil */
       header {
-        padding: 8px 12px 0;
+        padding: 5px 12px 0;
         flex-wrap: wrap;
+        gap: 0;
       }
       header .tagline { display: none; }
+      header h1 { font-size: 1rem; }
+      .logo-mark { width: 22px; height: 22px; }
 
       .header-actions {
         width: 100%;
@@ -970,19 +973,19 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 8px 4px;
+        padding: 6px 4px;
         border: none;
         border-right: 1px solid var(--border);
         border-radius: 0;
-        gap: 4px;
-        min-height: 44px;
+        gap: 3px;
+        min-height: 38px;
       }
       .btn-header:last-child { border-right: none; }
-      .btn-header svg { width: 18px; height: 18px; }
+      .btn-header svg { width: 16px; height: 16px; }
       .btn-label {
         display: block;
-        font-size: 0.38rem;
-        letter-spacing: 0.12em;
+        font-size: 0.36rem;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
         font-family: var(--font-sans);
         color: inherit;
@@ -1012,11 +1015,11 @@
         max-width: 100%;
       }
 
-      /* Panel: solo tan alto como su contenido, máximo 55dvh */
+      /* Panel: solo tan alto como su contenido, máximo 48dvh */
       .panel {
         flex: 0 0 auto;
         height: auto !important;
-        max-height: 55dvh;
+        max-height: 48dvh;
         position: static !important;
         transform: none !important;
         transition: none !important;
@@ -1026,14 +1029,32 @@
         box-shadow: none;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        padding-bottom: 64px;
+        overscroll-behavior: contain;
+        padding-bottom: 72px;
         display: block !important;
       }
 
       /* Todos los pilares ocultos por defecto; solo se muestra el activo */
       .pillar { display: none; }
       .pillar.mobile-open { display: block; }
+      .pillar-body { padding: 10px 16px 20px; }
+      .pillar-header { padding: 12px 16px; }
       .panel-footer { display: none; }
+
+      /* Controles más cómodos en touch */
+      .control { margin-bottom: 18px; gap: 8px; }
+      .ctrl-label { font-size: 0.6rem; width: 82px; }
+      .ctrl-value { font-size: 0.7rem; width: 26px; }
+
+      /* Sliders más fáciles de arrastrar */
+      input[type="range"] { height: 2px; }
+      input[type="range"]::-webkit-slider-thumb {
+        width: 16px; height: 16px;
+        margin-top: -7px;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 16px; height: 16px;
+      }
 
       /* Tab bar en móvil */
       .tab-bar { padding: 0 10px; }
