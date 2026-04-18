@@ -2113,6 +2113,7 @@ function redo() {
   applyState(redoStack.pop());
 }
 let showBefore       = false;
+let _previewScale    = 1; // downscale factor for preview canvas
 let activeCropFormat = 'free';
 let appliedCrop = null; // { sx, sy, sw, sh, exportW, exportH } en coords de originalImage
 let rotationDeg = 0;   // 0 | 90 | 180 | 270
@@ -2297,8 +2298,8 @@ const cropRatioH  = document.getElementById('crop-ratio-h');
 // Actualiza los inputs de proporción a partir de los valores de píxeles
 function syncInputsFromCropRect() {
   if (!canvas.width || !canvas.height) return;
-  const sw = Math.round((cropRect.x2 - cropRect.x1) * canvas.width);
-  const sh = Math.round((cropRect.y2 - cropRect.y1) * canvas.height);
+  const sw = Math.round((cropRect.x2 - cropRect.x1) * canvas.width / _previewScale);
+  const sh = Math.round((cropRect.y2 - cropRect.y1) * canvas.height / _previewScale);
   cropWInput.value = sw;
   cropHInput.value = sh;
   syncRatioFromPixels();
@@ -2419,16 +2420,18 @@ function exitCropMode(apply) {
     const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
     let exportW, exportH;
     if (activeCropFormat === 'free' || activeCropFormat === 'custom') {
-      exportW = parseFloat(document.getElementById('crop-custom-w').value) || Math.round((cropRect.x2 - cropRect.x1) * canvas.width);
-      exportH = parseFloat(document.getElementById('crop-custom-h').value) || Math.round((cropRect.y2 - cropRect.y1) * canvas.height);
+      exportW = parseFloat(document.getElementById('crop-custom-w').value) || Math.round((cropRect.x2 - cropRect.x1) * canvas.width / _previewScale);
+      exportH = parseFloat(document.getElementById('crop-custom-h').value) || Math.round((cropRect.y2 - cropRect.y1) * canvas.height / _previewScale);
     } else if (fmt) {
       exportW = fmt.exportW; exportH = fmt.exportH;
     }
     if (exportW && exportH) {
-      const sx = Math.round(Math.max(0, cropRect.x1 * canvas.width));
-      const sy = Math.round(Math.max(0, cropRect.y1 * canvas.height));
-      const sw = Math.round(Math.min(canvas.width  - sx, (cropRect.x2 - cropRect.x1) * canvas.width));
-      const sh = Math.round(Math.min(canvas.height - sy, (cropRect.y2 - cropRect.y1) * canvas.height));
+      const fullW = canvas.width / _previewScale;
+      const fullH = canvas.height / _previewScale;
+      const sx = Math.round(Math.max(0, cropRect.x1 * fullW));
+      const sy = Math.round(Math.max(0, cropRect.y1 * fullH));
+      const sw = Math.round(Math.min(fullW - sx, (cropRect.x2 - cropRect.x1) * fullW));
+      const sh = Math.round(Math.min(fullH - sy, (cropRect.y2 - cropRect.y1) * fullH));
       appliedCrop = { sx, sy, sw: Math.max(1, sw), sh: Math.max(1, sh), exportW, exportH };
     }
     overlayCanvas.style.display = 'none';
@@ -3048,69 +3051,83 @@ function applyVignette(c, w, h, vignette) {
   c.fillRect(0, 0, w, h);
 }
 
-function applyFilters() {
-  if (!originalImage) return;
-
-  const border = parseInt(sliders.borderSize.value);
+function renderToCanvas(tc, tctx, scale) {
+  const border  = parseInt(sliders.borderSize.value);
   const p = {};
   Object.keys(sliders).forEach(k => { p[k] = parseInt(sliders[k].value); });
 
   const srcW = appliedCrop ? appliedCrop.sw : originalImage.width;
   const srcH = appliedCrop ? appliedCrop.sh : originalImage.height;
-
-  // Rotation swaps canvas dimensions for 90°/270°
   const rotated90 = rotationDeg === 90 || rotationDeg === 270;
   const imgW = rotated90 ? srcH : srcW;
   const imgH = rotated90 ? srcW : srcH;
-  canvas.width  = imgW + border * 2;
-  canvas.height = imgH + border * 2;
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.save();
-  ctx.beginPath(); ctx.rect(border, border, imgW, imgH); ctx.clip();
-  ctx.translate(border + imgW / 2, border + imgH / 2);
+  const pBorder = Math.round(border * scale);
+  const pW = Math.round(imgW * scale);
+  const pH = Math.round(imgH * scale);
+  tc.width  = pW + pBorder * 2;
+  tc.height = pH + pBorder * 2;
+  tctx.fillStyle = '#ffffff';
+  tctx.fillRect(0, 0, tc.width, tc.height);
+
+  tctx.save();
+  tctx.beginPath(); tctx.rect(pBorder, pBorder, pW, pH); tctx.clip();
+  tctx.translate(pBorder + pW / 2, pBorder + pH / 2);
 
   const deg = parseFloat(nivelarSlider.value);
   if (deg !== 0) {
     const rad = deg * Math.PI / 180;
     const cosA = Math.abs(Math.cos(rad)), sinA = Math.abs(Math.sin(rad));
-    const scale = Math.max(
-      (imgW * cosA + imgH * sinA) / imgW,
-      (imgW * sinA + imgH * cosA) / imgH
+    const nivelarScale = Math.max(
+      (pW * cosA + pH * sinA) / pW,
+      (pW * sinA + pH * cosA) / pH
     );
-    ctx.rotate(rad);
-    ctx.scale(scale, scale);
+    tctx.rotate(rad);
+    tctx.scale(nivelarScale, nivelarScale);
   }
-  if (rotationDeg) ctx.rotate(rotationDeg * Math.PI / 180);
-  if (flipH) ctx.scale(-1, 1);
-  if (flipV) ctx.scale(1, -1);
+  if (rotationDeg) tctx.rotate(rotationDeg * Math.PI / 180);
+  if (flipH) tctx.scale(-1, 1);
+  if (flipV) tctx.scale(1, -1);
 
   if (appliedCrop) {
-    ctx.drawImage(originalImage, appliedCrop.sx, appliedCrop.sy, srcW, srcH, -srcW / 2, -srcH / 2, srcW, srcH);
+    tctx.drawImage(originalImage, appliedCrop.sx, appliedCrop.sy, srcW, srcH, -pW / 2, -pH / 2, pW, pH);
   } else {
-    ctx.drawImage(originalImage, -srcW / 2, -srcH / 2, srcW, srcH);
+    tctx.drawImage(originalImage, -pW / 2, -pH / 2, pW, pH);
   }
-  ctx.restore();
+  tctx.restore();
 
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const imageData = tctx.getImageData(0, 0, tc.width, tc.height);
   processPixels(imageData.data, p);
-  ctx.putImageData(imageData, 0, 0);
-  applyVignette(ctx, canvas.width, canvas.height, p.vignette);
+  tctx.putImageData(imageData, 0, 0);
+  applyVignette(tctx, tc.width, tc.height, p.vignette);
 
-  // Anotación manuscrita sobre el borde blanco
   const annotToggle = document.getElementById('annotation-toggle');
   const annotInput  = document.getElementById('annotation-text');
-  if (annotToggle?.checked && border > 0) {
+  if (annotToggle?.checked && pBorder > 0) {
     const text = annotInput.value || annotInput.placeholder;
-    const fontSize = Math.max(22, border * 0.38);
-    ctx.save();
-    ctx.font = `${fontSize}px 'Pinyon Script', cursive`;
-    ctx.fillStyle = '#1a1a1a';
-    ctx.textAlign = 'center';
-    ctx.fillText(text, canvas.width / 2, canvas.height - border * 0.32);
-    ctx.restore();
+    const fontSize = Math.max(12, pBorder * 0.38);
+    tctx.save();
+    tctx.font = `${fontSize}px 'Pinyon Script', cursive`;
+    tctx.fillStyle = '#1a1a1a';
+    tctx.textAlign = 'center';
+    tctx.fillText(text, tc.width / 2, tc.height - pBorder * 0.32);
+    tctx.restore();
   }
+}
+
+function applyFilters() {
+  if (!originalImage) return;
+
+  const border = parseInt(sliders.borderSize.value);
+  const srcW = appliedCrop ? appliedCrop.sw : originalImage.width;
+  const srcH = appliedCrop ? appliedCrop.sh : originalImage.height;
+  const rotated90 = rotationDeg === 90 || rotationDeg === 270;
+  const imgW = rotated90 ? srcH : srcW;
+  const imgH = rotated90 ? srcW : srcH;
+
+  const MAX_PREVIEW = 1200;
+  _previewScale = Math.min(1, MAX_PREVIEW / Math.max(imgW + border * 2, imgH + border * 2, 1));
+  renderToCanvas(canvas, ctx, _previewScale);
 }
 
 // ── Sliders: escuchar cambios ──
@@ -3139,11 +3156,16 @@ document.getElementById('btn-export').addEventListener('click', () => {
   btn.style.pointerEvents = 'none';
 
   document.fonts.load('48px "Pinyon Script"').finally(() => {
+    // Renderizar a resolución completa (independiente del preview escalado)
+    const full    = document.createElement('canvas');
+    const fullCtx = full.getContext('2d');
+    renderToCanvas(full, fullCtx, 1);
+
     const exp    = document.createElement('canvas');
     const expCtx = exp.getContext('2d');
 
-    // Calcular tamaño y recorte
-    let srcX = 0, srcY = 0, srcW = canvas.width, srcH = canvas.height;
+    // Calcular tamaño y recorte sobre el canvas full-res
+    let srcX = 0, srcY = 0, srcW = full.width, srcH = full.height;
     let expW, expH;
 
     if (appliedCrop) {
@@ -3151,30 +3173,29 @@ document.getElementById('btn-export').addEventListener('click', () => {
     } else if (activeCropFormat !== 'free') {
       const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
       if (activeCropFormat === 'custom') {
-        expW = parseFloat(document.getElementById('crop-custom-w').value) || canvas.width;
-        expH = parseFloat(document.getElementById('crop-custom-h').value) || canvas.height;
-        srcX = Math.round(cropRect.x1 * canvas.width);
-        srcY = Math.round(cropRect.y1 * canvas.height);
-        srcW = Math.round((cropRect.x2 - cropRect.x1) * canvas.width);
-        srcH = Math.round((cropRect.y2 - cropRect.y1) * canvas.height);
+        expW = parseFloat(document.getElementById('crop-custom-w').value) || full.width;
+        expH = parseFloat(document.getElementById('crop-custom-h').value) || full.height;
+        srcX = Math.round(cropRect.x1 * full.width);
+        srcY = Math.round(cropRect.y1 * full.height);
+        srcW = Math.round((cropRect.x2 - cropRect.x1) * full.width);
+        srcH = Math.round((cropRect.y2 - cropRect.y1) * full.height);
       } else if (fmt && fmt.ratio) {
         expW = fmt.exportW; expH = fmt.exportH;
-        srcX = Math.round(cropRect.x1 * canvas.width);
-        srcY = Math.round(cropRect.y1 * canvas.height);
-        srcW = Math.round((cropRect.x2 - cropRect.x1) * canvas.width);
-        srcH = Math.round((cropRect.y2 - cropRect.y1) * canvas.height);
+        srcX = Math.round(cropRect.x1 * full.width);
+        srcY = Math.round(cropRect.y1 * full.height);
+        srcW = Math.round((cropRect.x2 - cropRect.x1) * full.width);
+        srcH = Math.round((cropRect.y2 - cropRect.y1) * full.height);
       } else {
-        expW = canvas.width; expH = canvas.height;
+        expW = full.width; expH = full.height;
       }
     } else {
-      // Sin recorte activo: exportar el canvas en sus dimensiones reales
-      expW = canvas.width; expH = canvas.height;
+      expW = full.width; expH = full.height;
     }
 
     exp.width  = expW;
     exp.height = expH;
 
-    expCtx.drawImage(canvas, srcX, srcY, srcW, srcH, 0, 0, expW, expH);
+    expCtx.drawImage(full, srcX, srcY, srcW, srcH, 0, 0, expW, expH);
 
     // Nitidez al exportar
     const sharpAmount = parseInt(sharpnessSlider.value) / 100;
@@ -3307,11 +3328,16 @@ function showOriginal() {
   showBefore = true;
   document.getElementById('before-badge').style.display = 'block';
   const border = parseInt(sliders.borderSize.value);
-  canvas.width  = originalImage.width  + border * 2;
-  canvas.height = originalImage.height + border * 2;
+  const MAX_PREVIEW = 1200;
+  const ps = Math.min(1, MAX_PREVIEW / Math.max(originalImage.width + border * 2, originalImage.height + border * 2, 1));
+  const pBorder = Math.round(border * ps);
+  const pW = Math.round(originalImage.width * ps);
+  const pH = Math.round(originalImage.height * ps);
+  canvas.width  = pW + pBorder * 2;
+  canvas.height = pH + pBorder * 2;
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(originalImage, border, border);
+  ctx.drawImage(originalImage, pBorder, pBorder, pW, pH);
 }
 
 function hideOriginal() {
