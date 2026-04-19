@@ -1169,11 +1169,10 @@
     }
 
     @keyframes elo-diamond-cycle {
-      0%        { stroke-dashoffset: 300; } /* invisible */
-      32%       { stroke-dashoffset: 0;   } /* dibujado */
-      58%       { stroke-dashoffset: 0;   } /* mantiene */
-      90%       { stroke-dashoffset: 300; } /* borrado */
-      100%      { stroke-dashoffset: 300; } /* pausa */
+      0%        { stroke-dashoffset: 300; }
+      32%       { stroke-dashoffset: 0;   }
+      58%       { stroke-dashoffset: 0;   }
+      90%, 100% { stroke-dashoffset: 300; }
     }
     @keyframes elo-line-cycle {
       0%, 26%   { opacity: 0; }
@@ -3064,7 +3063,7 @@ function displayExif(tags) {
 }
 
 function loadImage(file) {
-  if (file.size > 80 * 1024 * 1024) {
+  if (file.size > MAX_FILE_BYTES) {
     alert('El archivo es demasiado grande (máx. 80 MB). Reduce el tamaño antes de subir.');
     return;
   }
@@ -3298,30 +3297,25 @@ Object.entries(sliders).forEach(([key, slider]) => {
 });
 
 // ── Exportar ──
-const EXPORT_OVERLAY_MS = 9000;
-
-function showExportOverlay() {
-  const overlay = document.getElementById('export-overlay');
-  const bar     = document.getElementById('export-progress-bar');
-  document.getElementById('export-status-text').textContent = 'Preparando tu foto\u2026';
-  // Reinicia animaciones CSS quitando y reponiendo la clase
-  overlay.classList.remove('visible');
-  bar.style.transition = 'none';
-  bar.style.width = '0%';
-  void overlay.offsetWidth; // fuerza reflow para reiniciar animations
-  overlay.classList.add('visible');
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    bar.style.transition = `width ${EXPORT_OVERLAY_MS}ms linear`;
-    bar.style.width = '100%';
-  }));
-}
+const EXPORT_OVERLAY_MS    = 9000;
+const EXPORT_CLICK_DELAY_MS = 600;
+const MAX_FILE_BYTES        = 80 * 1024 * 1024;
 
 function hideExportOverlay() {
-  const overlay = document.getElementById('export-overlay');
-  const bar     = document.getElementById('export-progress-bar');
-  overlay.classList.remove('visible');
-  bar.style.transition = 'none';
-  bar.style.width = '0%';
+  exportOverlayEl.classList.remove('visible');
+  exportBarEl.style.transition = 'none';
+  exportBarEl.style.width = '0%';
+}
+
+function showExportOverlay() {
+  exportStatusEl.textContent = 'Preparando tu foto\u2026';
+  hideExportOverlay();
+  void exportOverlayEl.offsetWidth; // fuerza reflow para reiniciar animaciones CSS
+  exportOverlayEl.classList.add('visible');
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    exportBarEl.style.transition = `width ${EXPORT_OVERLAY_MS}ms linear`;
+    exportBarEl.style.width = '100%';
+  }));
 }
 
 document.getElementById('btn-export').addEventListener('click', () => {
@@ -3390,7 +3384,7 @@ document.getElementById('btn-export').addEventListener('click', () => {
   });
 
   Promise.all([timerPromise, renderPromise]).then(([, { dataURL, safeName }]) => {
-    document.getElementById('export-status-text').textContent = 'Lista para descargar';
+    exportStatusEl.textContent = 'Lista para descargar';
     setTimeout(() => {
       const link = document.createElement('a');
       link.download = safeName + '.jpg';
@@ -3399,7 +3393,7 @@ document.getElementById('btn-export').addEventListener('click', () => {
       hideExportOverlay();
       btn.style.opacity = '';
       btn.style.pointerEvents = '';
-    }, 600);
+    }, EXPORT_CLICK_DELAY_MS);
   });
 });
 
@@ -3600,6 +3594,11 @@ canvas.addEventListener('touchcancel', () => {
 
 // ── Nav móvil ──
 let activeMobileSheet = null;
+
+// Elementos del overlay de exportación (cacheados para evitar lookups repetidos)
+const exportOverlayEl  = document.getElementById('export-overlay');
+const exportBarEl      = document.getElementById('export-progress-bar');
+const exportStatusEl   = document.getElementById('export-status-text');
 
 function showGeoTab(name, btn) {
   document.querySelectorAll('.mobile-geo-tab').forEach(b => b.classList.remove('active'));
