@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'none'; worker-src 'self'">
   <title>The Noir. Studio — Editor de Fotografía Gratis</title>
   <meta name="description" content="Editor de fotografía online con presets cinematográficos inspirados en el cine y la pintura. Gratis, sin registro. Exporta a Instagram 1080×1350.">
   <meta property="og:title" content="The Noir. Studio — Editor de Fotografía Gratis">
@@ -1104,6 +1105,22 @@
         color: #fff !important;
       }
       .mobile-nav-export:active { opacity: 0.8; }
+
+      /* Recorte: opciones en horizontal como barra de presets */
+      #geo-recorte .crop-formats {
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        scrollbar-width: none;
+        gap: 6px;
+        padding-bottom: 6px;
+        -webkit-mask-image: linear-gradient(to right, black 0%, black calc(100% - 32px), transparent 100%);
+        mask-image: linear-gradient(to right, black 0%, black calc(100% - 32px), transparent 100%);
+      }
+      #geo-recorte .crop-formats::-webkit-scrollbar { display: none; }
+      #geo-recorte .btn-crop { flex: 0 0 auto; min-width: 54px; padding: 8px 6px; gap: 5px; }
+      #geo-recorte .crop-shape { width: 26px; height: 26px; }
+      #geo-recorte .crop-name { font-size: 0.40rem; }
 
     }
   </style>
@@ -2925,6 +2942,10 @@ function displayExif(tags) {
 }
 
 function loadImage(file) {
+  if (file.size > 80 * 1024 * 1024) {
+    alert('El archivo es demasiado grande (máx. 80 MB). Reduce el tamaño antes de subir.');
+    return;
+  }
   // Leer EXIF del binario antes de convertir a dataURL
   const exifReader = new FileReader();
   exifReader.onload = ev => displayExif(readExif(ev.target.result));
@@ -3322,6 +3343,7 @@ sliders.borderSize.addEventListener('input', updateAnnotationState);
 
 // ── Pilares: colapsar/expandir ──
 function togglePillar(id) {
+  if (cropMode) exitCropMode(false);
   document.getElementById(id).classList.toggle('collapsed');
 }
 
@@ -3430,6 +3452,8 @@ function showGeoTab(name, btn) {
 
 function toggleMobileSheet(pillarId, btn) {
   const isSame = activeMobileSheet === pillarId;
+
+  if (cropMode) exitCropMode(false);
 
   document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.pillar').forEach(p => p.classList.remove('mobile-open'));
