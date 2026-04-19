@@ -1225,6 +1225,55 @@
       background: var(--accent);
     }
 
+    /* ── Cookie banner ── */
+    #cookie-banner {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--text);
+      color: #fff;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 9999;
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      line-height: 1.5;
+    }
+    #cookie-banner a { color: #aaa; text-decoration: underline; }
+    #cookie-banner a:hover { color: #fff; }
+    #cookie-accept {
+      flex-shrink: 0;
+      background: #fff;
+      color: var(--text);
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 0.52rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 8px 18px;
+      cursor: pointer;
+    }
+    #cookie-accept:hover { opacity: 0.8; }
+    #cookie-banner.hidden { display: none; }
+
+    /* ── Footer legal links ── */
+    .footer-legal-links {
+      display: flex;
+      gap: 14px;
+      margin-top: 3px;
+    }
+    .footer-legal-links a {
+      font-size: 0.46rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .footer-legal-links a:hover { color: var(--text); }
+
   </style>
 </head>
 <body>
@@ -1539,6 +1588,11 @@
       <span class="footer-info-label">Nombre:</span>
       <input type="text" id="filename-input" placeholder="noir-studio" maxlength="80" spellcheck="false" autocomplete="off">
       <span class="footer-info-label">.jpg</span>
+    </div>
+    <div class="footer-legal-links">
+      <a href="/aviso-legal.html" target="_blank">Aviso legal</a>
+      <a href="/privacidad.html" target="_blank">Privacidad</a>
+      <a href="/cookies.html" target="_blank">Cookies</a>
     </div>
     <div id="exif-bar">
       <span class="exif-item">
@@ -3651,6 +3705,26 @@ if (toolParam === 'border') {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
   }
+</script>
+
+<!-- Banner de cookies -->
+<div id="cookie-banner" role="complementary" aria-label="Aviso de cookies">
+  <span>Usamos Google Fonts para las tipografías, lo que puede registrar tu IP en los servidores de Google.
+    <a href="/cookies.html" target="_blank">Saber más</a>
+  </span>
+  <button id="cookie-accept">Entendido</button>
+</div>
+<script>
+  (function() {
+    var banner = document.getElementById('cookie-banner');
+    if (localStorage.getItem('ns_cookie_ok')) {
+      banner.classList.add('hidden');
+    }
+    document.getElementById('cookie-accept').addEventListener('click', function() {
+      localStorage.setItem('ns_cookie_ok', '1');
+      banner.classList.add('hidden');
+    });
+  })();
 </script>
 </body>
 </html>
