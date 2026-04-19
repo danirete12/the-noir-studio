@@ -2599,7 +2599,7 @@ window.addEventListener('touchmove', e => {
 window.addEventListener('touchend', () => { _cropDrag = null; });
 
 function updateCropOverlay() {
-  if (!originalImage) { overlayCanvas.style.display = 'none'; return; }
+  if (!originalImage || !cropMode) { overlayCanvas.style.display = 'none'; return; }
 
   const canvasRect = canvas.getBoundingClientRect();
   const areaRect   = document.getElementById('canvas-area').getBoundingClientRect();
