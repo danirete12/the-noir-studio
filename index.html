@@ -1150,30 +1150,35 @@
       height: 140px;
     }
 
+    /* Animación infinita del logo: dibuja → mantiene → borra → pausa → repite */
     .elo-diamond {
       stroke-dasharray: 300;
       stroke-dashoffset: 300;
     }
-    .elo-line-h {
-      stroke-dasharray: 78;
-      stroke-dashoffset: 78;
-    }
-    .elo-line-b {
-      stroke-dasharray: 68;
-      stroke-dashoffset: 68;
-    }
+    .elo-line-h { opacity: 0; }
+    .elo-line-b { opacity: 0; }
 
     #export-overlay.visible .elo-diamond {
-      animation: elo-draw 1.6s cubic-bezier(0.4,0,0.2,1) forwards;
+      animation: elo-diamond-cycle 5s cubic-bezier(0.4,0,0.2,1) infinite;
     }
     #export-overlay.visible .elo-line-h {
-      animation: elo-draw 0.5s ease-out 1.2s forwards;
+      animation: elo-line-cycle 5s ease-in-out infinite;
     }
     #export-overlay.visible .elo-line-b {
-      animation: elo-draw 0.4s ease-out 1.4s forwards;
+      animation: elo-line-cycle 5s ease-in-out 0.1s infinite;
     }
-    @keyframes elo-draw {
-      to { stroke-dashoffset: 0; }
+
+    @keyframes elo-diamond-cycle {
+      0%        { stroke-dashoffset: 300; } /* invisible */
+      32%       { stroke-dashoffset: 0;   } /* dibujado */
+      58%       { stroke-dashoffset: 0;   } /* mantiene */
+      90%       { stroke-dashoffset: 300; } /* borrado */
+      100%      { stroke-dashoffset: 300; } /* pausa */
+    }
+    @keyframes elo-line-cycle {
+      0%, 26%   { opacity: 0; }
+      36%, 56%  { opacity: 1; }
+      70%, 100% { opacity: 0; }
     }
 
     .export-wordmark {
@@ -1186,7 +1191,7 @@
       opacity: 0;
     }
     #export-overlay.visible .export-wordmark {
-      animation: elo-fadein 0.8s ease-out 1.7s forwards;
+      animation: elo-fadein 0.8s ease-out 1.6s forwards;
     }
     @keyframes elo-fadein {
       from { opacity: 0; transform: translateY(6px); }
@@ -1203,7 +1208,7 @@
       opacity: 0;
     }
     #export-overlay.visible .export-status {
-      animation: elo-fadein 0.6s ease-out 2.1s forwards;
+      animation: elo-fadein 0.6s ease-out 2.2s forwards;
     }
 
     /* Barra de progreso */
