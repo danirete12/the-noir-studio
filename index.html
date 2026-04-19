@@ -1123,6 +1123,100 @@
       #geo-recorte .crop-name { font-size: 0.40rem; }
 
     }
+
+    /* ── Overlay de exportación ── */
+    #export-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--bg);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+    }
+    #export-overlay.visible { display: flex; }
+
+    .export-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      width: 100%;
+      max-width: 520px;
+      padding: 0 24px;
+      box-sizing: border-box;
+    }
+
+    .export-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .export-logo-mark {
+      width: 48px;
+      height: 48px;
+    }
+    .export-wordmark {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      font-weight: 300;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    .export-tagline {
+      font-family: var(--font-sans);
+      font-size: 0.58rem;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Slot de anuncio — vacío de momento */
+    .export-ad-slot {
+      width: 100%;
+      min-height: 180px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .export-ad-label {
+      font-family: var(--font-sans);
+      font-size: 0.48rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--border);
+    }
+
+    .export-status {
+      font-family: var(--font-sans);
+      font-size: 0.58rem;
+      font-weight: 300;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Barra de progreso */
+    .export-progress-track {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--border);
+    }
+    #export-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+    }
+
   </style>
 </head>
 <body>
@@ -1464,6 +1558,33 @@
 </footer>
 
 <input type="file" id="file-input" accept="image/*">
+
+<!-- Overlay de exportación -->
+<div id="export-overlay" role="dialog" aria-label="Preparando descarga">
+  <div class="export-inner">
+    <div class="export-brand">
+      <svg class="export-logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g stroke="#1a1a1a" fill="none" stroke-linecap="round">
+          <path d="M 45,12 Q 50,7 55,12 L 84,45 Q 89,50 84,55 L 55,88 Q 50,93 45,88 L 16,55 Q 11,50 16,45 Z" stroke-width="4" stroke-linejoin="round"/>
+          <line x1="11" y1="50" x2="89" y2="50" stroke-width="1.5"/>
+          <line x1="16" y1="98" x2="84" y2="98" stroke-width="1.2"/>
+        </g>
+      </svg>
+      <span class="export-wordmark">The Noir Studio</span>
+      <span class="export-tagline">Sin scroll. Sin distracciones. Solo tu foto.</span>
+    </div>
+
+    <div class="export-ad-slot">
+      <!-- Espacio publicitario -->
+      <span class="export-ad-label">Espacio publicitario</span>
+    </div>
+
+    <span class="export-status" id="export-status-text">Preparando tu foto&hellip;</span>
+  </div>
+  <div class="export-progress-track">
+    <div id="export-progress-bar"></div>
+  </div>
+</div>
 
 <!-- Barra de navegación inferior (solo móvil) -->
 <nav class="mobile-nav" id="mobile-nav">
@@ -3176,6 +3297,29 @@ Object.entries(sliders).forEach(([key, slider]) => {
 });
 
 // ── Exportar ──
+const EXPORT_OVERLAY_MS = 9000;
+
+function showExportOverlay() {
+  const overlay = document.getElementById('export-overlay');
+  const bar     = document.getElementById('export-progress-bar');
+  document.getElementById('export-status-text').textContent = 'Preparando tu foto\u2026';
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  overlay.classList.add('visible');
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    bar.style.transition = `width ${EXPORT_OVERLAY_MS}ms linear`;
+    bar.style.width = '100%';
+  }));
+}
+
+function hideExportOverlay() {
+  const overlay = document.getElementById('export-overlay');
+  const bar     = document.getElementById('export-progress-bar');
+  overlay.classList.remove('visible');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+}
+
 document.getElementById('btn-export').addEventListener('click', () => {
   if (!originalImage) return;
 
@@ -3183,66 +3327,76 @@ document.getElementById('btn-export').addEventListener('click', () => {
   btn.style.opacity = '0.6';
   btn.style.pointerEvents = 'none';
 
-  document.fonts.load('48px "Pinyon Script"').finally(() => {
-    // Renderizar a resolución completa (independiente del preview escalado)
-    const full    = document.createElement('canvas');
-    const fullCtx = full.getContext('2d');
-    renderToCanvas(full, fullCtx, 1);
+  showExportOverlay();
 
-    const exp    = document.createElement('canvas');
-    const expCtx = exp.getContext('2d');
+  const timerPromise = new Promise(r => setTimeout(r, EXPORT_OVERLAY_MS));
 
-    // Calcular tamaño y recorte sobre el canvas full-res
-    let srcX = 0, srcY = 0, srcW = full.width, srcH = full.height;
-    let expW, expH;
+  const renderPromise = new Promise(resolve => {
+    setTimeout(() => {
+      document.fonts.load('48px "Pinyon Script"').finally(() => {
+        const full    = document.createElement('canvas');
+        const fullCtx = full.getContext('2d');
+        renderToCanvas(full, fullCtx, 1);
 
-    if (appliedCrop) {
-      expW = appliedCrop.exportW; expH = appliedCrop.exportH;
-    } else if (activeCropFormat !== 'free') {
-      const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
-      if (activeCropFormat === 'custom') {
-        expW = parseFloat(document.getElementById('crop-custom-w').value) || full.width;
-        expH = parseFloat(document.getElementById('crop-custom-h').value) || full.height;
-        srcX = Math.round(cropRect.x1 * full.width);
-        srcY = Math.round(cropRect.y1 * full.height);
-        srcW = Math.round((cropRect.x2 - cropRect.x1) * full.width);
-        srcH = Math.round((cropRect.y2 - cropRect.y1) * full.height);
-      } else if (fmt && fmt.ratio) {
-        expW = fmt.exportW; expH = fmt.exportH;
-        srcX = Math.round(cropRect.x1 * full.width);
-        srcY = Math.round(cropRect.y1 * full.height);
-        srcW = Math.round((cropRect.x2 - cropRect.x1) * full.width);
-        srcH = Math.round((cropRect.y2 - cropRect.y1) * full.height);
-      } else {
-        expW = full.width; expH = full.height;
-      }
-    } else {
-      expW = full.width; expH = full.height;
-    }
+        const exp    = document.createElement('canvas');
+        const expCtx = exp.getContext('2d');
 
-    exp.width  = expW;
-    exp.height = expH;
+        let srcX = 0, srcY = 0, srcW = full.width, srcH = full.height;
+        let expW, expH;
 
-    expCtx.drawImage(full, srcX, srcY, srcW, srcH, 0, 0, expW, expH);
+        if (appliedCrop) {
+          expW = appliedCrop.exportW; expH = appliedCrop.exportH;
+        } else if (activeCropFormat !== 'free') {
+          const fmt = CROP_FORMATS.find(f => f.id === activeCropFormat);
+          if (activeCropFormat === 'custom') {
+            expW = parseFloat(document.getElementById('crop-custom-w').value) || full.width;
+            expH = parseFloat(document.getElementById('crop-custom-h').value) || full.height;
+            srcX = Math.round(cropRect.x1 * full.width);
+            srcY = Math.round(cropRect.y1 * full.height);
+            srcW = Math.round((cropRect.x2 - cropRect.x1) * full.width);
+            srcH = Math.round((cropRect.y2 - cropRect.y1) * full.height);
+          } else if (fmt && fmt.ratio) {
+            expW = fmt.exportW; expH = fmt.exportH;
+            srcX = Math.round(cropRect.x1 * full.width);
+            srcY = Math.round(cropRect.y1 * full.height);
+            srcW = Math.round((cropRect.x2 - cropRect.x1) * full.width);
+            srcH = Math.round((cropRect.y2 - cropRect.y1) * full.height);
+          } else {
+            expW = full.width; expH = full.height;
+          }
+        } else {
+          expW = full.width; expH = full.height;
+        }
 
-    // Nitidez al exportar
-    const sharpAmount = parseInt(sharpnessSlider.value) / 100;
-    if (sharpAmount > 0) {
-      const imgData = expCtx.getImageData(0, 0, expW, expH);
-      sharpenImageData(imgData, sharpAmount * 0.8);
-      expCtx.putImageData(imgData, 0, 0);
-    }
+        exp.width = expW; exp.height = expH;
+        expCtx.drawImage(full, srcX, srcY, srcW, srcH, 0, 0, expW, expH);
 
-    const link    = document.createElement('a');
-    const rawName = document.getElementById('filename-input').value.trim();
-    const safeName = rawName.replace(/[^\w\-. ]/g, '').replace(/\s+/g, '-') || 'noir-studio';
-    link.download = safeName + '.jpg';
-    link.href     = exp.toDataURL('image/jpeg', 0.93);
-    link.click();
+        const sharpAmount = parseInt(sharpnessSlider.value) / 100;
+        if (sharpAmount > 0) {
+          const imgData = expCtx.getImageData(0, 0, expW, expH);
+          sharpenImageData(imgData, sharpAmount * 0.8);
+          expCtx.putImageData(imgData, 0, 0);
+        }
 
-    btn.style.opacity = '';
-    btn.style.pointerEvents = '';
-  }, 16);
+        const rawName  = document.getElementById('filename-input').value.trim();
+        const safeName = rawName.replace(/[^\w\-. ]/g, '').replace(/\s+/g, '-') || 'noir-studio';
+        resolve({ dataURL: exp.toDataURL('image/jpeg', 0.93), safeName });
+      });
+    }, 50);
+  });
+
+  Promise.all([timerPromise, renderPromise]).then(([, { dataURL, safeName }]) => {
+    document.getElementById('export-status-text').textContent = 'Lista para descargar';
+    setTimeout(() => {
+      const link = document.createElement('a');
+      link.download = safeName + '.jpg';
+      link.href = dataURL;
+      link.click();
+      hideExportOverlay();
+      btn.style.opacity = '';
+      btn.style.pointerEvents = '';
+    }, 600);
+  });
 });
 
 // ── Sharpening (Laplacian unsharp mask) ──
