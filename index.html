@@ -17,6 +17,12 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="The Noir. Studio — Editor de Fotografía Gratis">
   <meta name="twitter:image" content="https://thenoir.studio/og-image.png">
+  <link rel="alternate" hreflang="es" href="https://thenoir.studio/">
+  <link rel="alternate" hreflang="en" href="https://thenoir.studio/?lang=en">
+  <link rel="alternate" hreflang="fr" href="https://thenoir.studio/?lang=fr">
+  <link rel="alternate" hreflang="pt" href="https://thenoir.studio/?lang=pt">
+  <link rel="alternate" hreflang="de" href="https://thenoir.studio/?lang=de">
+  <link rel="alternate" hreflang="x-default" href="https://thenoir.studio/">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230f0f0d'/><g stroke='%23e8e2d8' fill='none' stroke-linecap='round'><path d='M 45,12 Q 50,7 55,12 L 84,45 Q 89,50 84,55 L 55,88 Q 50,93 45,88 L 16,55 Q 11,50 16,45 Z' stroke-width='4' stroke-linejoin='round'/><line x1='11' y1='50' x2='89' y2='50' stroke-width='1.5'/><line x1='16' y1='98' x2='84' y2='98' stroke-width='1.2'/></g></svg>">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -1275,6 +1281,26 @@
     }
     .footer-legal-links a:hover { color: var(--text); }
 
+    /* ── Lang switcher ── */
+    #lang-switcher {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-left: 16px;
+    }
+    #lang-switcher span {
+      font-size: 0.48rem;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 2px 0;
+      border-bottom: 1px solid transparent;
+      transition: color 0.15s;
+    }
+    #lang-switcher span:hover { color: var(--text); }
+    #lang-switcher span.active { color: var(--text); border-bottom-color: var(--text); }
+    @media (max-width: 767px) { #lang-switcher { display: none; } }
+
   </style>
 </head>
 <body>
@@ -1290,18 +1316,25 @@
   <h1><span class="h1-noir">The Noir.</span><span class="h1-studio">Studio</span></h1>
   <span class="tagline">Editor de Fotografía</span>
   <div class="header-actions">
-    <button id="btn-change-photo" class="btn-header" title="Cambiar foto" disabled>
+    <button id="btn-change-photo" class="btn-header" title="Cambiar foto" data-i18n-title="btn_change_photo_title" disabled>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="12" cy="12" r="4"/><path d="M9 5 L10.5 3 L13.5 3 L15 5"/></svg>
-      <span class="btn-label">Cambiar foto</span>
+      <span class="btn-label" data-i18n="btn_change_photo">Cambiar foto</span>
     </button>
-    <button id="btn-undo" class="btn-header" title="Deshacer (Ctrl+Z)" disabled>
+    <button id="btn-undo" class="btn-header" title="Deshacer (Ctrl+Z)" data-i18n-title="btn_undo_title" disabled>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11a6 6 0 0 1 0 12H8"/><polyline points="7,3 3,7 7,11"/></svg>
-      <span class="btn-label">Deshacer</span>
+      <span class="btn-label" data-i18n="btn_undo">Deshacer</span>
     </button>
-    <button id="btn-redo" class="btn-header" title="Rehacer (Ctrl+Y)" disabled>
+    <button id="btn-redo" class="btn-header" title="Rehacer (Ctrl+Y)" data-i18n-title="btn_redo_title" disabled>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7H10a6 6 0 0 0 0 12h6"/><polyline points="17,3 21,7 17,11"/></svg>
-      <span class="btn-label">Rehacer</span>
+      <span class="btn-label" data-i18n="btn_redo">Rehacer</span>
     </button>
+    <div id="lang-switcher">
+      <span data-lang="es">ES</span>
+      <span data-lang="en">EN</span>
+      <span data-lang="fr">FR</span>
+      <span data-lang="pt">PT</span>
+      <span data-lang="de">DE</span>
+    </div>
   </div>
 </header>
 
@@ -1319,13 +1352,13 @@
   <div class="canvas-area" id="canvas-area">
     <div class="drop-zone" id="drop-zone">
       <div class="icon">◇ ◇ ◇</div>
-      <p>Arrastra tu foto aquí<br>o haz clic para seleccionar<br>JPG · PNG · WEBP</p>
+      <p data-i18n="dropzone_text">Arrastra tu foto aquí<br>o haz clic para seleccionar<br>JPG · PNG · WEBP</p>
     </div>
     <canvas id="canvas"></canvas>
     <canvas id="crop-overlay-canvas"></canvas>
     <div class="crop-mode-bar" id="crop-mode-bar">
-      <button class="btn-crop-action btn-crop-cancel" id="btn-crop-cancel">Cancelar</button>
-      <button class="btn-crop-action btn-crop-apply" id="btn-crop-apply">Aplicar recorte</button>
+      <button class="btn-crop-action btn-crop-cancel" id="btn-crop-cancel" data-i18n="btn_crop_cancel">Cancelar</button>
+      <button class="btn-crop-action btn-crop-apply" id="btn-crop-apply" data-i18n="btn_crop_apply">Aplicar recorte</button>
     </div>
     <div id="before-badge">Antes</div>
   </div>
@@ -1351,31 +1384,31 @@
             <circle cx="16" cy="9" r="1.2" fill="currentColor" stroke="none"/>
           </svg>
         </span>
-        <span class="pillar-title">Color</span>
+        <span class="pillar-title" data-i18n="pillar_color">Color</span>
         <span class="pillar-toggle">▾</span>
       </div>
       <div class="pillar-body">
 
         <div class="control">
-          <span class="ctrl-label">Temperatura</span>
+          <span class="ctrl-label" data-i18n="lbl_temperature">Temperatura</span>
           <input type="range" id="warmth" min="-100" max="100" value="0">
           <span class="ctrl-value" id="val-warmth">0°</span>
         </div>
 
         <div class="control">
-          <span class="ctrl-label">Saturación</span>
+          <span class="ctrl-label" data-i18n="lbl_saturation">Saturación</span>
           <input type="range" id="saturation" min="-100" max="100" value="0">
           <span class="ctrl-value" id="val-saturation">0</span>
         </div>
 
         <div class="control">
-          <span class="ctrl-label">Lavados</span>
+          <span class="ctrl-label" data-i18n="lbl_lift">Lavados</span>
           <input type="range" id="liftBlacks" min="0" max="100" value="0">
           <span class="ctrl-value" id="val-liftBlacks">0</span>
         </div>
 
         <div class="control">
-          <span class="ctrl-label">Tinte</span>
+          <span class="ctrl-label" data-i18n="lbl_tint">Tinte</span>
           <input type="range" id="shadowTint" min="-100" max="100" value="0">
           <span class="ctrl-value" id="val-shadowTint">0</span>
         </div>
@@ -1401,25 +1434,25 @@
             <circle cx="21" cy="15" r="1" fill="currentColor" stroke="none"/>
           </svg>
         </span>
-        <span class="pillar-title">Textura</span>
+        <span class="pillar-title" data-i18n="pillar_texture">Textura</span>
         <span class="pillar-toggle">▾</span>
       </div>
       <div class="pillar-body">
 
         <div class="control">
-          <span class="ctrl-label">Grano</span>
+          <span class="ctrl-label" data-i18n="lbl_grain">Grano</span>
           <input type="range" id="grain" min="0" max="100" value="0">
           <span class="ctrl-value" id="val-grain">0</span>
         </div>
 
         <div class="control">
-          <span class="ctrl-label">Nitidez</span>
+          <span class="ctrl-label" data-i18n="lbl_sharpness">Nitidez</span>
           <input type="range" id="sharpness" min="0" max="100" value="45">
           <span class="ctrl-value" id="val-sharpness">45</span>
         </div>
 
         <div class="control">
-          <span class="ctrl-label">Viñeta</span>
+          <span class="ctrl-label" data-i18n="lbl_vignette">Viñeta</span>
           <input type="range" id="vignette" min="0" max="100" value="0">
           <span class="ctrl-value" id="val-vignette">0</span>
         </div>
@@ -1440,31 +1473,31 @@
             <line x1="12" y1="12" x2="16" y2="9"/>
           </svg>
         </span>
-        <span class="pillar-title">Revelado</span>
+        <span class="pillar-title" data-i18n="pillar_exposure">Revelado</span>
         <span class="pillar-toggle">▾</span>
       </div>
       <div class="pillar-body">
 
         <div class="control">
-          <span class="ctrl-label">Brillo</span>
+          <span class="ctrl-label" data-i18n="lbl_brightness">Brillo</span>
           <input type="range" id="brightness" min="-100" max="100" value="0">
           <span class="ctrl-value" id="val-brightness">0</span>
         </div>
 
         <div class="control">
-          <span class="ctrl-label">Contraste</span>
+          <span class="ctrl-label" data-i18n="lbl_contrast">Contraste</span>
           <input type="range" id="contrast" min="-100" max="100" value="0">
           <span class="ctrl-value" id="val-contrast">0</span>
         </div>
 
         <div class="control">
-          <span class="ctrl-label">Sombras</span>
+          <span class="ctrl-label" data-i18n="lbl_shadows">Sombras</span>
           <input type="range" id="shadows" min="-100" max="100" value="0">
           <span class="ctrl-value" id="val-shadows">0</span>
         </div>
 
         <div class="control">
-          <span class="ctrl-label">Luces</span>
+          <span class="ctrl-label" data-i18n="lbl_highlights">Luces</span>
           <input type="range" id="highlightRecovery" min="0" max="100" value="0">
           <span class="ctrl-value" id="val-highlightRecovery">0</span>
         </div>
@@ -1480,34 +1513,34 @@
             <path d="M3 21 L3 3 L21 3"/><path d="M3 3 L21 21"/>
           </svg>
         </span>
-        <span class="pillar-title">Geometría y Recorte</span>
+        <span class="pillar-title" data-i18n="pillar_geometry">Geometría y Recorte</span>
         <span class="pillar-toggle">▾</span>
       </div>
       <div class="pillar-body">
 
         <!-- Sub-tabs: solo visibles en móvil -->
         <div class="mobile-geo-tabs">
-          <button class="mobile-geo-tab active" onclick="showGeoTab('marco', this)">Marco</button>
-          <button class="mobile-geo-tab" onclick="showGeoTab('recorte', this)">Recorte</button>
-          <button class="mobile-geo-tab" onclick="showGeoTab('transformar', this)">Transformar</button>
+          <button class="mobile-geo-tab active" onclick="showGeoTab('marco', this)" data-i18n="geo_tab_frame">Marco</button>
+          <button class="mobile-geo-tab" onclick="showGeoTab('recorte', this)" data-i18n="geo_tab_crop">Recorte</button>
+          <button class="mobile-geo-tab" onclick="showGeoTab('transformar', this)" data-i18n="geo_tab_transform">Transformar</button>
         </div>
 
         <!-- Sección Marco + Anotación -->
         <div class="geo-section active" id="geo-marco">
           <div class="control">
-            <span class="ctrl-label">Marco</span>
+            <span class="ctrl-label" data-i18n="lbl_border">Marco</span>
             <input type="range" id="borderSize" min="0" max="120" value="0">
             <span class="ctrl-value" id="val-borderSize">0</span>
           </div>
 
           <div class="annotation-row">
-            <span class="annotation-label">Anotación</span>
+            <span class="annotation-label" data-i18n="lbl_annotation">Anotación</span>
             <label class="toggle">
               <input type="checkbox" id="annotation-toggle">
               <span class="toggle-track"></span>
             </label>
           </div>
-          <input type="text" class="annotation-input" id="annotation-text" placeholder="Caravaggio / Sevilla 2026" maxlength="40">
+          <input type="text" class="annotation-input" id="annotation-text" placeholder="Caravaggio / Sevilla 2026" data-i18n-ph="annotation_ph" maxlength="40">
         </div>
 
         <!-- Sección Recorte -->
@@ -1516,20 +1549,20 @@
           <div class="crop-custom-inputs" id="crop-custom-inputs">
             <div class="crop-custom-row">
               <div class="crop-custom-field">
-                <span class="crop-custom-lbl">Ancho</span>
+                <span class="crop-custom-lbl" data-i18n="lbl_crop_width">Ancho</span>
                 <input type="number" id="crop-custom-w" placeholder="1080" min="1" max="9999" value="1080">
               </div>
               <span class="crop-custom-sep">×</span>
               <div class="crop-custom-field">
-                <span class="crop-custom-lbl">Alto</span>
+                <span class="crop-custom-lbl" data-i18n="lbl_crop_height">Alto</span>
                 <input type="number" id="crop-custom-h" placeholder="1350" min="1" max="9999" value="1350">
               </div>
             </div>
-            <p class="crop-custom-px">píxeles</p>
+            <p class="crop-custom-px" data-i18n="lbl_crop_pixels">píxeles</p>
             <div class="crop-ratio-row">
               <div class="crop-custom-row">
                 <div class="crop-custom-field">
-                  <span class="crop-custom-lbl">Proporción</span>
+                  <span class="crop-custom-lbl" data-i18n="lbl_crop_ratio">Proporción</span>
                   <input type="number" id="crop-ratio-w" min="1" max="9999" value="4">
                 </div>
                 <span class="crop-custom-sep">:</span>
@@ -1545,28 +1578,28 @@
         <!-- Sección Transformar: Nivelar + botones -->
         <div class="geo-section" id="geo-transformar">
           <div class="control" style="padding-top: 14px;">
-            <span class="ctrl-label">Nivelar</span>
+            <span class="ctrl-label" data-i18n="lbl_level">Nivelar</span>
             <input type="range" id="nivelar" min="-10" max="10" step="0.5" value="0">
             <span class="ctrl-value" id="val-nivelar">0°</span>
           </div>
 
-          <p class="transform-header">Transformar</p>
+          <p class="transform-header" data-i18n="transform_title">Transformar</p>
           <div class="transform-row">
-            <button class="btn-transform" id="btn-rotate-l" title="Girar 90° izquierda">
+            <button class="btn-transform" id="btn-rotate-l" title="Girar 90° izquierda" data-i18n-title="btn_rot_left_title">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9"/><polyline points="3,7 3,12 8,12"/></svg>
-              <span>90° Izq</span>
+              <span data-i18n="btn_rot_left">90° Izq</span>
             </button>
-            <button class="btn-transform" id="btn-rotate-r" title="Girar 90° derecha">
+            <button class="btn-transform" id="btn-rotate-r" title="Girar 90° derecha" data-i18n-title="btn_rot_right_title">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><polyline points="21,7 21,12 16,12"/></svg>
-              <span>90° Der</span>
+              <span data-i18n="btn_rot_right">90° Der</span>
             </button>
-            <button class="btn-transform" id="btn-flip-h" title="Espejo horizontal">
+            <button class="btn-transform" id="btn-flip-h" title="Espejo horizontal" data-i18n-title="btn_flip_h_title">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M16 7 L20 12 L16 17"/><path d="M8 7 L4 12 L8 17"/></svg>
-              <span>Espejo H</span>
+              <span data-i18n="btn_flip_h">Espejo H</span>
             </button>
-            <button class="btn-transform" id="btn-flip-v" title="Espejo vertical">
+            <button class="btn-transform" id="btn-flip-v" title="Espejo vertical" data-i18n-title="btn_flip_v_title">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><path d="M7 8 L12 4 L17 8"/><path d="M7 16 L12 20 L17 16"/></svg>
-              <span>Espejo V</span>
+              <span data-i18n="btn_flip_v">Espejo V</span>
             </button>
           </div>
         </div>
@@ -1576,7 +1609,7 @@
 
     <!-- Reset -->
     <div class="panel-footer">
-      <button class="btn-secondary" id="btn-reset">Resetear todo</button>
+      <button class="btn-secondary" id="btn-reset" data-i18n="btn_reset">Resetear todo</button>
     </div>
 
   </div>
@@ -1586,7 +1619,7 @@
 <footer>
   <div class="footer-info">
     <div class="footer-name-row">
-      <span class="footer-info-label">Nombre:</span>
+      <span class="footer-info-label" data-i18n="lbl_filename">Nombre:</span>
       <input type="text" id="filename-input" placeholder="noir-studio" maxlength="80" spellcheck="false" autocomplete="off">
       <span class="footer-info-label">.jpg</span>
     </div>
@@ -1616,7 +1649,7 @@
   </div>
   <button id="btn-export">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:7px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Descargar
+    <span data-i18n="btn_export">Descargar</span>
   </button>
 </footer>
 
@@ -1634,7 +1667,7 @@
         stroke="#1a1a1a" stroke-width="1.2" stroke-linecap="round" pathLength="68"/>
     </svg>
     <span class="export-wordmark" id="export-wordmark">The Noir Studio</span>
-    <span class="export-status" id="export-status-text">Preparando tu foto&hellip;</span>
+    <span class="export-status" id="export-status-text" data-i18n="export_preparing">Preparando tu foto&hellip;</span>
   </div>
   <div class="export-progress-track">
     <div id="export-progress-bar"></div>
@@ -1645,31 +1678,223 @@
 <nav class="mobile-nav" id="mobile-nav">
   <button class="mobile-nav-btn" data-pillar="pillar-presets" onclick="toggleMobileSheet('pillar-presets', this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-    <span>Presets</span>
+    <span data-i18n="mobile_presets">Presets</span>
   </button>
   <button class="mobile-nav-btn" data-pillar="pillar-geo" onclick="toggleMobileSheet('pillar-geo', this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21 L3 3 L21 3"/><path d="M3 3 L21 21"/></svg>
-    <span>Geometría</span>
+    <span data-i18n="mobile_geometry">Geometría</span>
   </button>
   <button class="mobile-nav-btn" data-pillar="pillar-rev" onclick="toggleMobileSheet('pillar-rev', this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="12" y1="12" x2="16" y2="9"/></svg>
-    <span>Revelado</span>
+    <span data-i18n="mobile_exposure">Revelado</span>
   </button>
   <button class="mobile-nav-btn" data-pillar="pillar-tex" onclick="toggleMobileSheet('pillar-tex', this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="5" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="4" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="7" r="1.2" fill="currentColor" stroke="none"/><circle cx="20" cy="5" r="1.2" fill="currentColor" stroke="none"/><circle cx="7" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="13" cy="13" r="1.2" fill="currentColor" stroke="none"/><circle cx="18" cy="11" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="19" r="1.2" fill="currentColor" stroke="none"/><circle cx="17" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
-    <span>Textura</span>
+    <span data-i18n="mobile_texture">Textura</span>
   </button>
   <button class="mobile-nav-btn" data-pillar="pillar-color" onclick="toggleMobileSheet('pillar-color', this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c3.1 0 5.6-2.5 5.6-5.6C22 6 17.5 2 12 2z"/><circle cx="7" cy="10" r="1.2" fill="currentColor" stroke="none"/><circle cx="11" cy="7" r="1.2" fill="currentColor" stroke="none"/></svg>
-    <span>Color</span>
+    <span data-i18n="mobile_color">Color</span>
   </button>
   <button class="mobile-nav-btn mobile-nav-export" id="btn-export-mobile">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    <span>Guardar</span>
+    <span data-i18n="mobile_save">Guardar</span>
   </button>
 </nav>
 
 <script>
+// ── i18n ──
+const LANGS = {
+  es: {
+    btn_change_photo: 'Cambiar foto', btn_change_photo_title: 'Cambiar foto',
+    btn_undo: 'Deshacer', btn_undo_title: 'Deshacer (Ctrl+Z)',
+    btn_redo: 'Rehacer', btn_redo_title: 'Rehacer (Ctrl+Y)',
+    dropzone_text: 'Arrastra tu foto aquí<br>o haz clic para seleccionar<br>JPG · PNG · WEBP',
+    btn_crop_cancel: 'Cancelar', btn_crop_apply: 'Aplicar recorte',
+    pillar_color: 'Color', pillar_texture: 'Textura',
+    pillar_exposure: 'Revelado', pillar_geometry: 'Geometría y Recorte',
+    lbl_temperature: 'Temperatura', lbl_saturation: 'Saturación',
+    lbl_lift: 'Lavados', lbl_tint: 'Tinte',
+    lbl_grain: 'Grano', lbl_sharpness: 'Nitidez', lbl_vignette: 'Viñeta',
+    lbl_brightness: 'Brillo', lbl_contrast: 'Contraste',
+    lbl_shadows: 'Sombras', lbl_highlights: 'Luces',
+    geo_tab_frame: 'Marco', geo_tab_crop: 'Recorte', geo_tab_transform: 'Transformar',
+    lbl_border: 'Marco', lbl_annotation: 'Anotación',
+    annotation_ph: 'Caravaggio / Sevilla 2026',
+    lbl_crop_width: 'Ancho', lbl_crop_height: 'Alto',
+    lbl_crop_pixels: 'píxeles', lbl_crop_ratio: 'Proporción',
+    lbl_level: 'Nivelar', transform_title: 'Transformar',
+    btn_rot_left: '90° Izq', btn_rot_left_title: 'Girar 90° izquierda',
+    btn_rot_right: '90° Der', btn_rot_right_title: 'Girar 90° derecha',
+    btn_flip_h: 'Espejo H', btn_flip_h_title: 'Espejo horizontal',
+    btn_flip_v: 'Espejo V', btn_flip_v_title: 'Espejo vertical',
+    btn_reset: 'Resetear todo', lbl_filename: 'Nombre:',
+    btn_export: 'Descargar', export_preparing: 'Preparando tu foto…',
+    mobile_presets: 'Presets', mobile_geometry: 'Geometría',
+    mobile_exposure: 'Revelado', mobile_texture: 'Textura',
+    mobile_color: 'Color', mobile_save: 'Guardar',
+    cookie_text: 'Usamos Google Fonts para las tipografías, lo que puede registrar tu IP en los servidores de Google.',
+    cookie_btn: 'Entendido',
+  },
+  en: {
+    btn_change_photo: 'Change photo', btn_change_photo_title: 'Change photo',
+    btn_undo: 'Undo', btn_undo_title: 'Undo (Ctrl+Z)',
+    btn_redo: 'Redo', btn_redo_title: 'Redo (Ctrl+Y)',
+    dropzone_text: 'Drop your photo here<br>or click to select<br>JPG · PNG · WEBP',
+    btn_crop_cancel: 'Cancel', btn_crop_apply: 'Apply crop',
+    pillar_color: 'Color', pillar_texture: 'Texture',
+    pillar_exposure: 'Exposure', pillar_geometry: 'Geometry & Crop',
+    lbl_temperature: 'Temperature', lbl_saturation: 'Saturation',
+    lbl_lift: 'Lift', lbl_tint: 'Tint',
+    lbl_grain: 'Grain', lbl_sharpness: 'Sharpness', lbl_vignette: 'Vignette',
+    lbl_brightness: 'Brightness', lbl_contrast: 'Contrast',
+    lbl_shadows: 'Shadows', lbl_highlights: 'Highlights',
+    geo_tab_frame: 'Frame', geo_tab_crop: 'Crop', geo_tab_transform: 'Transform',
+    lbl_border: 'Frame', lbl_annotation: 'Annotation',
+    annotation_ph: 'Caravaggio / Seville 2026',
+    lbl_crop_width: 'Width', lbl_crop_height: 'Height',
+    lbl_crop_pixels: 'pixels', lbl_crop_ratio: 'Ratio',
+    lbl_level: 'Straighten', transform_title: 'Transform',
+    btn_rot_left: '90° Left', btn_rot_left_title: 'Rotate 90° left',
+    btn_rot_right: '90° Right', btn_rot_right_title: 'Rotate 90° right',
+    btn_flip_h: 'Flip H', btn_flip_h_title: 'Flip horizontal',
+    btn_flip_v: 'Flip V', btn_flip_v_title: 'Flip vertical',
+    btn_reset: 'Reset all', lbl_filename: 'Name:',
+    btn_export: 'Download', export_preparing: 'Preparing your photo…',
+    mobile_presets: 'Presets', mobile_geometry: 'Geometry',
+    mobile_exposure: 'Exposure', mobile_texture: 'Texture',
+    mobile_color: 'Color', mobile_save: 'Save',
+    cookie_text: 'We use Google Fonts for typography, which may log your IP on Google\'s servers.',
+    cookie_btn: 'Got it',
+  },
+  fr: {
+    btn_change_photo: 'Changer photo', btn_change_photo_title: 'Changer photo',
+    btn_undo: 'Annuler', btn_undo_title: 'Annuler (Ctrl+Z)',
+    btn_redo: 'Rétablir', btn_redo_title: 'Rétablir (Ctrl+Y)',
+    dropzone_text: 'Déposez votre photo ici<br>ou cliquez pour sélectionner<br>JPG · PNG · WEBP',
+    btn_crop_cancel: 'Annuler', btn_crop_apply: 'Appliquer le recadrage',
+    pillar_color: 'Couleur', pillar_texture: 'Texture',
+    pillar_exposure: 'Exposition', pillar_geometry: 'Géométrie et recadrage',
+    lbl_temperature: 'Température', lbl_saturation: 'Saturation',
+    lbl_lift: 'Rehaussement', lbl_tint: 'Teinte',
+    lbl_grain: 'Grain', lbl_sharpness: 'Netteté', lbl_vignette: 'Vignette',
+    lbl_brightness: 'Luminosité', lbl_contrast: 'Contraste',
+    lbl_shadows: 'Ombres', lbl_highlights: 'Hautes lumières',
+    geo_tab_frame: 'Cadre', geo_tab_crop: 'Recadrage', geo_tab_transform: 'Transformer',
+    lbl_border: 'Cadre', lbl_annotation: 'Annotation',
+    annotation_ph: 'Caravaggio / Séville 2026',
+    lbl_crop_width: 'Largeur', lbl_crop_height: 'Hauteur',
+    lbl_crop_pixels: 'pixels', lbl_crop_ratio: 'Proportion',
+    lbl_level: 'Redresser', transform_title: 'Transformer',
+    btn_rot_left: '90° Gauche', btn_rot_left_title: 'Rotation 90° gauche',
+    btn_rot_right: '90° Droite', btn_rot_right_title: 'Rotation 90° droite',
+    btn_flip_h: 'Miroir H', btn_flip_h_title: 'Miroir horizontal',
+    btn_flip_v: 'Miroir V', btn_flip_v_title: 'Miroir vertical',
+    btn_reset: 'Tout réinitialiser', lbl_filename: 'Nom :',
+    btn_export: 'Télécharger', export_preparing: 'Préparation de votre photo…',
+    mobile_presets: 'Préréglages', mobile_geometry: 'Géométrie',
+    mobile_exposure: 'Exposition', mobile_texture: 'Texture',
+    mobile_color: 'Couleur', mobile_save: 'Enregistrer',
+    cookie_text: 'Nous utilisons Google Fonts pour la typographie, ce qui peut enregistrer votre IP sur les serveurs de Google.',
+    cookie_btn: 'Compris',
+  },
+  pt: {
+    btn_change_photo: 'Trocar foto', btn_change_photo_title: 'Trocar foto',
+    btn_undo: 'Desfazer', btn_undo_title: 'Desfazer (Ctrl+Z)',
+    btn_redo: 'Refazer', btn_redo_title: 'Refazer (Ctrl+Y)',
+    dropzone_text: 'Arraste sua foto aqui<br>ou clique para selecionar<br>JPG · PNG · WEBP',
+    btn_crop_cancel: 'Cancelar', btn_crop_apply: 'Aplicar corte',
+    pillar_color: 'Cor', pillar_texture: 'Textura',
+    pillar_exposure: 'Exposição', pillar_geometry: 'Geometria e Corte',
+    lbl_temperature: 'Temperatura', lbl_saturation: 'Saturação',
+    lbl_lift: 'Elevação', lbl_tint: 'Matiz',
+    lbl_grain: 'Grão', lbl_sharpness: 'Nitidez', lbl_vignette: 'Vinheta',
+    lbl_brightness: 'Brilho', lbl_contrast: 'Contraste',
+    lbl_shadows: 'Sombras', lbl_highlights: 'Realces',
+    geo_tab_frame: 'Moldura', geo_tab_crop: 'Corte', geo_tab_transform: 'Transformar',
+    lbl_border: 'Moldura', lbl_annotation: 'Anotação',
+    annotation_ph: 'Caravaggio / Sevilha 2026',
+    lbl_crop_width: 'Largura', lbl_crop_height: 'Altura',
+    lbl_crop_pixels: 'pixels', lbl_crop_ratio: 'Proporção',
+    lbl_level: 'Nivelar', transform_title: 'Transformar',
+    btn_rot_left: '90° Esq', btn_rot_left_title: 'Girar 90° esquerda',
+    btn_rot_right: '90° Dir', btn_rot_right_title: 'Girar 90° direita',
+    btn_flip_h: 'Espelho H', btn_flip_h_title: 'Espelho horizontal',
+    btn_flip_v: 'Espelho V', btn_flip_v_title: 'Espelho vertical',
+    btn_reset: 'Redefinir tudo', lbl_filename: 'Nome:',
+    btn_export: 'Baixar', export_preparing: 'Preparando sua foto…',
+    mobile_presets: 'Presets', mobile_geometry: 'Geometria',
+    mobile_exposure: 'Exposição', mobile_texture: 'Textura',
+    mobile_color: 'Cor', mobile_save: 'Salvar',
+    cookie_text: 'Usamos Google Fonts para tipografia, o que pode registrar seu IP nos servidores do Google.',
+    cookie_btn: 'Entendi',
+  },
+  de: {
+    btn_change_photo: 'Foto wechseln', btn_change_photo_title: 'Foto wechseln',
+    btn_undo: 'Rückgängig', btn_undo_title: 'Rückgängig (Ctrl+Z)',
+    btn_redo: 'Wiederholen', btn_redo_title: 'Wiederholen (Ctrl+Y)',
+    dropzone_text: 'Foto hier ablegen<br>oder klicken zum Auswählen<br>JPG · PNG · WEBP',
+    btn_crop_cancel: 'Abbrechen', btn_crop_apply: 'Zuschnitt anwenden',
+    pillar_color: 'Farbe', pillar_texture: 'Textur',
+    pillar_exposure: 'Belichtung', pillar_geometry: 'Geometrie & Zuschnitt',
+    lbl_temperature: 'Farbtemperatur', lbl_saturation: 'Sättigung',
+    lbl_lift: 'Aufhellung', lbl_tint: 'Tönung',
+    lbl_grain: 'Körnung', lbl_sharpness: 'Schärfe', lbl_vignette: 'Vignette',
+    lbl_brightness: 'Helligkeit', lbl_contrast: 'Kontrast',
+    lbl_shadows: 'Schatten', lbl_highlights: 'Lichter',
+    geo_tab_frame: 'Rahmen', geo_tab_crop: 'Zuschnitt', geo_tab_transform: 'Transformieren',
+    lbl_border: 'Rahmen', lbl_annotation: 'Beschriftung',
+    annotation_ph: 'Caravaggio / Sevilla 2026',
+    lbl_crop_width: 'Breite', lbl_crop_height: 'Höhe',
+    lbl_crop_pixels: 'Pixel', lbl_crop_ratio: 'Seitenverhältnis',
+    lbl_level: 'Ausrichten', transform_title: 'Transformieren',
+    btn_rot_left: '90° Links', btn_rot_left_title: '90° nach links drehen',
+    btn_rot_right: '90° Rechts', btn_rot_right_title: '90° nach rechts drehen',
+    btn_flip_h: 'Spiegeln H', btn_flip_h_title: 'Horizontal spiegeln',
+    btn_flip_v: 'Spiegeln V', btn_flip_v_title: 'Vertikal spiegeln',
+    btn_reset: 'Alles zurücksetzen', lbl_filename: 'Name:',
+    btn_export: 'Herunterladen', export_preparing: 'Foto wird vorbereitet…',
+    mobile_presets: 'Presets', mobile_geometry: 'Geometrie',
+    mobile_exposure: 'Belichtung', mobile_texture: 'Textur',
+    mobile_color: 'Farbe', mobile_save: 'Speichern',
+    cookie_text: 'Wir verwenden Google Fonts für Schriftarten, wodurch Ihre IP auf Google-Servern gespeichert werden kann.',
+    cookie_btn: 'Verstanden',
+  },
+};
+
+let currentLang = 'es';
+
+function applyLang(code) {
+  const t = LANGS[code] || LANGS['es'];
+  currentLang = code;
+  document.documentElement.lang = code;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (t[key] !== undefined) el.innerHTML = t[key];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const key = el.dataset.i18nPh;
+    if (t[key] !== undefined) el.placeholder = t[key];
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.dataset.i18nTitle;
+    if (t[key] !== undefined) el.title = t[key];
+  });
+  document.querySelectorAll('#lang-switcher span').forEach(s => {
+    s.classList.toggle('active', s.dataset.lang === code);
+  });
+  localStorage.setItem('ns_lang', code);
+}
+
+function detectLang() {
+  const param = new URLSearchParams(location.search).get('lang');
+  if (param && LANGS[param]) return param;
+  const stored = localStorage.getItem('ns_lang');
+  if (stored && LANGS[stored]) return stored;
+  const browser = (navigator.language || 'es').slice(0, 2).toLowerCase();
+  return LANGS[browser] ? browser : 'es';
+}
+
 // ── Los 20 presets ──
 // Cada preset: label, color (iluminación al seleccionar), y valores de sliders.
 const PRESETS = {
@@ -3701,6 +3926,13 @@ if (toolParam === 'border') {
   sliders.borderSize.value = '60';
   vals.borderSize.textContent = '60';
 }
+
+// ── i18n: inicialización ──
+applyLang(detectLang());
+document.getElementById('lang-switcher').addEventListener('click', e => {
+  const lang = e.target.dataset.lang;
+  if (lang) applyLang(lang);
+});
 </script>
 <script>
   if ('serviceWorker' in navigator) {
@@ -3710,10 +3942,10 @@ if (toolParam === 'border') {
 
 <!-- Banner de cookies -->
 <div id="cookie-banner" role="complementary" aria-label="Aviso de cookies">
-  <span>Usamos Google Fonts para las tipografías, lo que puede registrar tu IP en los servidores de Google.
+  <span><span data-i18n="cookie_text">Usamos Google Fonts para las tipografías, lo que puede registrar tu IP en los servidores de Google.</span>
     <a href="/cookies.html" target="_blank">Saber más</a>
   </span>
-  <button id="cookie-accept">Entendido</button>
+  <button id="cookie-accept" data-i18n="cookie_btn">Entendido</button>
 </div>
 <script>
   (function() {
