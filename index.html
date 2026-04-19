@@ -1176,21 +1176,49 @@
       color: var(--muted);
     }
 
-    /* Slot de anuncio — vacío de momento */
+    /* Slot de contenido — branding hasta que haya anuncios */
     .export-ad-slot {
       width: 100%;
-      min-height: 180px;
-      border: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 0;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .export-ad-label {
+    .export-manifesto {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      text-align: center;
+    }
+    .export-presets-list {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      margin: 0;
+    }
+    .export-manifesto-line {
       font-family: var(--font-sans);
-      font-size: 0.48rem;
+      font-size: 0.58rem;
+      font-weight: 400;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin: 0;
+    }
+    .export-manifesto-sub {
+      font-family: var(--font-sans);
+      font-size: 0.52rem;
+      font-weight: 300;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--border);
+      color: var(--muted);
+      margin: 0;
     }
 
     .export-status {
@@ -1575,8 +1603,11 @@
     </div>
 
     <div class="export-ad-slot">
-      <!-- Espacio publicitario -->
-      <span class="export-ad-label">Espacio publicitario</span>
+      <div class="export-manifesto">
+        <p class="export-presets-list">Caravaggio &middot; Wes &middot; Zuloaga<br>Quentin &middot; Golden Hour &middot; Dead of Night<br>Velvet &middot; H-Format &middot; M-System</p>
+        <p class="export-manifesto-line">15 presets con nombre propio.</p>
+        <p class="export-manifesto-sub">Gratis. Sin cuenta. Sin límites.</p>
+      </div>
     </div>
 
     <span class="export-status" id="export-status-text">Preparando tu foto&hellip;</span>
