@@ -27,6 +27,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Instalar Android SDK (cmdline-tools)
+        uses: android-actions/setup-android@v3
+
       - name: Instalar bubblewrap
         run: npm install -g @bubblewrap/cli
 
@@ -48,7 +51,7 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          bubblewrap build \
+          yes "" | bubblewrap build \
             --skipPwaValidation \
             --signingKeyPath android.keystore \
             --signingKeyAlias noir-studio \
