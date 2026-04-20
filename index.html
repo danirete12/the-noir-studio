@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'none'; worker-src 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com; worker-src 'self'">
   <title>The Noir. Studio — Editor de Fotografía Gratis</title>
   <meta name="description" content="Editor de fotografía online con presets cinematográficos inspirados en el cine y la pintura. Gratis, sin registro. Exporta a Instagram 1080×1350.">
   <meta property="og:title" content="The Noir. Studio — Editor de Fotografía Gratis">
@@ -1302,6 +1302,14 @@
     @media (max-width: 767px) { #lang-switcher { display: none; } }
 
   </style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ERR3XP7V5R"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ERR3XP7V5R', { anonymize_ip: true });
+  </script>
 </head>
 <body>
 
@@ -1733,7 +1741,7 @@ const LANGS = {
     mobile_presets: 'Presets', mobile_geometry: 'Geometría',
     mobile_exposure: 'Revelado', mobile_texture: 'Textura',
     mobile_color: 'Color', mobile_save: 'Guardar',
-    cookie_text: 'Usamos Google Fonts para las tipografías, lo que puede registrar tu IP en los servidores de Google.',
+    cookie_text: 'Usamos Google Fonts y Google Analytics (datos anónimos). Google puede registrar tu IP.',
     cookie_btn: 'Entendido',
   },
   en: {
@@ -1884,6 +1892,7 @@ function applyLang(code) {
     s.classList.toggle('active', s.dataset.lang === code);
   });
   localStorage.setItem('ns_lang', code);
+  if (code !== 'es') gtag('event', 'language_changed', { language: code });
 }
 
 function detectLang() {
@@ -3227,6 +3236,7 @@ function applyPreset(key, btn) {
     resetSliders();
     return;
   }
+  gtag('event', 'preset_applied', { preset_name: key });
   saveHistory(captureState());
   activePreset = key;
 
@@ -3373,6 +3383,7 @@ function loadImage(file) {
       document.getElementById('exif-bar').classList.remove('visible');
 
       originalImage = img;
+      gtag('event', 'photo_loaded', { file_type: file.type });
       dropZone.style.display = 'none';
       canvas.style.display = 'block';
       document.getElementById('btn-change-photo').disabled = false;
@@ -3600,6 +3611,8 @@ function showExportOverlay() {
 
 document.getElementById('btn-export').addEventListener('click', () => {
   if (!originalImage) return;
+
+  gtag('event', 'export', { preset_name: activePreset || 'none' });
 
   const btn = document.getElementById('btn-export');
   btn.style.opacity = '0.6';
@@ -3942,7 +3955,7 @@ document.getElementById('lang-switcher').addEventListener('click', e => {
 
 <!-- Banner de cookies -->
 <div id="cookie-banner" role="complementary" aria-label="Aviso de cookies">
-  <span><span data-i18n="cookie_text">Usamos Google Fonts para las tipografías, lo que puede registrar tu IP en los servidores de Google.</span>
+  <span><span data-i18n="cookie_text">Usamos Google Fonts y Google Analytics (datos anónimos). Google puede registrar tu IP.</span>
     <a href="/cookies.html" target="_blank">Saber más</a>
   </span>
   <button id="cookie-accept" data-i18n="cookie_btn">Entendido</button>
