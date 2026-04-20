@@ -1,0 +1,63 @@
+name: TWA — Build AAB para Play Store
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'twa/twa-manifest.json'
+      - 'manifest.json'
+      - 'index.html'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar bubblewrap
+        run: npm install -g @bubblewrap/cli
+
+      - name: Restaurar keystore desde secret
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > twa/android.keystore
+
+      - name: Inicializar proyecto Android desde twa-manifest.json
+        working-directory: twa
+        run: |
+          yes "" | bubblewrap init \
+            --manifest https://raw.githubusercontent.com/danirete12/the-noir-studio/master/manifest.json \
+            --skipPwaValidation 2>/dev/null || true
+          # Restaurar nuestro twa-manifest.json con el dominio correcto
+          git checkout twa-manifest.json
+
+      - name: Compilar AAB firmado
+        working-directory: twa
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          bubblewrap build \
+            --skipPwaValidation \
+            --signingKeyPath android.keystore \
+            --signingKeyAlias noir-studio \
+            --signingKeyPassphrase "$KEYSTORE_PASSWORD" \
+            --signingStorePassphrase "$KEYSTORE_PASSWORD"
+
+      - name: Subir AAB como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: noir-studio-${{ github.run_number }}.aab
+          path: twa/app-release-signed.aab
+          retention-days: 90
