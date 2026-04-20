@@ -1,6 +1,6 @@
 {
   "packageId": "com.thenoirstudio.app",
-  "host": "PLACEHOLDER_DOMAIN",
+  "host": "thenoir.studio",
   "name": "The Noir Studio",
   "launcherName": "Noir Studio",
   "display": "standalone",
@@ -13,9 +13,9 @@
   "backgroundColor": "#ffffff",
   "enableNotifications": false,
   "startUrl": "/",
-  "iconUrl": "https://PLACEHOLDER_DOMAIN/icons/icon-512.png",
-  "maskableIconUrl": "https://PLACEHOLDER_DOMAIN/icons/icon-512-maskable.png",
-  "monochromeIconUrl": "https://PLACEHOLDER_DOMAIN/icons/icon-512.png",
+  "iconUrl": "https://thenoir.studio/icons/icon-512.png",
+  "maskableIconUrl": "https://thenoir.studio/icons/icon-512-maskable.png",
+  "monochromeIconUrl": "https://thenoir.studio/icons/icon-512.png",
   "appVersion": "1",
   "appVersionCode": 1,
   "signingKey": {
@@ -27,7 +27,7 @@
   "enableSiteSettingsShortcut": true,
   "isChromeOSOnly": false,
   "isMetaQuest": false,
-  "fullScopeUrl": "https://PLACEHOLDER_DOMAIN/",
+  "fullScopeUrl": "https://thenoir.studio/",
   "minSdkVersion": 19,
   "fingerprints": []
 }
