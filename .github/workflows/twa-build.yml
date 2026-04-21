@@ -33,6 +33,16 @@ jobs:
       - name: Instalar bubblewrap
         run: npm install -g @bubblewrap/cli
 
+      - name: Configurar bubblewrap para usar SDK/JDK del sistema
+        run: |
+          mkdir -p ~/.bubblewrap
+          cat > ~/.bubblewrap/config.json << EOF
+          {
+            "jdkPath": "$JAVA_HOME",
+            "androidSdkPath": "$ANDROID_SDK_ROOT"
+          }
+          EOF
+
       - name: Restaurar keystore desde secret
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > twa/android.keystore
@@ -40,10 +50,9 @@ jobs:
       - name: Inicializar proyecto Android desde twa-manifest.json
         working-directory: twa
         run: |
-          yes "" | bubblewrap init \
+          bubblewrap init \
             --manifest https://raw.githubusercontent.com/danirete12/the-noir-studio/master/manifest.json \
             --skipPwaValidation 2>/dev/null || true
-          # Restaurar nuestro twa-manifest.json con el dominio correcto
           git checkout twa-manifest.json
 
       - name: Compilar AAB firmado
@@ -51,7 +60,7 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          yes "" | bubblewrap build \
+          bubblewrap build \
             --skipPwaValidation \
             --signingKeyPath android.keystore \
             --signingKeyAlias noir-studio \
