@@ -55,12 +55,16 @@ jobs:
             --skipPwaValidation 2>/dev/null || true
           git checkout twa-manifest.json
 
+      - name: Actualizar proyecto y generar checksum
+        working-directory: twa
+        run: bubblewrap update --skipPwaValidation 2>/dev/null || true
+
       - name: Compilar AAB firmado
         working-directory: twa
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          echo "n" | bubblewrap build \
+          bubblewrap build \
             --skipPwaValidation \
             --signingKeyPath android.keystore \
             --signingKeyAlias noir-studio \
