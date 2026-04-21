@@ -49,24 +49,35 @@ jobs:
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > twa/android.keystore
 
-      - name: Inicializar proyecto Android desde twa-manifest.json
+      - name: Inicializar proyecto Android
         working-directory: twa
         run: |
-          bubblewrap init \
-            --manifest https://raw.githubusercontent.com/danirete12/the-noir-studio/master/manifest.json \
-            --skipPwaValidation 2>/dev/null || true
+          expect << 'EXPECT_EOF'
+          set timeout 120
+          spawn bubblewrap init --manifest https://raw.githubusercontent.com/danirete12/the-noir-studio/master/manifest.json --skipPwaValidation
+          expect "Domain:"
+          send "thenoir.studio\r"
+          expect {
+            -re {[?]} { send "\r"; exp_continue }
+            eof {}
+            timeout {}
+          }
+          EXPECT_EOF
           git checkout twa-manifest.json
+          ls -la
 
       - name: Actualizar proyecto y generar checksum
         working-directory: twa
         run: bubblewrap update --skipPwaValidation 2>/dev/null || true
 
-      - name: Parchear build.gradle y compilar AAB
+      - name: Parchear y compilar AAB
         working-directory: twa
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          sed -i 's/splashScreenFadeOutDuration: ,/splashScreenFadeOutDuration: 300,/' app/build.gradle
+          sed -i 's/splashScreenFadeOutDuration: ,/splashScreenFadeOutDuration: 300,/' app/build.gradle || true
+          sed -i 's/minSdkVersion 19/minSdkVersion 21/' app/build.gradle || true
+          sed -i 's/minSdkVersion="19"/minSdkVersion="21"/' app/src/main/AndroidManifest.xml || true
           ./gradlew bundleRelease \
             -Pandroid.injected.signing.store.file=$(pwd)/android.keystore \
             -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
