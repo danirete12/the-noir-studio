@@ -61,20 +61,17 @@ jobs:
         working-directory: twa
         run: bubblewrap update --skipPwaValidation 2>/dev/null || true
 
-      - name: Compilar AAB firmado
+      - name: Parchear build.gradle y compilar AAB
         working-directory: twa
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          KPASS="$KEYSTORE_PASSWORD" expect << 'EXPECT_EOF'
-          set timeout 300
-          spawn bubblewrap build --skipPwaValidation --signingKeyPath android.keystore --signingKeyAlias noir-studio
-          expect "Password for the Key Store:"
-          send "$env(KPASS)\r"
-          expect "Password for the Key:"
-          send "$env(KPASS)\r"
-          expect eof
-          EXPECT_EOF
+          sed -i 's/splashScreenFadeOutDuration: ,/splashScreenFadeOutDuration: 300,/' app/build.gradle
+          ./gradlew bundleRelease \
+            -Pandroid.injected.signing.store.file=$(pwd)/android.keystore \
+            -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias=noir-studio \
+            -Pandroid.injected.signing.key.password="$KEYSTORE_PASSWORD"
 
       - name: Buscar AAB generado
         working-directory: twa
@@ -84,5 +81,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: noir-studio-${{ github.run_number }}.aab
-          path: twa/app-release-signed.aab
+          path: twa/app/build/outputs/bundle/release/app-release.aab
           retention-days: 90
