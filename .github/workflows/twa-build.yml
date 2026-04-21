@@ -30,8 +30,10 @@ jobs:
       - name: Instalar Android SDK (cmdline-tools)
         uses: android-actions/setup-android@v3
 
-      - name: Instalar bubblewrap
-        run: npm install -g @bubblewrap/cli
+      - name: Instalar bubblewrap y expect
+        run: |
+          npm install -g @bubblewrap/cli
+          sudo apt-get install -y expect
 
       - name: Configurar bubblewrap para usar SDK/JDK del sistema
         run: |
@@ -64,12 +66,15 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          bubblewrap build \
-            --skipPwaValidation \
-            --signingKeyPath android.keystore \
-            --signingKeyAlias noir-studio \
-            --signingKeyPassphrase "$KEYSTORE_PASSWORD" \
-            --signingStorePassphrase "$KEYSTORE_PASSWORD"
+          KPASS="$KEYSTORE_PASSWORD" expect << 'EXPECT_EOF'
+          set timeout 300
+          spawn bubblewrap build --skipPwaValidation --signingKeyPath android.keystore --signingKeyAlias noir-studio
+          expect "Password for the Key Store:"
+          send "$env(KPASS)\r"
+          expect "Password for the Key:"
+          send "$env(KPASS)\r"
+          expect eof
+          EXPECT_EOF
 
       - name: Subir AAB como artefacto
         uses: actions/upload-artifact@v4
