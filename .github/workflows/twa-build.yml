@@ -60,7 +60,7 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          bubblewrap build \
+          echo "n" | bubblewrap build \
             --skipPwaValidation \
             --signingKeyPath android.keystore \
             --signingKeyAlias noir-studio \
