@@ -35,6 +35,7 @@ Viven en `.claude/agents/`. Invocarlos cuando la tarea encaje con su especialida
 - `desarrollador-frontend` — Canvas API, JS, rendimiento
 - `desarrollador-backend` — cuando llegue el momento del servidor
 - `ingeniero-procesamiento-ia` — algoritmos de imagen, WebGL, IA
+- `experto-seo` — SEO técnico, ASO Play Store, keywords, schema markup, visibilidad orgánica
 
 ## Reglas de desarrollo
 
