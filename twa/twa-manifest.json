@@ -28,7 +28,7 @@
   "isChromeOSOnly": false,
   "isMetaQuest": false,
   "fullScopeUrl": "https://thenoir.studio/",
-  "minSdkVersion": 19,
+  "minSdkVersion": 21,
   "splashScreenFadeOutDuration": 300,
   "fingerprints": []
 }
