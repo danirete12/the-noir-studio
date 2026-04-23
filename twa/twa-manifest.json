@@ -75,11 +75,17 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
+          echo "=== versionCode ANTES ==="
+          grep -n "versionCode" app/build.gradle || echo "no encontrado"
+
+          sed -i "s/versionCode [0-9][0-9]*/versionCode 3/g" app/build.gradle || true
           sed -i 's/applicationId ".*"/applicationId "com.thenoirstudio.app"/' app/build.gradle || true
-          sed -i 's/versionCode [0-9]*/versionCode 2/' app/build.gradle || true
-          sed -i 's/splashScreenFadeOutDuration: ,/splashScreenFadeOutDuration: 300,/' app/build.gradle || true
           sed -i 's/minSdkVersion 19/minSdkVersion 21/' app/build.gradle || true
           sed -i 's/minSdkVersion="19"/minSdkVersion="21"/' app/src/main/AndroidManifest.xml || true
+
+          echo "=== versionCode DESPUÉS ==="
+          grep -n "versionCode" app/build.gradle
+
           ./gradlew bundleRelease \
             -Pandroid.injected.signing.store.file=$(pwd)/android.keystore \
             -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
