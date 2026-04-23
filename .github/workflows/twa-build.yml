@@ -70,14 +70,29 @@ jobs:
         working-directory: twa
         run: bubblewrap update --skipPwaValidation 2>/dev/null || true
 
+      - name: Parchear build.gradle
+        working-directory: twa
+        run: |
+          python3 << 'PYEOF'
+          import re
+          with open('app/build.gradle', 'r') as f:
+              c = f.read()
+          print("ANTES:", [(l.strip()) for l in c.splitlines() if any(x in l for x in ['applicationId','namespace','versionCode','versionName'])])
+          c = re.sub(r'applicationId\s+"[^"]*"', 'applicationId "com.thenoirstudio.app"', c)
+          c = re.sub(r'namespace\s+"[^"]*"', 'namespace "com.thenoirstudio.app"', c)
+          c = re.sub(r'versionCode\s+\d+', 'versionCode 3', c)
+          c = re.sub(r'versionName\s+"[^"]*"', 'versionName "1.0.3"', c)
+          with open('app/build.gradle', 'w') as f:
+              f.write(c)
+          print("DESPUÉS:", [(l.strip()) for l in c.splitlines() if any(x in l for x in ['applicationId','namespace','versionCode','versionName'])])
+          PYEOF
+
       - name: Compilar AAB
         working-directory: twa
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           ./gradlew bundleRelease \
-            -Pandroid.injected.version.code=3 \
-            -Pandroid.injected.version.name="1.0.3" \
             -Pandroid.injected.signing.store.file=$(pwd)/android.keystore \
             -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
             -Pandroid.injected.signing.key.alias=noir-studio \
