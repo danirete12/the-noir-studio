@@ -2,6 +2,10 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteRule ^\.well-known/ - [L]
+
+  # URLs de idioma: /en/ /fr/ /pt/ /de/ → index.html (URL permanece limpia)
+  RewriteRule ^(en|fr|pt|de)/?$ /index.html [L,QSA]
+  RewriteRule ^(en|fr|pt|de)/(.*)$ /index.html [L,QSA]
 </IfModule>
 
 <Files ".well-known">

@@ -5,10 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com; worker-src 'self'">
-  <title>The Noir Studio — Editor de Fotografía Gratis Online</title>
-  <meta name="description" content="Editor de fotografía online con presets cinematográficos inspirados en el cine y la pintura clásica. Gratis, sin registro, sin instalación. Exporta a Instagram 1080×1350.">
-  <meta property="og:title" content="The Noir Studio — Editor de Fotografía Gratis Online">
-  <meta property="og:description" content="Presets cinematográficos con nombres propios: Caravaggio, Wes, Quentin, Zuloaga. Edita y exporta a Instagram en 30 segundos. Gratis, sin cuenta, sin instalación.">
+  <title>Editor de Fotografía Gratis Online — The Noir Studio</title>
+  <meta name="description" content="Editor de fotografía gratis online con presets cinematográficos. Sin registro, sin instalación. Aplica presets de cine, ajusta, exporta a Instagram 1080×1350 en 30 segundos.">
+  <meta property="og:title" content="Editor de Fotografía Gratis Online — The Noir Studio">
+  <meta property="og:description" content="Editor de fotografía gratis online. Presets con nombres propios: Caravaggio, Wes, Quentin, Zuloaga. Sin cuenta, sin instalación. Exporta a Instagram en 30 segundos.">
   <meta property="og:type" content="website">
   <link rel="canonical" href="https://thenoir.studio/">
   <meta property="og:url" content="https://thenoir.studio/">
@@ -17,14 +17,14 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@thenoirstudio">
-  <meta name="twitter:title" content="The Noir Studio — Editor de Fotografía Gratis Online">
-  <meta name="twitter:description" content="Presets cinematográficos con nombres propios: Caravaggio, Wes, Quentin, Zuloaga. Edita y exporta a Instagram en 30 segundos. Gratis, sin cuenta, sin instalación.">
+  <meta name="twitter:title" content="Editor de Fotografía Gratis Online — The Noir Studio">
+  <meta name="twitter:description" content="Editor de fotografía gratis online. Presets con nombres propios: Caravaggio, Wes, Quentin, Zuloaga. Sin cuenta, sin instalación. Exporta a Instagram en 30 segundos.">
   <meta name="twitter:image" content="https://thenoir.studio/og-image.png">
   <link rel="alternate" hreflang="es" href="https://thenoir.studio/">
-  <link rel="alternate" hreflang="en" href="https://thenoir.studio/?lang=en">
-  <link rel="alternate" hreflang="fr" href="https://thenoir.studio/?lang=fr">
-  <link rel="alternate" hreflang="pt" href="https://thenoir.studio/?lang=pt">
-  <link rel="alternate" hreflang="de" href="https://thenoir.studio/?lang=de">
+  <link rel="alternate" hreflang="en" href="https://thenoir.studio/en/">
+  <link rel="alternate" hreflang="fr" href="https://thenoir.studio/fr/">
+  <link rel="alternate" hreflang="pt" href="https://thenoir.studio/pt/">
+  <link rel="alternate" hreflang="de" href="https://thenoir.studio/de/">
   <link rel="alternate" hreflang="x-default" href="https://thenoir.studio/">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="manifest" href="manifest.json">
@@ -89,6 +89,12 @@
       letter-spacing: 0.35em;
       color: var(--text);
       display: flex;
+      flex-direction: column;
+      gap: 0.1em;
+    }
+
+    header h1 .h1-brand {
+      display: flex;
       align-items: baseline;
       gap: 0.18em;
     }
@@ -108,7 +114,7 @@
       text-transform: none;
     }
 
-    header .tagline {
+    header h1 .tagline {
       font-size: 0.55rem;
       letter-spacing: 0.22em;
       text-transform: uppercase;
@@ -977,7 +983,7 @@
         flex-wrap: wrap;
         gap: 0;
       }
-      header .tagline { display: none; }
+      header h1 .tagline { display: none; }
       header h1 { font-size: 1rem; }
       .logo-mark { width: 22px; height: 22px; }
 
@@ -1326,8 +1332,10 @@
       <line x1="16" y1="98" x2="84" y2="98" stroke-width="1.2"/>
     </g>
   </svg>
-  <h1><span class="h1-noir">The Noir.</span><span class="h1-studio">Studio</span></h1>
-  <span class="tagline">Editor de Fotografía</span>
+  <h1>
+    <span class="h1-brand"><span class="h1-noir">The Noir.</span><span class="h1-studio">Studio</span></span>
+    <span class="tagline" data-i18n="tagline">Editor de Fotografía Gratis Online</span>
+  </h1>
   <div class="header-actions">
     <button id="btn-change-photo" class="btn-header" title="Cambiar foto" data-i18n-title="btn_change_photo_title" disabled>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="12" cy="12" r="4"/><path d="M9 5 L10.5 3 L13.5 3 L15 5"/></svg>
@@ -1373,7 +1381,7 @@
       <button class="btn-crop-action btn-crop-cancel" id="btn-crop-cancel" data-i18n="btn_crop_cancel">Cancelar</button>
       <button class="btn-crop-action btn-crop-apply" id="btn-crop-apply" data-i18n="btn_crop_apply">Aplicar recorte</button>
     </div>
-    <div id="before-badge">Antes</div>
+    <div id="before-badge" data-i18n="before_badge">Antes</div>
   </div>
 
   <!-- El Laboratorio -->
@@ -1720,6 +1728,12 @@
 // ── i18n ──
 const LANGS = {
   es: {
+    tagline: 'Editor de Fotografía Gratis Online',
+    before_badge: 'Antes',
+    page_title: 'Editor de Fotografía Gratis Online — The Noir Studio',
+    meta_description: 'Editor de fotografía gratis online con presets cinematográficos. Sin registro, sin instalación. Aplica presets de cine, ajusta, exporta a Instagram 1080×1350 en 30 segundos.',
+    og_title: 'Editor de Fotografía Gratis Online — The Noir Studio',
+    og_description: 'Editor de fotografía gratis online. Presets con nombres propios: Caravaggio, Wes, Quentin, Zuloaga. Sin cuenta, sin instalación. Exporta a Instagram en 30 segundos.',
     btn_change_photo: 'Cambiar foto', btn_change_photo_title: 'Cambiar foto',
     btn_undo: 'Deshacer', btn_undo_title: 'Deshacer (Ctrl+Z)',
     btn_redo: 'Rehacer', btn_redo_title: 'Rehacer (Ctrl+Y)',
@@ -1751,6 +1765,12 @@ const LANGS = {
     cookie_btn: 'Entendido',
   },
   en: {
+    tagline: 'Free Online Photo Editor',
+    before_badge: 'Before',
+    page_title: 'Free Online Photo Editor — The Noir Studio',
+    meta_description: 'Free online photo editor with cinematic presets. No sign-up, no install. Apply film-inspired presets, adjust, and export to Instagram 1080×1350 in 30 seconds.',
+    og_title: 'Free Online Photo Editor — The Noir Studio',
+    og_description: 'Free online photo editor. Cinematic presets: Caravaggio, Wes, Quentin, Zuloaga. No account, no install. Export to Instagram in 30 seconds.',
     btn_change_photo: 'Change photo', btn_change_photo_title: 'Change photo',
     btn_undo: 'Undo', btn_undo_title: 'Undo (Ctrl+Z)',
     btn_redo: 'Redo', btn_redo_title: 'Redo (Ctrl+Y)',
@@ -1782,6 +1802,12 @@ const LANGS = {
     cookie_btn: 'Got it',
   },
   fr: {
+    tagline: 'Éditeur Photo Gratuit en Ligne',
+    before_badge: 'Avant',
+    page_title: 'Éditeur Photo Gratuit en Ligne — The Noir Studio',
+    meta_description: 'Éditeur photo gratuit en ligne avec presets cinématographiques. Sans inscription, sans installation. Appliquez des presets cinéma et exportez vers Instagram 1080×1350 en 30 secondes.',
+    og_title: 'Éditeur Photo Gratuit en Ligne — The Noir Studio',
+    og_description: 'Éditeur photo gratuit en ligne. Presets cinématographiques : Caravaggio, Wes, Quentin, Zuloaga. Sans compte, sans installation. Export Instagram en 30 secondes.',
     btn_change_photo: 'Changer photo', btn_change_photo_title: 'Changer photo',
     btn_undo: 'Annuler', btn_undo_title: 'Annuler (Ctrl+Z)',
     btn_redo: 'Rétablir', btn_redo_title: 'Rétablir (Ctrl+Y)',
@@ -1813,6 +1839,12 @@ const LANGS = {
     cookie_btn: 'Compris',
   },
   pt: {
+    tagline: 'Editor de Fotos Grátis Online',
+    before_badge: 'Antes',
+    page_title: 'Editor de Fotos Grátis Online — The Noir Studio',
+    meta_description: 'Editor de fotos grátis online com presets cinematográficos. Sem cadastro, sem instalação. Aplique presets de cinema e exporte para Instagram 1080×1350 em 30 segundos.',
+    og_title: 'Editor de Fotos Grátis Online — The Noir Studio',
+    og_description: 'Editor de fotos grátis online. Presets cinematográficos: Caravaggio, Wes, Quentin, Zuloaga. Sem conta, sem instalação. Exporte para Instagram em 30 segundos.',
     btn_change_photo: 'Trocar foto', btn_change_photo_title: 'Trocar foto',
     btn_undo: 'Desfazer', btn_undo_title: 'Desfazer (Ctrl+Z)',
     btn_redo: 'Refazer', btn_redo_title: 'Refazer (Ctrl+Y)',
@@ -1844,6 +1876,12 @@ const LANGS = {
     cookie_btn: 'Entendi',
   },
   de: {
+    tagline: 'Kostenloser Online Foto-Editor',
+    before_badge: 'Vorher',
+    page_title: 'Kostenloser Online Foto-Editor — The Noir Studio',
+    meta_description: 'Kostenloser Online-Fotoeditor mit kinematografischen Presets. Ohne Anmeldung, ohne Installation. Film-Presets anwenden und für Instagram 1080×1350 in 30 Sekunden exportieren.',
+    og_title: 'Kostenloser Online Foto-Editor — The Noir Studio',
+    og_description: 'Kostenloser Online-Fotoeditor. Kinematografische Presets: Caravaggio, Wes, Quentin, Zuloaga. Ohne Konto, ohne Installation. Export für Instagram in 30 Sekunden.',
     btn_change_photo: 'Foto wechseln', btn_change_photo_title: 'Foto wechseln',
     btn_undo: 'Rückgängig', btn_undo_title: 'Rückgängig (Ctrl+Z)',
     btn_redo: 'Wiederholen', btn_redo_title: 'Wiederholen (Ctrl+Y)',
@@ -1897,11 +1935,32 @@ function applyLang(code) {
   document.querySelectorAll('#lang-switcher span').forEach(s => {
     s.classList.toggle('active', s.dataset.lang === code);
   });
+  // Update SEO meta tags
+  if (t.page_title) document.title = t.page_title;
+  const setMeta = (sel, val) => { const el = document.querySelector(sel); if (el && val) el.setAttribute('content', val); };
+  setMeta('meta[name="description"]', t.meta_description);
+  setMeta('meta[property="og:title"]', t.og_title);
+  setMeta('meta[property="og:description"]', t.og_description);
+  setMeta('meta[name="twitter:title"]', t.og_title);
+  setMeta('meta[name="twitter:description"]', t.og_description);
+  // Update canonical URL and push clean path
+  const base = 'https://thenoir.studio';
+  const cleanPath = code === 'es' ? '/' : `/${code}/`;
+  const canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.href = base + cleanPath;
+  setMeta('meta[property="og:url"]', base + cleanPath);
+  if (history.replaceState) {
+    const current = location.pathname;
+    const isLangPath = /^\/(en|fr|pt|de)\/?$/.test(current);
+    if (isLangPath || current === '/') history.replaceState(null, '', cleanPath);
+  }
   localStorage.setItem('ns_lang', code);
   if (code !== 'es') gtag('event', 'language_changed', { language: code });
 }
 
 function detectLang() {
+  const pathMatch = location.pathname.match(/^\/(en|fr|pt|de)\/?$/);
+  if (pathMatch) return pathMatch[1];
   const param = new URLSearchParams(location.search).get('lang');
   if (param && LANGS[param]) return param;
   const stored = localStorage.getItem('ns_lang');
