@@ -1645,9 +1645,9 @@
       <span class="footer-info-label">.jpg</span>
     </div>
     <div class="footer-legal-links">
-      <a href="/aviso-legal.html" target="_blank">Aviso legal</a>
-      <a href="/privacidad.html" target="_blank">Privacidad</a>
-      <a href="/cookies.html" target="_blank">Cookies</a>
+      <a href="/aviso-legal.html" target="_blank" data-i18n="legal_notice">Aviso legal</a>
+      <a href="/privacidad.html" target="_blank" data-i18n="legal_privacy">Privacidad</a>
+      <a href="/cookies.html" target="_blank" data-i18n="legal_cookies">Cookies</a>
     </div>
     <div id="exif-bar">
       <span class="exif-item">
@@ -1762,7 +1762,10 @@ const LANGS = {
     mobile_exposure: 'Revelado', mobile_texture: 'Textura',
     mobile_color: 'Color', mobile_save: 'Guardar',
     cookie_text: 'Usamos Google Fonts y Google Analytics (datos anónimos). Google puede registrar tu IP.',
-    cookie_btn: 'Entendido',
+    cookie_btn: 'Entendido', cookie_more: 'Saber más',
+    group_luz: 'Luz', group_cine: 'Cine', group_arte: 'Arte', group_camara: 'Cámara',
+    group_revelado: 'Revelado', group_visor: 'Visor', group_grano: 'Grano', group_ciudades: 'Ciudades',
+    legal_notice: 'Aviso legal', legal_privacy: 'Privacidad', legal_cookies: 'Cookies',
   },
   en: {
     tagline: 'Free Online Photo Editor',
@@ -1799,7 +1802,10 @@ const LANGS = {
     mobile_exposure: 'Exposure', mobile_texture: 'Texture',
     mobile_color: 'Color', mobile_save: 'Save',
     cookie_text: 'We use Google Fonts for typography, which may log your IP on Google\'s servers.',
-    cookie_btn: 'Got it',
+    cookie_btn: 'Got it', cookie_more: 'Learn more',
+    group_luz: 'Light', group_cine: 'Film', group_arte: 'Art', group_camara: 'Camera',
+    group_revelado: 'Darkroom', group_visor: 'Viewfinder', group_grano: 'Grain', group_ciudades: 'Cities',
+    legal_notice: 'Legal notice', legal_privacy: 'Privacy', legal_cookies: 'Cookies',
   },
   fr: {
     tagline: 'Éditeur Photo Gratuit en Ligne',
@@ -1836,7 +1842,10 @@ const LANGS = {
     mobile_exposure: 'Exposition', mobile_texture: 'Texture',
     mobile_color: 'Couleur', mobile_save: 'Enregistrer',
     cookie_text: 'Nous utilisons Google Fonts pour la typographie, ce qui peut enregistrer votre IP sur les serveurs de Google.',
-    cookie_btn: 'Compris',
+    cookie_btn: 'Compris', cookie_more: 'En savoir plus',
+    group_luz: 'Lumière', group_cine: 'Cinéma', group_arte: 'Art', group_camara: 'Appareil',
+    group_revelado: 'Chambre noire', group_visor: 'Viseur', group_grano: 'Grain', group_ciudades: 'Villes',
+    legal_notice: 'Mentions légales', legal_privacy: 'Confidentialité', legal_cookies: 'Cookies',
   },
   pt: {
     tagline: 'Editor de Fotos Grátis Online',
@@ -1873,7 +1882,10 @@ const LANGS = {
     mobile_exposure: 'Exposição', mobile_texture: 'Textura',
     mobile_color: 'Cor', mobile_save: 'Salvar',
     cookie_text: 'Usamos Google Fonts para tipografia, o que pode registrar seu IP nos servidores do Google.',
-    cookie_btn: 'Entendi',
+    cookie_btn: 'Entendi', cookie_more: 'Saiba mais',
+    group_luz: 'Luz', group_cine: 'Cinema', group_arte: 'Arte', group_camara: 'Câmera',
+    group_revelado: 'Revelação', group_visor: 'Visor', group_grano: 'Grão', group_ciudades: 'Cidades',
+    legal_notice: 'Aviso legal', legal_privacy: 'Privacidade', legal_cookies: 'Cookies',
   },
   de: {
     tagline: 'Kostenloser Online Foto-Editor',
@@ -1910,7 +1922,10 @@ const LANGS = {
     mobile_exposure: 'Belichtung', mobile_texture: 'Textur',
     mobile_color: 'Farbe', mobile_save: 'Speichern',
     cookie_text: 'Wir verwenden Google Fonts für Schriftarten, wodurch Ihre IP auf Google-Servern gespeichert werden kann.',
-    cookie_btn: 'Verstanden',
+    cookie_btn: 'Verstanden', cookie_more: 'Mehr erfahren',
+    group_luz: 'Licht', group_cine: 'Film', group_arte: 'Kunst', group_camara: 'Kamera',
+    group_revelado: 'Dunkelkammer', group_visor: 'Sucher', group_grano: 'Korn', group_ciudades: 'Städte',
+    legal_notice: 'Impressum', legal_privacy: 'Datenschutz', legal_cookies: 'Cookies',
   },
 };
 
@@ -3171,7 +3186,7 @@ GROUPS.forEach((group, gi) => {
   const tab = document.createElement('button');
   tab.className = 'tab-btn';
   tab.dataset.group = String(gi);
-  tab.innerHTML = `<span class="tab-icon">${GROUP_ICONS[group.label] || ''}</span><span>${group.label}</span>`;
+  tab.innerHTML = `<span class="tab-icon">${GROUP_ICONS[group.id] || ''}</span><span data-i18n="group_${group.id}">${group.label}</span>`;
   tab.addEventListener('click', () => toggleTab(String(gi), tab));
   tabBar.appendChild(tab);
 
@@ -3227,6 +3242,7 @@ if (mobilePresetsBody) {
   GROUPS.forEach((group, gi) => {
     const tab = document.createElement('button');
     tab.className = 'mobile-cat-btn' + (gi === 0 ? ' active' : '');
+    tab.dataset.i18n = `group_${group.id}`;
     tab.textContent = group.label;
     tab.addEventListener('click', () => showMobileGroup(gi));
     catsRow.appendChild(tab);
@@ -4048,7 +4064,7 @@ document.getElementById('lang-switcher').addEventListener('click', e => {
 <!-- Banner de cookies -->
 <div id="cookie-banner" role="complementary" aria-label="Aviso de cookies">
   <span><span data-i18n="cookie_text">Usamos Google Fonts y Google Analytics (datos anónimos). Google puede registrar tu IP.</span>
-    <a href="/cookies.html" target="_blank">Saber más</a>
+    <a href="/cookies.html" target="_blank" data-i18n="cookie_more">Saber más</a>
   </span>
   <button id="cookie-accept" data-i18n="cookie_btn">Entendido</button>
 </div>
