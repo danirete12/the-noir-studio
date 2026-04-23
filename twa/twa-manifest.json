@@ -1,87 +1,49 @@
-name: TWA — Build AAB para Play Store
-
-on:
-  push:
-    branches: [master]
-    paths:
-      - 'twa/twa-manifest.json'
-      - 'manifest.json'
-      - 'index.html'
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Configurar Java 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Instalar Android SDK (cmdline-tools)
-        uses: android-actions/setup-android@v3
-
-      - name: Instalar bubblewrap y expect
-        run: |
-          npm install -g @bubblewrap/cli
-          sudo apt-get install -y expect
-
-      - name: Configurar bubblewrap para usar SDK/JDK del sistema
-        run: |
-          mkdir -p ~/.bubblewrap
-          cat > ~/.bubblewrap/config.json << EOF
-          {
-            "jdkPath": "$JAVA_HOME",
-            "androidSdkPath": "$ANDROID_SDK_ROOT"
-          }
-          EOF
-
-      - name: Restaurar keystore desde secret
-        run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > twa/android.keystore
-
-      - name: Inicializar proyecto Android desde twa-manifest.json
-        working-directory: twa
-        run: |
-          bubblewrap init \
-            --manifest https://raw.githubusercontent.com/danirete12/the-noir-studio/master/manifest.json \
-            --skipPwaValidation 2>/dev/null || true
-          git checkout twa-manifest.json
-
-      - name: Actualizar proyecto y generar checksum
-        working-directory: twa
-        run: bubblewrap update --skipPwaValidation 2>/dev/null || true
-
-      - name: Parchear build.gradle y compilar AAB
-        working-directory: twa
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-        run: |
-          sed -i 's/splashScreenFadeOutDuration: ,/splashScreenFadeOutDuration: 300,/' app/build.gradle
-          sed -i 's/minSdkVersion 19/minSdkVersion 21/' app/build.gradle
-          sed -i 's/minSdkVersion="19"/minSdkVersion="21"/' app/src/main/AndroidManifest.xml
-          ./gradlew bundleRelease \
-            -Pandroid.injected.signing.store.file=$(pwd)/android.keystore \
-            -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
-            -Pandroid.injected.signing.key.alias=noir-studio \
-            -Pandroid.injected.signing.key.password="$KEYSTORE_PASSWORD"
-
-      - name: Buscar AAB generado
-        working-directory: twa
-        run: find . -name "*.aab" 2>/dev/null
-
-      - name: Subir AAB como artefacto
-        uses: actions/upload-artifact@v4
-        with:
-          name: noir-studio-${{ github.run_number }}.aab
-          path: twa/app/build/outputs/bundle/release/app-release.aab
-          retention-days: 90
+{
+  "packageId": "com.thenoirstudio.app",
+  "host": "thenoir.studio",
+  "name": "The Noir Studio",
+  "launcherName": "Noir Studio",
+  "display": "standalone",
+  "orientation": "default",
+  "themeColor": "#1a1a1a",
+  "navigationColor": "#1a1a1a",
+  "navigationColorDark": "#1a1a1a",
+  "navigationDividerColor": "#1a1a1a",
+  "navigationDividerColorDark": "#1a1a1a",
+  "backgroundColor": "#1a1a1a",
+  "enableNotifications": false,
+  "startUrl": "/",
+  "iconUrl": "https://thenoir.studio/apple-touch-icon.png",
+  "maskableIconUrl": "https://thenoir.studio/apple-touch-icon.png",
+  "monochromeIconUrl": "https://thenoir.studio/apple-touch-icon.png",
+  "appVersion": "1.0.0",
+  "appVersionCode": 1,
+  "signingKey": {
+    "path": "android.keystore",
+    "alias": "noir-studio"
+  },
+  "splashScreenFadeOutDuration": 300,
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://thenoir.studio/",
+  "minSdkVersion": 21,
+  "targetSdkVersion": 34,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://thenoir.studio/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableWindowsAppSdkCompat": false,
+  "chromOSOnlyFeatures": false,
+  "orientationLock": "default",
+  "fingerprints": [
+    {
+      "name": "noir-studio",
+      "value": "33:3E:6F:CB:08:E5:BD:BD:A0:8E:00:8E:51:56:D9:80:6A:C9:48:59:EE:07:6A:86:AE:64:6C:BA:28:EB:E8:B9"
+    }
+  ]
+}
