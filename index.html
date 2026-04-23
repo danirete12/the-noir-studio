@@ -1949,11 +1949,7 @@ function applyLang(code) {
   const canonical = document.querySelector('link[rel="canonical"]');
   if (canonical) canonical.href = base + cleanPath;
   setMeta('meta[property="og:url"]', base + cleanPath);
-  if (history.replaceState) {
-    const current = location.pathname;
-    const isLangPath = /^\/(en|fr|pt|de)\/?$/.test(current);
-    if (isLangPath || current === '/') history.replaceState(null, '', cleanPath);
-  }
+  if (history.replaceState) history.replaceState(null, '', cleanPath);
   localStorage.setItem('ns_lang', code);
   if (code !== 'es') gtag('event', 'language_changed', { language: code });
 }
