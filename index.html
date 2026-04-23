@@ -447,10 +447,12 @@
     }
 
     .pillar-toggle {
-      font-size: 0.5rem;
-      color: var(--muted);
-      transition: transform 0.2s;
+      font-size: 0.75rem;
+      color: var(--text);
+      opacity: 0.5;
+      transition: transform 0.2s, opacity 0.2s;
     }
+    .pillar-header:hover .pillar-toggle { opacity: 0.9; }
     .pillar.collapsed .pillar-toggle { transform: rotate(-90deg); }
 
     .pillar-body {
@@ -1671,14 +1673,15 @@
   <div class="export-inner">
     <svg class="export-logo-anim" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path class="elo-diamond" d="M 45,12 Q 50,7 55,12 L 84,45 Q 89,50 84,55 L 55,88 Q 50,93 45,88 L 16,55 Q 11,50 16,45 Z"
-        fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" pathLength="300"/>
+        fill="none" stroke="#e8e2d8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" pathLength="300"/>
       <line class="elo-line-h" x1="11" y1="50" x2="89" y2="50"
-        stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" pathLength="78"/>
+        stroke="#e8e2d8" stroke-width="1.5" stroke-linecap="round" pathLength="78"/>
       <line class="elo-line-b" x1="16" y1="98" x2="84" y2="98"
-        stroke="#1a1a1a" stroke-width="1.2" stroke-linecap="round" pathLength="68"/>
+        stroke="#e8e2d8" stroke-width="1.2" stroke-linecap="round" pathLength="68"/>
     </svg>
     <span class="export-wordmark" id="export-wordmark">The Noir Studio</span>
     <span class="export-status" id="export-status-text" data-i18n="export_preparing">Preparando tu foto&hellip;</span>
+    <span id="export-countdown" style="font-family:var(--font-sans);font-size:0.6rem;font-weight:300;letter-spacing:0.12em;color:var(--muted);opacity:0;transition:opacity 0.4s;margin-top:4px;"></span>
   </div>
   <div class="export-progress-track">
     <div id="export-progress-bar"></div>
@@ -3391,11 +3394,18 @@ function loadImage(file) {
       canvas.style.display = 'block';
       document.getElementById('btn-change-photo').disabled = false;
       updateAnnotationState();
-      // Inicializar inputs con las dimensiones reales de la imagen
       cropWInput.value = img.width;
       cropHInput.value = img.height;
       syncRatioFromPixels();
       applyFilters();
+    };
+    img.onerror = () => {
+      dropZone.style.display = '';
+      canvas.style.display = 'none';
+      const hint = dropZone.querySelector('.drop-hint') || dropZone;
+      const prev = hint.innerHTML;
+      hint.innerHTML = '<span style="color:var(--accent);letter-spacing:0.08em;font-size:0.6rem">Formato no compatible. Prueba con JPG, PNG o WEBP.</span>';
+      setTimeout(() => { hint.innerHTML = prev; }, 3500);
     };
     img.src = e.target.result;
   };
@@ -3604,12 +3614,26 @@ function hideExportOverlay() {
 function showExportOverlay() {
   exportStatusEl.textContent = 'Preparando tu foto\u2026';
   hideExportOverlay();
-  void exportOverlayEl.offsetWidth; // fuerza reflow para reiniciar animaciones CSS
+  void exportOverlayEl.offsetWidth;
   exportOverlayEl.classList.add('visible');
   requestAnimationFrame(() => requestAnimationFrame(() => {
     exportBarEl.style.transition = `width ${EXPORT_OVERLAY_MS}ms linear`;
     exportBarEl.style.width = '100%';
   }));
+
+  const countdownEl = document.getElementById('export-countdown');
+  let secs = Math.round(EXPORT_OVERLAY_MS / 1000);
+  countdownEl.textContent = secs + 's';
+  countdownEl.style.opacity = '1';
+  const countdownInterval = setInterval(() => {
+    secs--;
+    if (secs <= 0) {
+      clearInterval(countdownInterval);
+      countdownEl.style.opacity = '0';
+    } else {
+      countdownEl.textContent = secs + 's';
+    }
+  }, 1000);
 }
 
 document.getElementById('btn-export').addEventListener('click', () => {
@@ -3926,6 +3950,16 @@ function toggleMobileSheet(pillarId, btn) {
 
 // Exportar desde móvil
 document.getElementById('btn-export-mobile').addEventListener('click', () => {
+  if (!originalImage) {
+    const btn = document.getElementById('btn-export-mobile');
+    btn.style.transition = 'transform 0.08s';
+    const shake = [0, -6, 6, -4, 4, 0];
+    shake.reduce((p, x, i) => p.then(() => new Promise(r => {
+      btn.style.transform = `translateX(${x}px)`;
+      setTimeout(r, 60);
+    })), Promise.resolve()).then(() => { btn.style.transform = ''; });
+    return;
+  }
   document.getElementById('btn-export').click();
 });
 
