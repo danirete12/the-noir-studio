@@ -75,6 +75,7 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
+          sed -i 's/applicationId ".*"/applicationId "com.thenoirstudio.app"/' app/build.gradle || true
           sed -i 's/splashScreenFadeOutDuration: ,/splashScreenFadeOutDuration: 300,/' app/build.gradle || true
           sed -i 's/minSdkVersion 19/minSdkVersion 21/' app/build.gradle || true
           sed -i 's/minSdkVersion="19"/minSdkVersion="21"/' app/src/main/AndroidManifest.xml || true
