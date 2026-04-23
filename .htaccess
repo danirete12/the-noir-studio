@@ -1,0 +1,10 @@
+# Permitir acceso a .well-known (necesario para TWA assetlinks)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^\.well-known/ - [L]
+</IfModule>
+
+<Files ".well-known">
+  Require all granted
+</Files>
+
