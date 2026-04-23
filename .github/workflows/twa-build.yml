@@ -70,16 +70,14 @@ jobs:
         working-directory: twa
         run: bubblewrap update --skipPwaValidation 2>/dev/null || true
 
-      - name: Parchear y compilar AAB
+      - name: Compilar AAB
         working-directory: twa
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          sed -i 's/applicationId ".*"/applicationId "com.thenoirstudio.app"/' app/build.gradle || true
-          sed -i 's/splashScreenFadeOutDuration: ,/splashScreenFadeOutDuration: 300,/' app/build.gradle || true
-          sed -i 's/minSdkVersion 19/minSdkVersion 21/' app/build.gradle || true
-          sed -i 's/minSdkVersion="19"/minSdkVersion="21"/' app/src/main/AndroidManifest.xml || true
           ./gradlew bundleRelease \
+            -Pandroid.injected.version.code=3 \
+            -Pandroid.injected.version.name="1.0.3" \
             -Pandroid.injected.signing.store.file=$(pwd)/android.keystore \
             -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
             -Pandroid.injected.signing.key.alias=noir-studio \
