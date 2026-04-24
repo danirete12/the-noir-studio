@@ -70,21 +70,37 @@ jobs:
         working-directory: twa
         run: bubblewrap update --skipPwaValidation 2>/dev/null || true
 
-      - name: Parchear build.gradle
+      - name: Parchear build.gradle y AndroidManifest.xml
         working-directory: twa
         run: |
           python3 << 'PYEOF'
           import re
+
+          # --- build.gradle ---
           with open('app/build.gradle', 'r') as f:
               c = f.read()
-          print("ANTES:", [(l.strip()) for l in c.splitlines() if any(x in l for x in ['applicationId','namespace','versionCode','versionName'])])
+          print("build.gradle ANTES:", [l.strip() for l in c.splitlines() if any(x in l for x in ['applicationId','namespace','versionCode','versionName'])])
           c = re.sub(r'applicationId\s+"[^"]*"', 'applicationId "com.thenoirstudio.app"', c)
-          c = re.sub(r'namespace\s+"[^"]*"', 'namespace "com.thenoirstudio.app"', c)
+          if re.search(r'namespace\s+"[^"]*"', c):
+              c = re.sub(r'namespace\s+"[^"]*"', 'namespace "com.thenoirstudio.app"', c)
+          else:
+              c = re.sub(r'(android\s*\{)', r'\1\n    namespace "com.thenoirstudio.app"', c, count=1)
           c = re.sub(r'versionCode\s+\d+', 'versionCode 3', c)
           c = re.sub(r'versionName\s+"[^"]*"', 'versionName "1.0.3"', c)
           with open('app/build.gradle', 'w') as f:
               f.write(c)
-          print("DESPUÉS:", [(l.strip()) for l in c.splitlines() if any(x in l for x in ['applicationId','namespace','versionCode','versionName'])])
+          print("build.gradle DESPUÉS:", [l.strip() for l in c.splitlines() if any(x in l for x in ['applicationId','namespace','versionCode','versionName'])])
+
+          # --- AndroidManifest.xml ---
+          # AGP 8.x: el namespace va en build.gradle; package="" en el manifest causa error de build
+          manifest_path = 'app/src/main/AndroidManifest.xml'
+          with open(manifest_path, 'r') as f:
+              m = f.read()
+          print("manifest ANTES (package attr):", re.findall(r'package="[^"]*"', m))
+          m = re.sub(r'\s+package="[^"]*"', '', m)
+          with open(manifest_path, 'w') as f:
+              f.write(m)
+          print("manifest DESPUÉS (package attr):", re.findall(r'package="[^"]*"', m))
           PYEOF
 
       - name: Compilar AAB
