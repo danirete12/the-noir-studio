@@ -1735,7 +1735,7 @@ const LANGS = {
   es: {
     tagline: 'Editor de Fotografía Gratis Online',
     before_badge: 'Antes',
-    page_title: 'Editor de Fotografía Gratis Online — The Noir Studio',
+    page_title: 'Editor de Fotos Gratis Online con Presets — The Noir Studio',
     meta_description: 'Editor de fotografía gratis online con presets cinematográficos. Sin registro, sin instalación. Aplica presets de cine, ajusta, exporta a Instagram 1080×1350 en 30 segundos.',
     og_title: 'Editor de Fotos Gratis Online con Presets — The Noir Studio',
     og_description: 'Editor de fotos online gratis. Presets cinematográficos: Caravaggio, Wes, Quentin, Zuloaga. Sin cuenta, sin instalación. Exporta a Instagram en 30 segundos.',
@@ -1775,7 +1775,7 @@ const LANGS = {
   en: {
     tagline: 'Free Online Photo Editor',
     before_badge: 'Before',
-    page_title: 'Free Online Photo Editor — The Noir Studio',
+    page_title: 'Free Online Photo Editor with Cinematic Presets — The Noir Studio',
     meta_description: 'Free online photo editor with cinematic presets. No sign-up, no install. Apply film-inspired presets, adjust, and export to Instagram 1080×1350 in 30 seconds.',
     og_title: 'Free Online Photo Editor with Cinematic Presets — The Noir Studio',
     og_description: 'Free online photo editor with cinematic presets. No account, no install. Caravaggio, Wes, Quentin, Zuloaga. Export to Instagram 1080×1350 in 30 seconds.',
@@ -1815,7 +1815,7 @@ const LANGS = {
   fr: {
     tagline: 'Éditeur Photo Gratuit en Ligne',
     before_badge: 'Avant',
-    page_title: 'Éditeur Photo Gratuit en Ligne — The Noir Studio',
+    page_title: 'Éditeur Photo Gratuit en Ligne avec Presets — The Noir Studio',
     meta_description: 'Éditeur photo gratuit en ligne avec presets cinématographiques. Sans inscription, sans installation. Appliquez des presets cinéma et exportez vers Instagram 1080×1350 en 30 secondes.',
     og_title: 'Éditeur Photo Gratuit en Ligne avec Presets — The Noir Studio',
     og_description: 'Éditeur photo gratuit en ligne avec presets cinématographiques. Sans compte, sans installation. Caravaggio, Wes, Quentin, Zuloaga. Export Instagram en 30 secondes.',
@@ -1855,7 +1855,7 @@ const LANGS = {
   pt: {
     tagline: 'Editor de Fotos Grátis Online',
     before_badge: 'Antes',
-    page_title: 'Editor de Fotos Grátis Online — The Noir Studio',
+    page_title: 'Editor de Fotos Grátis Online com Presets — The Noir Studio',
     meta_description: 'Editor de fotos grátis online com presets cinematográficos. Sem cadastro, sem instalação. Aplique presets de cinema e exporte para Instagram 1080×1350 em 30 segundos.',
     og_title: 'Editor de Fotos Grátis Online com Presets — The Noir Studio',
     og_description: 'Editor de fotos grátis online com presets cinematográficos. Sem conta, sem instalação. Caravaggio, Wes, Quentin, Zuloaga. Exporte para Instagram em 30 segundos.',
@@ -1895,7 +1895,7 @@ const LANGS = {
   de: {
     tagline: 'Kostenloser Online Foto-Editor',
     before_badge: 'Vorher',
-    page_title: 'Kostenloser Online Foto-Editor — The Noir Studio',
+    page_title: 'Kostenloser Online Foto-Editor mit Presets — The Noir Studio',
     meta_description: 'Kostenloser Online-Fotoeditor mit kinematografischen Presets. Ohne Anmeldung, ohne Installation. Film-Presets anwenden und für Instagram 1080×1350 in 30 Sekunden exportieren.',
     og_title: 'Kostenloser Online Foto-Editor mit Presets — The Noir Studio',
     og_description: 'Kostenloser Online-Fotoeditor mit kinematografischen Presets. Ohne Konto, ohne Installation. Caravaggio, Wes, Quentin, Zuloaga. Export für Instagram 1080×1350 in 30 Sekunden.',
@@ -1943,6 +1943,12 @@ function applyLang(code) {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     if (t[key] !== undefined) el.innerHTML = t[key];
+  });
+  // Pase explícito para etiquetas de grupo (tabs y mobile cats creados dinámicamente)
+  GROUPS.forEach(group => {
+    const key = `group_${group.id}`;
+    if (t[key] === undefined) return;
+    document.querySelectorAll(`[data-i18n="${key}"]`).forEach(el => { el.textContent = t[key]; });
   });
   document.querySelectorAll('[data-i18n-ph]').forEach(el => {
     const key = el.dataset.i18nPh;
@@ -3186,12 +3192,17 @@ const tabBar    = document.getElementById('tab-bar');
 const tabDrawer = document.getElementById('tab-drawer');
 let activeTab   = null;
 
+// Detectar idioma inicial antes de crear tabs para mostrar etiqueta correcta desde el inicio
+const _initLangCode = localStorage.getItem('ns_lang') || (location.pathname.match(/^\/(en|fr|pt|de)\/?$/)||[])[1] || 'es';
+const _initT = LANGS[_initLangCode] || LANGS['es'];
+
 GROUPS.forEach((group, gi) => {
   // Tab
   const tab = document.createElement('button');
   tab.className = 'tab-btn';
   tab.dataset.group = String(gi);
-  tab.innerHTML = `<span class="tab-icon">${GROUP_ICONS[group.id] || ''}</span><span data-i18n="group_${group.id}">${group.label}</span>`;
+  const _groupLabel = _initT[`group_${group.id}`] || group.label;
+  tab.innerHTML = `<span class="tab-icon">${GROUP_ICONS[group.id] || ''}</span><span data-i18n="group_${group.id}">${_groupLabel}</span>`;
   tab.addEventListener('click', () => toggleTab(String(gi), tab));
   tabBar.appendChild(tab);
 
@@ -3248,7 +3259,7 @@ if (mobilePresetsBody) {
     const tab = document.createElement('button');
     tab.className = 'mobile-cat-btn' + (gi === 0 ? ' active' : '');
     tab.dataset.i18n = `group_${group.id}`;
-    tab.textContent = group.label;
+    tab.textContent = _initT[`group_${group.id}`] || group.label;
     tab.addEventListener('click', () => showMobileGroup(gi));
     catsRow.appendChild(tab);
   });
