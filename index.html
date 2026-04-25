@@ -5,10 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com; worker-src 'self'">
-  <title>Editor de Fotografía Gratis Online — The Noir Studio</title>
-  <meta name="description" content="Editor de fotografía gratis online con presets cinematográficos. Sin registro, sin instalación. Aplica presets de cine, ajusta, exporta a Instagram 1080×1350 en 30 segundos.">
-  <meta property="og:title" content="Editor de Fotografía Gratis Online — The Noir Studio">
-  <meta property="og:description" content="Editor de fotografía gratis online. Presets con nombres propios: Caravaggio, Wes, Quentin, Zuloaga. Sin cuenta, sin instalación. Exporta a Instagram en 30 segundos.">
+  <title>Editor de Fotos Gratis Online con Presets — The Noir Studio</title>
+  <meta name="description" content="Editor de fotos gratis online con presets cinematográficos. Sin registro, sin instalación. Ajusta, exporta a Instagram 1080×1350 en 30 segundos. Caravaggio, Fuji, Leica y más.">
+  <meta property="og:title" content="Editor de Fotos Gratis Online con Presets — The Noir Studio">
+  <meta property="og:description" content="Editor de fotos online gratis. Presets con nombres propios: Caravaggio, Wes, Quentin, Zuloaga. Sin cuenta, sin instalación. Exporta a Instagram en 30 segundos.">
   <meta property="og:type" content="website">
   <link rel="canonical" href="https://thenoir.studio/">
   <meta property="og:url" content="https://thenoir.studio/">
@@ -17,25 +17,30 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@thenoirstudio">
-  <meta name="twitter:title" content="Editor de Fotografía Gratis Online — The Noir Studio">
-  <meta name="twitter:description" content="Editor de fotografía gratis online. Presets con nombres propios: Caravaggio, Wes, Quentin, Zuloaga. Sin cuenta, sin instalación. Exporta a Instagram en 30 segundos.">
+  <meta name="twitter:title" content="Editor de Fotos Gratis Online con Presets — The Noir Studio">
+  <meta name="twitter:description" content="Editor de fotos online gratis. Presets cinematográficos: Caravaggio, Wes, Quentin, Zuloaga. Sin cuenta, sin instalación. Exporta a Instagram en 30 segundos.">
   <meta name="twitter:image" content="https://thenoir.studio/og-image.png">
   <link rel="alternate" hreflang="es" href="https://thenoir.studio/">
-  <link rel="alternate" hreflang="en" href="https://thenoir.studio/en/">
-  <link rel="alternate" hreflang="fr" href="https://thenoir.studio/fr/">
-  <link rel="alternate" hreflang="pt" href="https://thenoir.studio/pt/">
-  <link rel="alternate" hreflang="de" href="https://thenoir.studio/de/">
+  <link rel="alternate" hreflang="en" href="https://thenoir.studio/">
+  <link rel="alternate" hreflang="fr" href="https://thenoir.studio/">
+  <link rel="alternate" hreflang="pt" href="https://thenoir.studio/">
+  <link rel="alternate" hreflang="de" href="https://thenoir.studio/">
   <link rel="alternate" hreflang="x-default" href="https://thenoir.studio/">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <meta name="theme-color" content="#1a1a1a">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Noir Studio">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;700&family=Inter:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;700&family=Inter:wght@300;400;500&family=Pinyon+Script&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;700&family=Inter:wght@300;400;500&family=Pinyon+Script&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;700&family=Inter:wght@300;400;500&family=Pinyon+Script&display=swap"></noscript>
   <style>
     :root {
       --bg:         #0f0f0d;
@@ -1358,7 +1363,7 @@
     </div>
   </div>
 </header>
-
+<main id="app-main" aria-label="Editor de fotografía">
 <!-- La Curaduría: grupos de presets -->
 <div class="presets-bar-wrapper">
   <div class="tab-bar" id="tab-bar"><span class="presets-wordmark">Presets</span></div>
@@ -1732,8 +1737,8 @@ const LANGS = {
     before_badge: 'Antes',
     page_title: 'Editor de Fotografía Gratis Online — The Noir Studio',
     meta_description: 'Editor de fotografía gratis online con presets cinematográficos. Sin registro, sin instalación. Aplica presets de cine, ajusta, exporta a Instagram 1080×1350 en 30 segundos.',
-    og_title: 'Editor de Fotografía Gratis Online — The Noir Studio',
-    og_description: 'Editor de fotografía gratis online. Presets con nombres propios: Caravaggio, Wes, Quentin, Zuloaga. Sin cuenta, sin instalación. Exporta a Instagram en 30 segundos.',
+    og_title: 'Editor de Fotos Gratis Online con Presets — The Noir Studio',
+    og_description: 'Editor de fotos online gratis. Presets cinematográficos: Caravaggio, Wes, Quentin, Zuloaga. Sin cuenta, sin instalación. Exporta a Instagram en 30 segundos.',
     btn_change_photo: 'Cambiar foto', btn_change_photo_title: 'Cambiar foto',
     btn_undo: 'Deshacer', btn_undo_title: 'Deshacer (Ctrl+Z)',
     btn_redo: 'Rehacer', btn_redo_title: 'Rehacer (Ctrl+Y)',
@@ -1772,8 +1777,8 @@ const LANGS = {
     before_badge: 'Before',
     page_title: 'Free Online Photo Editor — The Noir Studio',
     meta_description: 'Free online photo editor with cinematic presets. No sign-up, no install. Apply film-inspired presets, adjust, and export to Instagram 1080×1350 in 30 seconds.',
-    og_title: 'Free Online Photo Editor — The Noir Studio',
-    og_description: 'Free online photo editor. Cinematic presets: Caravaggio, Wes, Quentin, Zuloaga. No account, no install. Export to Instagram in 30 seconds.',
+    og_title: 'Free Online Photo Editor with Cinematic Presets — The Noir Studio',
+    og_description: 'Free online photo editor with cinematic presets. No account, no install. Caravaggio, Wes, Quentin, Zuloaga. Export to Instagram 1080×1350 in 30 seconds.',
     btn_change_photo: 'Change photo', btn_change_photo_title: 'Change photo',
     btn_undo: 'Undo', btn_undo_title: 'Undo (Ctrl+Z)',
     btn_redo: 'Redo', btn_redo_title: 'Redo (Ctrl+Y)',
@@ -1812,8 +1817,8 @@ const LANGS = {
     before_badge: 'Avant',
     page_title: 'Éditeur Photo Gratuit en Ligne — The Noir Studio',
     meta_description: 'Éditeur photo gratuit en ligne avec presets cinématographiques. Sans inscription, sans installation. Appliquez des presets cinéma et exportez vers Instagram 1080×1350 en 30 secondes.',
-    og_title: 'Éditeur Photo Gratuit en Ligne — The Noir Studio',
-    og_description: 'Éditeur photo gratuit en ligne. Presets cinématographiques : Caravaggio, Wes, Quentin, Zuloaga. Sans compte, sans installation. Export Instagram en 30 secondes.',
+    og_title: 'Éditeur Photo Gratuit en Ligne avec Presets — The Noir Studio',
+    og_description: 'Éditeur photo gratuit en ligne avec presets cinématographiques. Sans compte, sans installation. Caravaggio, Wes, Quentin, Zuloaga. Export Instagram en 30 secondes.',
     btn_change_photo: 'Changer photo', btn_change_photo_title: 'Changer photo',
     btn_undo: 'Annuler', btn_undo_title: 'Annuler (Ctrl+Z)',
     btn_redo: 'Rétablir', btn_redo_title: 'Rétablir (Ctrl+Y)',
@@ -1852,8 +1857,8 @@ const LANGS = {
     before_badge: 'Antes',
     page_title: 'Editor de Fotos Grátis Online — The Noir Studio',
     meta_description: 'Editor de fotos grátis online com presets cinematográficos. Sem cadastro, sem instalação. Aplique presets de cinema e exporte para Instagram 1080×1350 em 30 segundos.',
-    og_title: 'Editor de Fotos Grátis Online — The Noir Studio',
-    og_description: 'Editor de fotos grátis online. Presets cinematográficos: Caravaggio, Wes, Quentin, Zuloaga. Sem conta, sem instalação. Exporte para Instagram em 30 segundos.',
+    og_title: 'Editor de Fotos Grátis Online com Presets — The Noir Studio',
+    og_description: 'Editor de fotos grátis online com presets cinematográficos. Sem conta, sem instalação. Caravaggio, Wes, Quentin, Zuloaga. Exporte para Instagram em 30 segundos.',
     btn_change_photo: 'Trocar foto', btn_change_photo_title: 'Trocar foto',
     btn_undo: 'Desfazer', btn_undo_title: 'Desfazer (Ctrl+Z)',
     btn_redo: 'Refazer', btn_redo_title: 'Refazer (Ctrl+Y)',
@@ -1892,8 +1897,8 @@ const LANGS = {
     before_badge: 'Vorher',
     page_title: 'Kostenloser Online Foto-Editor — The Noir Studio',
     meta_description: 'Kostenloser Online-Fotoeditor mit kinematografischen Presets. Ohne Anmeldung, ohne Installation. Film-Presets anwenden und für Instagram 1080×1350 in 30 Sekunden exportieren.',
-    og_title: 'Kostenloser Online Foto-Editor — The Noir Studio',
-    og_description: 'Kostenloser Online-Fotoeditor. Kinematografische Presets: Caravaggio, Wes, Quentin, Zuloaga. Ohne Konto, ohne Installation. Export für Instagram in 30 Sekunden.',
+    og_title: 'Kostenloser Online Foto-Editor mit Presets — The Noir Studio',
+    og_description: 'Kostenloser Online-Fotoeditor mit kinematografischen Presets. Ohne Konto, ohne Installation. Caravaggio, Wes, Quentin, Zuloaga. Export für Instagram 1080×1350 in 30 Sekunden.',
     btn_change_photo: 'Foto wechseln', btn_change_photo_title: 'Foto wechseln',
     btn_undo: 'Rückgängig', btn_undo_title: 'Rückgängig (Ctrl+Z)',
     btn_redo: 'Wiederholen', btn_redo_title: 'Wiederholen (Ctrl+Y)',
@@ -4080,5 +4085,6 @@ document.getElementById('lang-switcher').addEventListener('click', e => {
     });
   })();
 </script>
+</main>
 </body>
 </html>
