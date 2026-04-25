@@ -111,12 +111,14 @@
     }
 
     header h1 .h1-studio {
-      font-weight: 300;
-      font-style: italic;
-      font-size: 1.25rem;
-      letter-spacing: 0.12em;
+      font-family: 'Pinyon Script', cursive;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 1.85rem;
+      letter-spacing: 0.04em;
       color: #c8c4be;
       text-transform: none;
+      line-height: 1;
     }
 
     header h1 .tagline {
@@ -1363,7 +1365,6 @@
     </div>
   </div>
 </header>
-<main id="app-main" aria-label="Editor de fotografía">
 <!-- La Curaduría: grupos de presets -->
 <div class="presets-bar-wrapper">
   <div class="tab-bar" id="tab-bar"><span class="presets-wordmark">Presets</span></div>
@@ -1372,7 +1373,7 @@
   </div>
 </div>
 
-<div class="workspace">
+<div class="workspace" role="main">
 
   <!-- La Obra -->
   <div class="canvas-area" id="canvas-area">
@@ -4096,6 +4097,5 @@ document.getElementById('lang-switcher').addEventListener('click', e => {
     });
   })();
 </script>
-</main>
 </body>
 </html>
