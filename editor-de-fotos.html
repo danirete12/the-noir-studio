@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editor de Fotos Online Gratis con Presets — The Noir Studio</title>
+<meta name="description" content="Editor de fotos online gratis con 15 presets de autor. Edita tus fotos con presets cinematográficos, ajusta exposición, contraste y grano. Sin registro, sin instalación.">
+<link rel="canonical" href="https://thenoir.studio/editor-de-fotos.html">
+<meta property="og:title" content="Editor de Fotos Online Gratis con Presets — The Noir Studio">
+<meta property="og:description" content="Editor de fotos online gratis con 15 presets de autor. Sin registro, sin instalación.">
+<meta property="og:url" content="https://thenoir.studio/editor-de-fotos.html">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
+<style>
+:root {
+  --bg: #0f0f0d; --panel: #161613; --border: #2a2723;
+  --text: #e8e2d8; --muted: #7a7570; --accent: #C07828;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: var(--font-sans); font-size: 13px;
+  font-weight: 300; letter-spacing: 0.06em;
+  display: flex; flex-direction: column; min-height: 100%;
+}
+a { color: inherit; text-decoration: none; }
+header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 24px; height: 52px;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.logo-mark { width: 26px; height: 26px; flex-shrink: 0; }
+.brand {
+  font-family: var(--font-serif); font-size: 1rem;
+  font-weight: 300; letter-spacing: 0.3em; text-transform: uppercase;
+}
+.lang-sw { margin-left: auto; display: flex; gap: 10px; }
+.lang-sw button {
+  background: none; border: none; color: var(--muted);
+  font-family: var(--font-sans); font-size: 0.5rem;
+  letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; padding: 0;
+}
+.lang-sw button.active { color: var(--text); }
+main {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; padding: 60px 24px 48px; gap: 48px;
+  max-width: 720px; margin: 0 auto; width: 100%;
+}
+.hero { text-align: center; }
+.hero h1 {
+  font-family: var(--font-serif); font-size: 2.6rem;
+  font-weight: 300; letter-spacing: 0.18em; text-transform: uppercase;
+  margin-bottom: 16px; line-height: 1.2;
+}
+.hero p {
+  font-size: 0.62rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); line-height: 2.4;
+}
+.cta-btn {
+  display: inline-block; background: var(--accent); color: #fff;
+  padding: 15px 56px; font-family: var(--font-sans);
+  font-size: 0.65rem; font-weight: 500; letter-spacing: 0.22em;
+  text-transform: uppercase; transition: opacity 0.2s;
+}
+.cta-btn:hover { opacity: 0.85; }
+.features {
+  width: 100%;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px; background: var(--border);
+}
+.feature {
+  background: var(--bg); padding: 24px 20px;
+}
+.feature-title {
+  font-size: 0.55rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 10px;
+}
+.feature-body {
+  font-size: 0.58rem; letter-spacing: 0.08em;
+  color: var(--muted); line-height: 2;
+}
+.presets-list {
+  width: 100%; border: 1px solid var(--border); padding: 24px;
+}
+.presets-title {
+  font-size: 0.5rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 16px;
+}
+.presets-names {
+  font-family: var(--font-serif); font-size: 1.1rem;
+  font-weight: 300; letter-spacing: 0.12em; color: #5a5652;
+  line-height: 2;
+}
+footer {
+  border-top: 1px solid var(--border);
+  padding: 36px 24px 20px;
+}
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 28px; max-width: 860px; margin: 0 auto 28px;
+}
+.tools-cat-title {
+  font-size: 0.48rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+}
+.tools-cat a {
+  display: block; font-size: 0.57rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #4a4642;
+  padding: 3px 0; transition: color 0.2s;
+}
+.tools-cat a:hover { color: var(--text); }
+.tools-cat a.current { color: var(--text); pointer-events: none; }
+.legal-row {
+  display: flex; justify-content: center; gap: 20px;
+  padding-top: 20px; border-top: 1px solid var(--border);
+}
+.legal-row a {
+  font-size: 0.48rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g stroke="#e8e2d8" fill="none" stroke-linecap="round">
+      <path d="M 45,12 Q 50,7 55,12 L 84,45 Q 89,50 84,55 L 55,88 Q 50,93 45,88 L 16,55 Q 11,50 16,45 Z" stroke-width="4" stroke-linejoin="round"/>
+      <line x1="11" y1="50" x2="89" y2="50" stroke-width="1.5"/>
+      <line x1="16" y1="98" x2="84" y2="98" stroke-width="1.2"/>
+    </g>
+  </svg>
+  <a href="/" class="brand">The Noir. Studio</a>
+  <div class="lang-sw" id="lang-sw">
+    <button data-lang="es">ES</button>
+    <button data-lang="en">EN</button>
+    <button data-lang="fr">FR</button>
+    <button data-lang="pt">PT</button>
+    <button data-lang="de">DE</button>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1 data-i18n="h1">Editor de fotos<br>online gratis</h1>
+    <p data-i18n="desc">15 presets de autor · 11 controles de ajuste · Sin registro · Sin instalación<br>Exporta a 1080×1350 px para Instagram</p>
+  </div>
+
+  <a href="/" class="cta-btn" data-i18n="cta">Abrir el editor</a>
+
+  <div class="features">
+    <div class="feature">
+      <p class="feature-title" data-i18n="feat1_title">Sin fricciones</p>
+      <p class="feature-body" data-i18n="feat1_body">Arrastra tu foto. Selecciona un preset. Exportas en 30 segundos. Sin cuenta, sin watermark forzado.</p>
+    </div>
+    <div class="feature">
+      <p class="feature-title" data-i18n="feat2_title">Presets de autor</p>
+      <p class="feature-body" data-i18n="feat2_body">Cada preset es una referencia cultural: Caravaggio, Wes Anderson, Zuloaga, Velvet Underground...</p>
+    </div>
+    <div class="feature">
+      <p class="feature-title" data-i18n="feat3_title">Control total</p>
+      <p class="feature-body" data-i18n="feat3_body">11 sliders de ajuste: temperatura, brillo, contraste, saturación, sombras, tinte, luces, viñeta, grano...</p>
+    </div>
+    <div class="feature">
+      <p class="feature-title" data-i18n="feat4_title">Exportación profesional</p>
+      <p class="feature-body" data-i18n="feat4_body">Exporta a 1080×1350 px, JPEG 0.93, con nitidez de exportación (unsharp mask). Listo para Instagram.</p>
+    </div>
+  </div>
+
+  <div class="presets-list">
+    <p class="presets-title" data-i18n="presets_title">15 Presets incluidos</p>
+    <p class="presets-names">Caravaggio · Zuloaga · Wes · Quentin · H-Format · M-System · F-Chrome · Velvet · Dead of Night · Golden Hour · First Light · Silver · Celeste · Ember · Raw</p>
+  </div>
+</main>
+
+<footer>
+  <nav class="tools-grid">
+    <div class="tools-cat">
+      <p class="tools-cat-title" data-i18n="cat_edit">Editar</p>
+      <a href="/" data-i18n="tool_editor" class="current">Editor de fotos online</a>
+      <a href="mejorar-foto.html" data-i18n="tool_mejorar">Mejorar calidad de foto</a>
+      <a href="recortar-imagen.html" data-i18n="tool_recortar">Recortar imagen</a>
+      <a href="redimensionar-imagen.html" data-i18n="tool_redimensionar">Redimensionar imagen</a>
+      <a href="comprimir-imagen.html" data-i18n="tool_comprimir">Comprimir imagen</a>
+    </div>
+    <div class="tools-cat">
+      <p class="tools-cat-title" data-i18n="cat_convert">Convertir</p>
+      <a href="convertir-webp-a-jpg.html">WEBP → JPG</a>
+      <a href="convertir-heic-a-jpg.html">HEIC → JPG</a>
+      <a href="convertir-png-a-jpg.html">PNG → JPG</a>
+      <a href="convertir-jpg-a-png.html">JPG → PNG</a>
+    </div>
+  </nav>
+  <div class="legal-row">
+    <a href="aviso-legal.html" data-i18n="legal">Aviso legal</a>
+    <a href="privacidad.html" data-i18n="privacy">Privacidad</a>
+  </div>
+</footer>
+
+<script>
+const LANGS = {
+  es: {
+    h1:'Editor de fotos\nonline gratis',
+    desc:'15 presets de autor · 11 controles de ajuste · Sin registro · Sin instalación\nExporta a 1080×1350 px para Instagram',
+    cta:'Abrir el editor',
+    feat1_title:'Sin fricciones', feat1_body:'Arrastra tu foto. Selecciona un preset. Exportas en 30 segundos. Sin cuenta, sin watermark forzado.',
+    feat2_title:'Presets de autor', feat2_body:'Cada preset es una referencia cultural: Caravaggio, Wes Anderson, Zuloaga, Velvet Underground...',
+    feat3_title:'Control total', feat3_body:'11 sliders de ajuste: temperatura, brillo, contraste, saturación, sombras, tinte, luces, viñeta, grano...',
+    feat4_title:'Exportación profesional', feat4_body:'Exporta a 1080×1350 px, JPEG 0.93, con nitidez de exportación (unsharp mask). Listo para Instagram.',
+    presets_title:'15 Presets incluidos',
+    cat_edit:'Editar', cat_convert:'Convertir',
+    tool_editor:'Editor de fotos online', tool_mejorar:'Mejorar calidad de foto',
+    tool_recortar:'Recortar imagen', tool_redimensionar:'Redimensionar imagen',
+    tool_comprimir:'Comprimir imagen', legal:'Aviso legal', privacy:'Privacidad',
+  },
+  en: {
+    h1:'Free online\nphoto editor',
+    desc:'15 signature presets · 11 adjustment controls · No sign-up · No install\nExport to 1080×1350 px for Instagram',
+    cta:'Open the editor',
+    feat1_title:'Zero friction', feat1_body:'Drop your photo. Pick a preset. Export in 30 seconds. No account, no forced watermark.',
+    feat2_title:'Signature presets', feat2_body:'Each preset is a cultural reference: Caravaggio, Wes Anderson, Zuloaga, Velvet Underground...',
+    feat3_title:'Full control', feat3_body:'11 adjustment sliders: temperature, brightness, contrast, saturation, shadows, tint, highlights, vignette, grain...',
+    feat4_title:'Professional export', feat4_body:'Export to 1080×1350 px, JPEG 0.93, with export sharpening (unsharp mask). Ready for Instagram.',
+    presets_title:'15 included presets',
+    cat_edit:'Edit', cat_convert:'Convert',
+    tool_editor:'Online photo editor', tool_mejorar:'Enhance photo quality',
+    tool_recortar:'Crop image', tool_redimensionar:'Resize image',
+    tool_comprimir:'Compress image', legal:'Legal notice', privacy:'Privacy',
+  },
+  fr: {
+    h1:'Éditeur photo\nen ligne gratuit',
+    desc:'15 presets d\'auteur · 11 réglages · Sans inscription · Sans installation\nExporter en 1080×1350 px pour Instagram',
+    cta:'Ouvrir l\'éditeur',
+    feat1_title:'Zéro friction', feat1_body:'Déposez votre photo. Choisissez un preset. Exportez en 30 secondes. Sans compte, sans filigrane forcé.',
+    feat2_title:'Presets d\'auteur', feat2_body:'Chaque preset est une référence culturelle : Caravaggio, Wes Anderson, Zuloaga, Velvet Underground...',
+    feat3_title:'Contrôle total', feat3_body:'11 curseurs de réglage : température, luminosité, contraste, saturation, ombres, teinte, hautes lumières, vignette, grain...',
+    feat4_title:'Export professionnel', feat4_body:'Exportez en 1080×1350 px, JPEG 0.93, avec netteté d\'export (masque flou). Prêt pour Instagram.',
+    presets_title:'15 presets inclus',
+    cat_edit:'Éditer', cat_convert:'Convertir',
+    tool_editor:'Éditeur photo en ligne', tool_mejorar:'Améliorer la qualité',
+    tool_recortar:'Recadrer image', tool_redimensionar:'Redimensionner image',
+    tool_comprimir:'Compresser image', legal:'Mentions légales', privacy:'Confidentialité',
+  },
+  pt: {
+    h1:'Editor de fotos\nonline grátis',
+    desc:'15 presets autorais · 11 controles de ajuste · Sem cadastro · Sem instalação\nExporte para 1080×1350 px para Instagram',
+    cta:'Abrir o editor',
+    feat1_title:'Sem fricção', feat1_body:'Arraste sua foto. Selecione um preset. Exporte em 30 segundos. Sem conta, sem marca d\'água forçada.',
+    feat2_title:'Presets autorais', feat2_body:'Cada preset é uma referência cultural: Caravaggio, Wes Anderson, Zuloaga, Velvet Underground...',
+    feat3_title:'Controle total', feat3_body:'11 sliders de ajuste: temperatura, brilho, contraste, saturação, sombras, matiz, luzes, vinheta, grão...',
+    feat4_title:'Exportação profissional', feat4_body:'Exporte para 1080×1350 px, JPEG 0.93, com nitidez de exportação (unsharp mask). Pronto para Instagram.',
+    presets_title:'15 presets incluídos',
+    cat_edit:'Editar', cat_convert:'Converter',
+    tool_editor:'Editor de fotos online', tool_mejorar:'Melhorar qualidade de foto',
+    tool_recortar:'Cortar imagem', tool_redimensionar:'Redimensionar imagem',
+    tool_comprimir:'Comprimir imagem', legal:'Aviso legal', privacy:'Privacidade',
+  },
+  de: {
+    h1:'Kostenloser\nOnline-Fotoeditor',
+    desc:'15 Signatur-Presets · 11 Einstellungen · Ohne Anmeldung · Ohne Installation\nExport als 1080×1350 px für Instagram',
+    cta:'Editor öffnen',
+    feat1_title:'Keine Hürden', feat1_body:'Foto ablegen. Preset wählen. In 30 Sekunden exportieren. Kein Konto, kein Wasserzeichen.',
+    feat2_title:'Signatur-Presets', feat2_body:'Jedes Preset ist eine Kulturreferenz: Caravaggio, Wes Anderson, Zuloaga, Velvet Underground...',
+    feat3_title:'Volle Kontrolle', feat3_body:'11 Regler: Temperatur, Helligkeit, Kontrast, Sättigung, Schatten, Farbton, Lichter, Vignette, Korn...',
+    feat4_title:'Professioneller Export', feat4_body:'Export als 1080×1350 px, JPEG 0.93, mit Export-Schärfung (Unscharf maskieren). Bereit für Instagram.',
+    presets_title:'15 enthaltene Presets',
+    cat_edit:'Bearbeiten', cat_convert:'Konvertieren',
+    tool_editor:'Online-Fotoeditor', tool_mejorar:'Fotoqualität verbessern',
+    tool_recortar:'Bild zuschneiden', tool_redimensionar:'Bild skalieren',
+    tool_comprimir:'Bild komprimieren', legal:'Impressum', privacy:'Datenschutz',
+  },
+};
+
+let currentLang = localStorage.getItem('ns_lang') || navigator.language.slice(0,2) || 'es';
+if (!LANGS[currentLang]) currentLang = 'es';
+
+function applyLang(code) {
+  if (!LANGS[code]) return;
+  currentLang = code;
+  document.documentElement.lang = code;
+  const t = LANGS[code];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (t[k] !== undefined) el.innerHTML = t[k].replace(/\n/g, '<br>');
+  });
+  document.querySelectorAll('#lang-sw button').forEach(b =>
+    b.classList.toggle('active', b.dataset.lang === code));
+  document.title = t.h1.replace('<br>', ' ') + ' — The Noir Studio';
+  localStorage.setItem('ns_lang', code);
+}
+
+document.getElementById('lang-sw').addEventListener('click', e => {
+  if (e.target.dataset.lang) applyLang(e.target.dataset.lang);
+});
+applyLang(currentLang);
+</script>
+</body>
+</html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recortar Imagen Online Gratis — The Noir Studio</title>
+<meta name="description" content="Recorta imágenes online gratis. Elige proporción libre, cuadrada, 4:5 para Instagram o 16:9 para pantalla. Sin registro, sin instalación.">
+<link rel="canonical" href="https://thenoir.studio/recortar-imagen.html">
+<meta property="og:title" content="Recortar Imagen Online Gratis — The Noir Studio">
+<meta property="og:description" content="Recorta imágenes online gratis. Proporciones para Instagram, pantalla o libre. Sin registro.">
+<meta property="og:url" content="https://thenoir.studio/recortar-imagen.html">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
+<style>
+:root {
+  --bg: #0f0f0d; --panel: #161613; --border: #2a2723;
+  --text: #e8e2d8; --muted: #7a7570; --accent: #C07828;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: var(--font-sans); font-size: 13px;
+  font-weight: 300; letter-spacing: 0.06em;
+  display: flex; flex-direction: column; min-height: 100%;
+}
+a { color: inherit; text-decoration: none; }
+header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 24px; height: 52px;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.logo-mark { width: 26px; height: 26px; flex-shrink: 0; }
+.brand {
+  font-family: var(--font-serif); font-size: 1rem;
+  font-weight: 300; letter-spacing: 0.3em; text-transform: uppercase;
+}
+.header-sep { color: var(--border); margin: 0 4px; }
+.tool-label {
+  font-size: 0.55rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--muted);
+}
+.lang-sw { margin-left: auto; display: flex; gap: 10px; }
+.lang-sw button {
+  background: none; border: none; color: var(--muted);
+  font-family: var(--font-sans); font-size: 0.5rem;
+  letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; padding: 0;
+}
+.lang-sw button.active { color: var(--text); }
+main {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; padding: 48px 24px 40px; gap: 28px;
+}
+.tool-hero { text-align: center; }
+.tool-hero h1 {
+  font-family: var(--font-serif); font-size: 2rem;
+  font-weight: 300; letter-spacing: 0.18em; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.tool-hero p {
+  font-size: 0.6rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted);
+}
+.drop-zone {
+  width: 100%; max-width: 520px; min-height: 260px;
+  border: 1px solid var(--border); cursor: pointer;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative; overflow: hidden; transition: border-color 0.2s;
+}
+.drop-zone:hover, .drop-zone.drag-over { border-color: #5a5652; }
+.drop-zone input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.drop-hint { text-align: center; padding: 40px; pointer-events: none; }
+.drop-icon { font-size: 1rem; letter-spacing: 0.4em; color: var(--border); margin-bottom: 16px; }
+.drop-text {
+  font-size: 0.6rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted); line-height: 2;
+}
+.crop-wrap {
+  width: 100%; max-width: 520px; display: none;
+  position: relative; background: #000; overflow: hidden;
+  max-height: 360px;
+}
+canvas#crop-canvas { display: block; width: 100%; cursor: move; }
+.controls {
+  width: 100%; max-width: 520px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.ratio-row {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.ratio-btn {
+  background: none; border: 1px solid var(--border);
+  color: var(--muted); font-family: var(--font-sans);
+  font-size: 0.5rem; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 6px 14px; cursor: pointer; transition: all 0.15s;
+}
+.ratio-btn:hover { border-color: #5a5652; color: var(--text); }
+.ratio-btn.active { border-color: var(--accent); color: var(--accent); }
+.ctrl-label {
+  font-size: 0.55rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted);
+}
+.dim-info {
+  font-size: 0.52rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted);
+}
+.btn-export {
+  background: var(--accent); color: #fff; border: none;
+  padding: 13px 48px; font-family: var(--font-sans);
+  font-size: 0.6rem; font-weight: 500; letter-spacing: 0.2em;
+  text-transform: uppercase; cursor: pointer; transition: opacity 0.2s;
+}
+.btn-export:disabled { opacity: 0.3; cursor: default; }
+.btn-export:not(:disabled):hover { opacity: 0.85; }
+footer {
+  border-top: 1px solid var(--border);
+  padding: 36px 24px 20px;
+}
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 28px; max-width: 860px; margin: 0 auto 28px;
+}
+.tools-cat-title {
+  font-size: 0.48rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+}
+.tools-cat a {
+  display: block; font-size: 0.57rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #4a4642;
+  padding: 3px 0; transition: color 0.2s;
+}
+.tools-cat a:hover { color: var(--text); }
+.tools-cat a.current { color: var(--text); pointer-events: none; }
+.legal-row {
+  display: flex; justify-content: center; gap: 20px;
+  padding-top: 20px; border-top: 1px solid var(--border);
+}
+.legal-row a {
+  font-size: 0.48rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g stroke="#e8e2d8" fill="none" stroke-linecap="round">
+      <path d="M 45,12 Q 50,7 55,12 L 84,45 Q 89,50 84,55 L 55,88 Q 50,93 45,88 L 16,55 Q 11,50 16,45 Z" stroke-width="4" stroke-linejoin="round"/>
+      <line x1="11" y1="50" x2="89" y2="50" stroke-width="1.5"/>
+      <line x1="16" y1="98" x2="84" y2="98" stroke-width="1.2"/>
+    </g>
+  </svg>
+  <a href="/" class="brand">The Noir. Studio</a>
+  <span class="header-sep">—</span>
+  <span class="tool-label" data-i18n="tool_name">Recortar imagen</span>
+  <div class="lang-sw" id="lang-sw">
+    <button data-lang="es">ES</button>
+    <button data-lang="en">EN</button>
+    <button data-lang="fr">FR</button>
+    <button data-lang="pt">PT</button>
+    <button data-lang="de">DE</button>
+  </div>
+</header>
+
+<main>
+  <div class="tool-hero">
+    <h1 data-i18n="h1">Recortar imagen</h1>
+    <p data-i18n="desc">Libre · Cuadrado · 4:5 Instagram · 16:9 · Gratis</p>
+  </div>
+
+  <div class="drop-zone" id="drop-zone">
+    <input type="file" id="file-input" accept="image/*">
+    <div class="drop-hint" id="drop-hint">
+      <div class="drop-icon">◇ ◇ ◇</div>
+      <p class="drop-text" data-i18n="drop_text">Arrastra tu imagen aquí<br>o haz clic para seleccionar<br>JPG · PNG · WEBP</p>
+    </div>
+  </div>
+
+  <div class="crop-wrap" id="crop-wrap">
+    <canvas id="crop-canvas"></canvas>
+  </div>
+
+  <div class="controls" id="controls-panel" style="display:none">
+    <div>
+      <p class="ctrl-label" style="margin-bottom:10px" data-i18n="lbl_ratio">Proporción</p>
+      <div class="ratio-row" id="ratio-row">
+        <button class="ratio-btn" data-ratio="free" data-i18n="ratio_free">Libre</button>
+        <button class="ratio-btn active" data-ratio="1:1">1:1</button>
+        <button class="ratio-btn" data-ratio="4:5">4:5 Instagram</button>
+        <button class="ratio-btn" data-ratio="16:9">16:9</button>
+        <button class="ratio-btn" data-ratio="3:2">3:2</button>
+      </div>
+    </div>
+    <p class="dim-info" id="dim-info"></p>
+  </div>
+
+  <button class="btn-export" id="btn-export" disabled data-i18n="btn">Descargar recorte</button>
+</main>
+
+<footer>
+  <nav class="tools-grid">
+    <div class="tools-cat">
+      <p class="tools-cat-title" data-i18n="cat_edit">Editar</p>
+      <a href="/" data-i18n="tool_editor">Editor de fotos online</a>
+      <a href="mejorar-foto.html" data-i18n="tool_mejorar">Mejorar calidad de foto</a>
+      <a href="recortar-imagen.html" class="current" data-i18n="tool_recortar">Recortar imagen</a>
+      <a href="redimensionar-imagen.html" data-i18n="tool_redimensionar">Redimensionar imagen</a>
+      <a href="comprimir-imagen.html" data-i18n="tool_comprimir">Comprimir imagen</a>
+    </div>
+    <div class="tools-cat">
+      <p class="tools-cat-title" data-i18n="cat_convert">Convertir</p>
+      <a href="convertir-webp-a-jpg.html">WEBP → JPG</a>
+      <a href="convertir-heic-a-jpg.html">HEIC → JPG</a>
+      <a href="convertir-png-a-jpg.html">PNG → JPG</a>
+      <a href="convertir-jpg-a-png.html">JPG → PNG</a>
+    </div>
+  </nav>
+  <div class="legal-row">
+    <a href="aviso-legal.html" data-i18n="legal">Aviso legal</a>
+    <a href="privacidad.html" data-i18n="privacy">Privacidad</a>
+  </div>
+</footer>
+
+<script>
+const LANGS = {
+  es: {
+    tool_name:'Recortar imagen', h1:'Recortar imagen',
+    desc:'Libre · Cuadrado · 4:5 Instagram · 16:9 · Gratis',
+    drop_text:'Arrastra tu imagen aquí\no haz clic para seleccionar\nJPG · PNG · WEBP',
+    lbl_ratio:'Proporción', ratio_free:'Libre',
+    btn:'Descargar recorte', cat_edit:'Editar', cat_convert:'Convertir',
+    tool_editor:'Editor de fotos online', tool_mejorar:'Mejorar calidad de foto',
+    tool_recortar:'Recortar imagen', tool_redimensionar:'Redimensionar imagen',
+    tool_comprimir:'Comprimir imagen', legal:'Aviso legal', privacy:'Privacidad',
+  },
+  en: {
+    tool_name:'Crop image', h1:'Crop image',
+    desc:'Free · Square · 4:5 Instagram · 16:9 · Free',
+    drop_text:'Drop your image here\nor click to select\nJPG · PNG · WEBP',
+    lbl_ratio:'Aspect ratio', ratio_free:'Free',
+    btn:'Download crop', cat_edit:'Edit', cat_convert:'Convert',
+    tool_editor:'Online photo editor', tool_mejorar:'Enhance photo quality',
+    tool_recortar:'Crop image', tool_redimensionar:'Resize image',
+    tool_comprimir:'Compress image', legal:'Legal notice', privacy:'Privacy',
+  },
+  fr: {
+    tool_name:'Recadrer image', h1:'Recadrer une image',
+    desc:'Libre · Carré · 4:5 Instagram · 16:9 · Gratuit',
+    drop_text:'Déposez votre image ici\nou cliquez pour sélectionner\nJPG · PNG · WEBP',
+    lbl_ratio:'Proportion', ratio_free:'Libre',
+    btn:'Télécharger le recadrage', cat_edit:'Éditer', cat_convert:'Convertir',
+    tool_editor:'Éditeur photo en ligne', tool_mejorar:'Améliorer la qualité',
+    tool_recortar:'Recadrer image', tool_redimensionar:'Redimensionner image',
+    tool_comprimir:'Compresser image', legal:'Mentions légales', privacy:'Confidentialité',
+  },
+  pt: {
+    tool_name:'Cortar imagem', h1:'Cortar imagem',
+    desc:'Livre · Quadrado · 4:5 Instagram · 16:9 · Grátis',
+    drop_text:'Arraste sua imagem aqui\nou clique para selecionar\nJPG · PNG · WEBP',
+    lbl_ratio:'Proporção', ratio_free:'Livre',
+    btn:'Baixar recorte', cat_edit:'Editar', cat_convert:'Converter',
+    tool_editor:'Editor de fotos online', tool_mejorar:'Melhorar qualidade de foto',
+    tool_recortar:'Cortar imagem', tool_redimensionar:'Redimensionar imagem',
+    tool_comprimir:'Comprimir imagem', legal:'Aviso legal', privacy:'Privacidade',
+  },
+  de: {
+    tool_name:'Bild zuschneiden', h1:'Bild zuschneiden',
+    desc:'Frei · Quadrat · 4:5 Instagram · 16:9 · Kostenlos',
+    drop_text:'Bild hier ablegen\noder klicken zum Auswählen\nJPG · PNG · WEBP',
+    lbl_ratio:'Seitenverhältnis', ratio_free:'Frei',
+    btn:'Ausschnitt herunterladen', cat_edit:'Bearbeiten', cat_convert:'Konvertieren',
+    tool_editor:'Online-Fotoeditor', tool_mejorar:'Fotoqualität verbessern',
+    tool_recortar:'Bild zuschneiden', tool_redimensionar:'Bild skalieren',
+    tool_comprimir:'Bild komprimieren', legal:'Impressum', privacy:'Datenschutz',
+  },
+};
+
+let currentLang = localStorage.getItem('ns_lang') || navigator.language.slice(0,2) || 'es';
+if (!LANGS[currentLang]) currentLang = 'es';
+
+function applyLang(code) {
+  if (!LANGS[code]) return;
+  currentLang = code;
+  document.documentElement.lang = code;
+  const t = LANGS[code];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (t[k] !== undefined) el.innerHTML = t[k].replace(/\n/g, '<br>');
+  });
+  document.querySelectorAll('#lang-sw button').forEach(b =>
+    b.classList.toggle('active', b.dataset.lang === code));
+  document.title = t.h1 + ' Online Gratis — The Noir Studio';
+  localStorage.setItem('ns_lang', code);
+}
+
+document.getElementById('lang-sw').addEventListener('click', e => {
+  if (e.target.dataset.lang) applyLang(e.target.dataset.lang);
+});
+applyLang(currentLang);
+
+let originalImage = null;
+let originalName = 'imagen';
+let currentRatio = '1:1';
+let cropX = 0, cropY = 0, cropW = 0, cropH = 0;
+let dragging = false, dragStartX = 0, dragStartY = 0, cropStartX = 0, cropStartY = 0;
+
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const dropHint = document.getElementById('drop-hint');
+const cropWrap = document.getElementById('crop-wrap');
+const cropCanvas = document.getElementById('crop-canvas');
+const controlsPanel = document.getElementById('controls-panel');
+const btnExport = document.getElementById('btn-export');
+const dimInfo = document.getElementById('dim-info');
+const ctx = cropCanvas.getContext('2d');
+
+function getRatioNum(r) {
+  if (r === 'free') return null;
+  const parts = r.split(':').map(Number);
+  return parts[0] / parts[1];
+}
+
+function computeCrop(imgW, imgH, ratio) {
+  if (!ratio) { return { x: 0, y: 0, w: imgW, h: imgH }; }
+  let cw, ch;
+  if (imgW / imgH > ratio) { ch = imgH; cw = Math.round(ch * ratio); }
+  else { cw = imgW; ch = Math.round(cw / ratio); }
+  return { x: Math.round((imgW - cw) / 2), y: Math.round((imgH - ch) / 2), w: cw, h: ch };
+}
+
+function drawCrop() {
+  if (!originalImage) return;
+  const displayW = cropCanvas.width, displayH = cropCanvas.height;
+  const scaleX = displayW / originalImage.naturalWidth;
+  const scaleY = displayH / originalImage.naturalHeight;
+  ctx.clearRect(0, 0, displayW, displayH);
+  ctx.drawImage(originalImage, 0, 0, displayW, displayH);
+  const dx = cropX * scaleX, dy = cropY * scaleY;
+  const dw = cropW * scaleX, dh = cropH * scaleY;
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(0, 0, displayW, dy);
+  ctx.fillRect(0, dy + dh, displayW, displayH - dy - dh);
+  ctx.fillRect(0, dy, dx, dh);
+  ctx.fillRect(dx + dw, dy, displayW - dx - dw, dh);
+  ctx.strokeStyle = 'rgba(232,226,216,0.9)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(dx + 0.5, dy + 0.5, dw - 1, dh - 1);
+  ctx.setLineDash([dw/3, 0]);
+  ctx.strokeStyle = 'rgba(232,226,216,0.3)';
+  ctx.lineWidth = 0.5;
+  for (let i = 1; i < 3; i++) {
+    ctx.beginPath(); ctx.moveTo(dx + dw/3*i, dy); ctx.lineTo(dx + dw/3*i, dy + dh); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(dx, dy + dh/3*i); ctx.lineTo(dx + dw, dy + dh/3*i); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  dimInfo.textContent = cropW + ' × ' + cropH + ' px';
+}
+
+function applyRatio() {
+  if (!originalImage) return;
+  const ratio = getRatioNum(currentRatio);
+  const c = computeCrop(originalImage.naturalWidth, originalImage.naturalHeight, ratio);
+  cropX = c.x; cropY = c.y; cropW = c.w; cropH = c.h;
+  drawCrop();
+}
+
+function loadFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  originalName = file.name.replace(/\.[^.]+$/, '');
+  const img = new Image();
+  img.onload = () => {
+    originalImage = img;
+    const maxW = Math.min(520, window.innerWidth - 48);
+    const scale = Math.min(maxW / img.naturalWidth, 360 / img.naturalHeight, 1);
+    cropCanvas.width = Math.round(img.naturalWidth * scale);
+    cropCanvas.height = Math.round(img.naturalHeight * scale);
+    dropZone.style.display = 'none';
+    cropWrap.style.display = 'block';
+    controlsPanel.style.display = 'flex';
+    btnExport.disabled = false;
+    applyRatio();
+  };
+  img.src = URL.createObjectURL(file);
+}
+
+document.getElementById('ratio-row').addEventListener('click', e => {
+  const btn = e.target.closest('.ratio-btn');
+  if (!btn) return;
+  document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRatio = btn.dataset.ratio;
+  applyRatio();
+});
+
+cropCanvas.addEventListener('mousedown', e => {
+  dragging = true;
+  const r = cropCanvas.getBoundingClientRect();
+  dragStartX = e.clientX - r.left;
+  dragStartY = e.clientY - r.top;
+  cropStartX = cropX; cropStartY = cropY;
+});
+
+cropCanvas.addEventListener('mousemove', e => {
+  if (!dragging || !originalImage) return;
+  const r = cropCanvas.getBoundingClientRect();
+  const scaleX = originalImage.naturalWidth / cropCanvas.width;
+  const scaleY = originalImage.naturalHeight / cropCanvas.height;
+  const dx = (e.clientX - r.left - dragStartX) * scaleX;
+  const dy = (e.clientY - r.top - dragStartY) * scaleY;
+  cropX = Math.max(0, Math.min(originalImage.naturalWidth - cropW, Math.round(cropStartX + dx)));
+  cropY = Math.max(0, Math.min(originalImage.naturalHeight - cropH, Math.round(cropStartY + dy)));
+  drawCrop();
+});
+
+cropCanvas.addEventListener('mouseup', () => { dragging = false; });
+cropCanvas.addEventListener('mouseleave', () => { dragging = false; });
+
+cropCanvas.addEventListener('touchstart', e => {
+  const t = e.touches[0];
+  dragging = true;
+  const r = cropCanvas.getBoundingClientRect();
+  dragStartX = t.clientX - r.left;
+  dragStartY = t.clientY - r.top;
+  cropStartX = cropX; cropStartY = cropY;
+}, { passive: true });
+
+cropCanvas.addEventListener('touchmove', e => {
+  if (!dragging || !originalImage) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  const r = cropCanvas.getBoundingClientRect();
+  const scaleX = originalImage.naturalWidth / cropCanvas.width;
+  const scaleY = originalImage.naturalHeight / cropCanvas.height;
+  const dx = (t.clientX - r.left - dragStartX) * scaleX;
+  const dy = (t.clientY - r.top - dragStartY) * scaleY;
+  cropX = Math.max(0, Math.min(originalImage.naturalWidth - cropW, Math.round(cropStartX + dx)));
+  cropY = Math.max(0, Math.min(originalImage.naturalHeight - cropH, Math.round(cropStartY + dy)));
+  drawCrop();
+}, { passive: false });
+
+cropCanvas.addEventListener('touchend', () => { dragging = false; });
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  loadFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', () => loadFile(fileInput.files[0]));
+
+btnExport.addEventListener('click', () => {
+  if (!originalImage) return;
+  const out = document.createElement('canvas');
+  out.width = cropW; out.height = cropH;
+  out.getContext('2d').drawImage(originalImage, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+  const a = document.createElement('a');
+  a.download = originalName + '-recorte.jpg';
+  a.href = out.toDataURL('image/jpeg', 0.93);
+  a.click();
+});
+</script>
+</body>
+</html>
