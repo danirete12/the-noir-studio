@@ -1106,7 +1106,7 @@
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: contain;
-        padding-bottom: 72px;
+        padding-bottom: 100px;
         display: block !important;
       }
 
@@ -1139,12 +1139,42 @@
       /* Nav inferior */
       .mobile-nav {
         display: flex;
+        flex-direction: column;
         position: fixed;
         bottom: 0; left: 0; right: 0;
-        height: 58px;
+        height: auto;
         background: var(--bg);
         border-top: 1px solid var(--border);
         z-index: 200;
+      }
+
+      .mobile-filename-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      #filename-input-mobile {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--border);
+        color: var(--text);
+        font-family: var(--font-sans);
+        font-size: 0.72rem;
+        letter-spacing: 0.04em;
+        flex: 1;
+        padding: 2px 0;
+        outline: none;
+        min-width: 0;
+        transition: border-color 0.2s;
+      }
+      #filename-input-mobile:focus { border-bottom-color: var(--accent); }
+      #filename-input-mobile::placeholder { color: var(--muted); }
+
+      .mobile-nav-buttons {
+        display: flex;
+        height: 58px;
       }
 
       .mobile-nav-btn {
@@ -1773,30 +1803,37 @@
 
 <!-- Barra de navegación inferior (solo móvil) -->
 <nav class="mobile-nav" id="mobile-nav">
-  <button class="mobile-nav-btn" data-pillar="pillar-presets" onclick="toggleMobileSheet('pillar-presets', this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-    <span data-i18n="mobile_presets">Presets</span>
-  </button>
-  <button class="mobile-nav-btn" data-pillar="pillar-geo" onclick="toggleMobileSheet('pillar-geo', this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21 L3 3 L21 3"/><path d="M3 3 L21 21"/></svg>
-    <span data-i18n="mobile_geometry">Geometría</span>
-  </button>
-  <button class="mobile-nav-btn" data-pillar="pillar-rev" onclick="toggleMobileSheet('pillar-rev', this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="12" y1="12" x2="16" y2="9"/></svg>
-    <span data-i18n="mobile_exposure">Revelado</span>
-  </button>
-  <button class="mobile-nav-btn" data-pillar="pillar-tex" onclick="toggleMobileSheet('pillar-tex', this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="5" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="4" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="7" r="1.2" fill="currentColor" stroke="none"/><circle cx="20" cy="5" r="1.2" fill="currentColor" stroke="none"/><circle cx="7" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="13" cy="13" r="1.2" fill="currentColor" stroke="none"/><circle cx="18" cy="11" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="19" r="1.2" fill="currentColor" stroke="none"/><circle cx="17" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
-    <span data-i18n="mobile_texture">Textura</span>
-  </button>
-  <button class="mobile-nav-btn" data-pillar="pillar-color" onclick="toggleMobileSheet('pillar-color', this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c3.1 0 5.6-2.5 5.6-5.6C22 6 17.5 2 12 2z"/><circle cx="7" cy="10" r="1.2" fill="currentColor" stroke="none"/><circle cx="11" cy="7" r="1.2" fill="currentColor" stroke="none"/></svg>
-    <span data-i18n="mobile_color">Color</span>
-  </button>
-  <button class="mobile-nav-btn mobile-nav-export" id="btn-export-mobile">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    <span data-i18n="mobile_save">Guardar</span>
-  </button>
+  <div class="mobile-filename-bar">
+    <span class="footer-info-label" data-i18n="lbl_filename">Nombre</span>
+    <input type="text" id="filename-input-mobile" placeholder="noir-studio" maxlength="80" spellcheck="false" autocomplete="off">
+    <span class="footer-info-label">.jpg</span>
+  </div>
+  <div class="mobile-nav-buttons">
+    <button class="mobile-nav-btn" data-pillar="pillar-presets" onclick="toggleMobileSheet('pillar-presets', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span data-i18n="mobile_presets">Presets</span>
+    </button>
+    <button class="mobile-nav-btn" data-pillar="pillar-geo" onclick="toggleMobileSheet('pillar-geo', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21 L3 3 L21 3"/><path d="M3 3 L21 21"/></svg>
+      <span data-i18n="mobile_geometry">Geometría</span>
+    </button>
+    <button class="mobile-nav-btn" data-pillar="pillar-rev" onclick="toggleMobileSheet('pillar-rev', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><line x1="12" y1="4" x2="12" y2="7"/><line x1="12" y1="12" x2="16" y2="9"/></svg>
+      <span data-i18n="mobile_exposure">Revelado</span>
+    </button>
+    <button class="mobile-nav-btn" data-pillar="pillar-tex" onclick="toggleMobileSheet('pillar-tex', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="5" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="4" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="7" r="1.2" fill="currentColor" stroke="none"/><circle cx="20" cy="5" r="1.2" fill="currentColor" stroke="none"/><circle cx="7" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="13" cy="13" r="1.2" fill="currentColor" stroke="none"/><circle cx="18" cy="11" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="19" r="1.2" fill="currentColor" stroke="none"/><circle cx="17" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
+      <span data-i18n="mobile_texture">Textura</span>
+    </button>
+    <button class="mobile-nav-btn" data-pillar="pillar-color" onclick="toggleMobileSheet('pillar-color', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c3.1 0 5.6-2.5 5.6-5.6C22 6 17.5 2 12 2z"/><circle cx="7" cy="10" r="1.2" fill="currentColor" stroke="none"/><circle cx="11" cy="7" r="1.2" fill="currentColor" stroke="none"/></svg>
+      <span data-i18n="mobile_color">Color</span>
+    </button>
+    <button class="mobile-nav-btn mobile-nav-export" id="btn-export-mobile">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span data-i18n="mobile_save">Guardar</span>
+    </button>
+  </div>
 </nav>
 
 <script>
@@ -3298,6 +3335,21 @@ GROUPS.forEach((group, gi) => {
   });
 });
 
+// ── Cache de thumbnails de presets ──
+const _thumbSvgCache = {};
+const _thumbDataCache = {};
+const THUMB_SIZE = 64;
+
+function _applyThumbToBtn(btn, key) {
+  if (!_thumbDataCache[key]) return;
+  const iconEl = btn.querySelector('.preset-icon');
+  if (!iconEl) return;
+  if (!_thumbSvgCache[key]) _thumbSvgCache[key] = iconEl.innerHTML;
+  iconEl.style.cssText = 'width:' + THUMB_SIZE + 'px;height:' + THUMB_SIZE + 'px;overflow:hidden;flex-shrink:0;';
+  iconEl.innerHTML = '<img src="' + _thumbDataCache[key] + '" alt="" style="width:100%;height:100%;display:block;object-fit:cover;">';
+  iconEl.classList.add('has-thumb');
+}
+
 // ── Presets en pillar móvil — VSCO style ──
 const mobilePresetsBody = document.getElementById('pillar-presets-body');
 if (mobilePresetsBody) {
@@ -3321,6 +3373,7 @@ if (mobilePresetsBody) {
       btn.innerHTML = `<span class="preset-icon">${PRESET_ICONS[key] || ''}</span><span class="preset-label">${preset.label}</span>`;
       btn.addEventListener('click', () => applyPreset(key, btn));
       strip.appendChild(btn);
+      _applyThumbToBtn(btn, key);
     });
     strip.scrollLeft = 0;
   }
@@ -3652,15 +3705,11 @@ function processPixels(data, p) {
   }
 }
 
-const _thumbSvgCache = {};
-
 function renderPresetThumbnails() {
   if (!originalImage) return;
-  // Defer un frame para que el canvas principal pinte primero,
-  // luego procesar todos los presets de golpe (síncrono).
   requestAnimationFrame(() => {
     if (!originalImage) return;
-    const THUMB = 64;
+    const T = THUMB_SIZE;
     const iw = originalImage.naturalWidth || originalImage.width;
     const ih = originalImage.naturalHeight || originalImage.height;
     if (!iw || !ih) return;
@@ -3669,47 +3718,45 @@ function renderPresetThumbnails() {
     const sx = (iw - side) / 2;
     const sy = (ih - side) / 2;
     const srcC = document.createElement('canvas');
-    srcC.width = THUMB; srcC.height = THUMB;
+    srcC.width = T; srcC.height = T;
     const srcCtx = srcC.getContext('2d');
     if (!srcCtx) return;
-    srcCtx.drawImage(originalImage, sx, sy, side, side, 0, 0, THUMB, THUMB);
-    const srcData = srcCtx.getImageData(0, 0, THUMB, THUMB);
+    srcCtx.drawImage(originalImage, sx, sy, side, side, 0, 0, T, T);
+    const srcData = srcCtx.getImageData(0, 0, T, T);
 
     Object.keys(PRESETS).forEach(key => {
       try {
         const preset = PRESETS[key];
         if (!preset) return;
-        const iconEl = document.querySelector(`.btn-preset[data-key="${CSS.escape(key)}"] .preset-icon`);
-        if (!iconEl) return;
 
         const cloned = new Uint8ClampedArray(srcData.data);
-        const id = new ImageData(cloned, THUMB, THUMB);
+        const id = new ImageData(cloned, T, T);
         processPixels(id.data, { ...preset, grain: 0, borderSize: 0 });
 
         const tc = document.createElement('canvas');
-        tc.width = THUMB; tc.height = THUMB;
+        tc.width = T; tc.height = T;
         const tctx = tc.getContext('2d');
         if (!tctx) return;
         tctx.putImageData(id, 0, 0);
-        if ((preset.vignette || 0) > 0) applyVignette(tctx, THUMB, THUMB, preset.vignette);
+        if ((preset.vignette || 0) > 0) applyVignette(tctx, T, T, preset.vignette);
 
-        const dataUrl = tc.toDataURL('image/jpeg', 0.75);
-        if (!_thumbSvgCache[key]) _thumbSvgCache[key] = iconEl.innerHTML;
-        iconEl.style.cssText = 'width:' + THUMB + 'px;height:' + THUMB + 'px;overflow:hidden;';
-        iconEl.innerHTML = '<img src="' + dataUrl + '" alt="" style="width:100%;height:100%;display:block;object-fit:cover;">';
-        iconEl.classList.add('has-thumb');
-      } catch(e) { /* skip preset on error */ }
+        _thumbDataCache[key] = tc.toDataURL('image/jpeg', 0.75);
+
+        // Aplicar a todos los botones con esta key (desktop + móvil activo)
+        document.querySelectorAll(`.btn-preset[data-key="${CSS.escape(key)}"]`).forEach(btn => {
+          _applyThumbToBtn(btn, key);
+        });
+      } catch(e) { /* skip preset */ }
     });
   });
 }
 
 function clearPresetThumbnails() {
-  document.querySelectorAll('.btn-preset').forEach(btn => {
-    const key = btn.dataset.key;
-    const iconEl = btn.querySelector('.preset-icon');
-    if (!iconEl || !iconEl.classList.contains('has-thumb')) return;
+  Object.keys(_thumbDataCache).forEach(k => delete _thumbDataCache[k]);
+  document.querySelectorAll('.preset-icon.has-thumb').forEach(iconEl => {
+    const key = iconEl.closest('.btn-preset')?.dataset.key;
     iconEl.style.cssText = '';
-    iconEl.innerHTML = _thumbSvgCache[key] || '';
+    iconEl.innerHTML = (key && _thumbSvgCache[key]) ? _thumbSvgCache[key] : '';
     iconEl.classList.remove('has-thumb');
   });
 }
@@ -4167,6 +4214,15 @@ function toggleMobileSheet(pillarId, btn) {
   pillar.classList.add('mobile-open');
   pillar.classList.remove('collapsed');
 }
+
+// Sincronizar inputs de nombre de archivo (desktop ↔ móvil)
+(function() {
+  const mob = document.getElementById('filename-input-mobile');
+  const desk = document.getElementById('filename-input');
+  if (!mob || !desk) return;
+  mob.addEventListener('input', () => { desk.value = mob.value; });
+  desk.addEventListener('input', () => { mob.value = desk.value; });
+})();
 
 // Exportar desde móvil
 document.getElementById('btn-export-mobile').addEventListener('click', () => {
