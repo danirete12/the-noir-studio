@@ -3653,73 +3653,62 @@ function processPixels(data, p) {
 }
 
 const _thumbSvgCache = {};
-let _thumbSourceData = null; // ImageData pre-renderizada del source
 
 function renderPresetThumbnails() {
   if (!originalImage) return;
-  const THUMB = 80;
-  const iw = originalImage.naturalWidth || originalImage.width;
-  const ih = originalImage.naturalHeight || originalImage.height;
-  if (!iw || !ih) return;
+  // Defer un frame para que el canvas principal pinte primero,
+  // luego procesar todos los presets de golpe (síncrono).
+  requestAnimationFrame(() => {
+    if (!originalImage) return;
+    const THUMB = 64;
+    const iw = originalImage.naturalWidth || originalImage.width;
+    const ih = originalImage.naturalHeight || originalImage.height;
+    if (!iw || !ih) return;
 
-  // Dibujar la imagen source una sola vez, centrada y cuadrada
-  const side = Math.min(iw, ih);
-  const sx = (iw - side) / 2;
-  const sy = (ih - side) / 2;
-  const srcC = document.createElement('canvas');
-  srcC.width = THUMB; srcC.height = THUMB;
-  const srcCtx = srcC.getContext('2d');
-  srcCtx.drawImage(originalImage, sx, sy, side, side, 0, 0, THUMB, THUMB);
-  _thumbSourceData = srcCtx.getImageData(0, 0, THUMB, THUMB);
+    const side = Math.min(iw, ih);
+    const sx = (iw - side) / 2;
+    const sy = (ih - side) / 2;
+    const srcC = document.createElement('canvas');
+    srcC.width = THUMB; srcC.height = THUMB;
+    const srcCtx = srcC.getContext('2d');
+    if (!srcCtx) return;
+    srcCtx.drawImage(originalImage, sx, sy, side, side, 0, 0, THUMB, THUMB);
+    const srcData = srcCtx.getImageData(0, 0, THUMB, THUMB);
 
-  const keys = Object.keys(PRESETS);
-  let idx = 0;
+    Object.keys(PRESETS).forEach(key => {
+      try {
+        const preset = PRESETS[key];
+        if (!preset) return;
+        const iconEl = document.querySelector(`.btn-preset[data-key="${CSS.escape(key)}"] .preset-icon`);
+        if (!iconEl) return;
 
-  function next() {
-    if (!originalImage || idx >= keys.length) return;
-    const key = keys[idx++];
-    const preset = PRESETS[key];
-    if (!preset) { requestAnimationFrame(next); return; }
+        const cloned = new Uint8ClampedArray(srcData.data);
+        const id = new ImageData(cloned, THUMB, THUMB);
+        processPixels(id.data, { ...preset, grain: 0, borderSize: 0 });
 
-    // Clonar los píxeles del source para no acumular efectos entre presets
-    const cloned = new Uint8ClampedArray(_thumbSourceData.data);
-    const id = new ImageData(cloned, THUMB, THUMB);
-    const p = { ...preset, grain: 0, borderSize: 0 };
+        const tc = document.createElement('canvas');
+        tc.width = THUMB; tc.height = THUMB;
+        const tctx = tc.getContext('2d');
+        if (!tctx) return;
+        tctx.putImageData(id, 0, 0);
+        if ((preset.vignette || 0) > 0) applyVignette(tctx, THUMB, THUMB, preset.vignette);
 
-    try { processPixels(id.data, p); } catch(e) { requestAnimationFrame(next); return; }
-
-    const tc = document.createElement('canvas');
-    tc.width = THUMB; tc.height = THUMB;
-    const tctx = tc.getContext('2d');
-    tctx.putImageData(id, 0, 0);
-    if ((preset.vignette || 0) > 0) applyVignette(tctx, THUMB, THUMB, preset.vignette);
-
-    let dataUrl;
-    try { dataUrl = tc.toDataURL('image/jpeg', 0.82); } catch(e) { requestAnimationFrame(next); return; }
-
-    document.querySelectorAll(`.btn-preset[data-key="${CSS.escape(key)}"]`).forEach(btn => {
-      const iconEl = btn.querySelector('.preset-icon');
-      if (!iconEl) return;
-      if (!_thumbSvgCache[key]) _thumbSvgCache[key] = iconEl.innerHTML;
-      const thumbImg = document.createElement('img');
-      thumbImg.src = dataUrl;
-      thumbImg.alt = '';
-      iconEl.innerHTML = '';
-      iconEl.appendChild(thumbImg);
-      iconEl.classList.add('has-thumb');
+        const dataUrl = tc.toDataURL('image/jpeg', 0.75);
+        if (!_thumbSvgCache[key]) _thumbSvgCache[key] = iconEl.innerHTML;
+        iconEl.style.cssText = 'width:' + THUMB + 'px;height:' + THUMB + 'px;overflow:hidden;';
+        iconEl.innerHTML = '<img src="' + dataUrl + '" alt="" style="width:100%;height:100%;display:block;object-fit:cover;">';
+        iconEl.classList.add('has-thumb');
+      } catch(e) { /* skip preset on error */ }
     });
-
-    requestAnimationFrame(next);
-  }
-  requestAnimationFrame(next);
+  });
 }
 
 function clearPresetThumbnails() {
-  _thumbSourceData = null;
   document.querySelectorAll('.btn-preset').forEach(btn => {
     const key = btn.dataset.key;
     const iconEl = btn.querySelector('.preset-icon');
     if (!iconEl || !iconEl.classList.contains('has-thumb')) return;
+    iconEl.style.cssText = '';
     iconEl.innerHTML = _thumbSvgCache[key] || '';
     iconEl.classList.remove('has-thumb');
   });
