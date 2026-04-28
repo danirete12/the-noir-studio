@@ -141,7 +141,7 @@ main {
   position: relative; background: #000; overflow: hidden;
   max-height: 360px;
 }
-canvas#crop-canvas { display: block; width: 100%; cursor: move; }
+canvas#crop-canvas { display: block; max-width: 100%; cursor: move; }
 .controls {
   width: 100%; max-width: 520px;
   display: flex; flex-direction: column; gap: 16px;
@@ -473,8 +473,8 @@ cropCanvas.addEventListener('mousedown', e => {
 cropCanvas.addEventListener('mousemove', e => {
   if (!dragging || !originalImage) return;
   const r = cropCanvas.getBoundingClientRect();
-  const scaleX = originalImage.naturalWidth / cropCanvas.width;
-  const scaleY = originalImage.naturalHeight / cropCanvas.height;
+  const scaleX = originalImage.naturalWidth / r.width;
+  const scaleY = originalImage.naturalHeight / r.height;
   const dx = (e.clientX - r.left - dragStartX) * scaleX;
   const dy = (e.clientY - r.top - dragStartY) * scaleY;
   cropX = Math.max(0, Math.min(originalImage.naturalWidth - cropW, Math.round(cropStartX + dx)));
@@ -499,8 +499,8 @@ cropCanvas.addEventListener('touchmove', e => {
   e.preventDefault();
   const t = e.touches[0];
   const r = cropCanvas.getBoundingClientRect();
-  const scaleX = originalImage.naturalWidth / cropCanvas.width;
-  const scaleY = originalImage.naturalHeight / cropCanvas.height;
+  const scaleX = originalImage.naturalWidth / r.width;
+  const scaleY = originalImage.naturalHeight / r.height;
   const dx = (t.clientX - r.left - dragStartX) * scaleX;
   const dy = (t.clientY - r.top - dragStartY) * scaleY;
   cropX = Math.max(0, Math.min(originalImage.naturalWidth - cropW, Math.round(cropStartX + dx)));
